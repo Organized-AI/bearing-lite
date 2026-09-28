@@ -10,10 +10,12 @@ without automatic rereview. `hooks/assurance-budget.cjs` is the exact
 runtime mirror of the block below; the block is authoritative.
 
 The `deterministic_verification` gate passes only when every required
-System One claim (`jev` or `laya`) has an independent assurance receipt that
-`hooks/verification.cjs` marks `gate_eligible`; see
+System One claim (`jev`, `laya`, or `validator`) has an independent assurance
+receipt that `hooks/verification.cjs` marks `gate_eligible`; see
 `references/system1-rubrics.md`. A `DECLARED` slot names the backend identity
-as `tool` (`jev`, `laya`, or `jev+laya` when claims use both) and
+as `tool`: one backend, or the `+`-joined set the required claims use, in the
+order `jev`, `laya`, `validator` (for example `laya+validator`); a required
+claim whose backend the tool does not name fails the slot. It also names
 `threshold: "all_required_claims_gate_eligible"`; with no eligible claim the
 slot is `NOT_APPLICABLE` with a reason. A declaration that still names the
 retired `reverify` gate fails closed at this slot
@@ -23,7 +25,7 @@ retired `reverify` gate fails closed at this slot
 {
   "gate_order": ["build", "types_lint", "red_then_green", "mutation", "changed_line_coverage", "deterministic_verification", "reviewer"],
   "deterministic_verification_gate": {
-    "tools": ["jev", "laya", "jev+laya"],
+    "tools": ["jev", "laya", "validator", "jev+laya", "jev+validator", "laya+validator", "jev+laya+validator"],
     "threshold": "all_required_claims_gate_eligible",
     "retired_gate_names": ["reverify"]
   },

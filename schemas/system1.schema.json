@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/alphazede/bearing-lite/schemas/system1.schema.json",
-  "title": "Bearing Lite System One deterministic-execution backends (jev, laya)",
-  "description": "One schema family (\"system1\") for two distinct verification backend identities, `jev` and `laya`. A System One decision model scores fixed, typed options for a fixed input; it never generates text. Bearing uses it only for deterministic execution: a frozen, versioned rubric pins exactly one backend, one immutable model revision, one typed question, fixed thresholds, a replay protocol, and a gateway cache policy, so a verdict is mechanically derived and reproducible. Three document shapes: (a) `rubric` - the frozen rubric definition, discriminated on `backend`; (b) `command_configuration` - the object hooks/verification-bridge.cjs planVerification stores in a request and receipt for this backend; (c) `backend_output` - the run output handed to sealVerification, whose SHA-256 over canonical JSON becomes the receipt `evidence_digest`. Schema validates structure only; hooks/verification.cjs still enforces diagnostic-versus-assurance authority, independence, and gate eligibility. No valid document carries a credential, key, or account id: secrets are referenced only by environment-variable name.",
+  "title": "Bearing Lite System One deterministic-execution backends (jev, laya, validator)",
+  "description": "One schema family (\"system1\") for three distinct verification backend identities: the decision models `jev` and `laya`, and `validator`, a pinned deterministic program (no model, no probability) for rules expressible as code. A System One decision model scores fixed, typed options for a fixed input; it never generates text. Bearing uses it only for deterministic execution: a frozen, versioned rubric pins exactly one backend, one immutable model revision, one typed question, fixed thresholds, a replay protocol, and a gateway cache policy, so a verdict is mechanically derived and reproducible. Three document shapes: (a) `rubric` - the frozen rubric definition, discriminated on `backend`; (b) `command_configuration` - the object hooks/verification-bridge.cjs planVerification stores in a request and receipt for this backend; (c) `backend_output` - the run output handed to sealVerification, whose SHA-256 over canonical JSON becomes the receipt `evidence_digest`. Schema validates structure only; hooks/verification.cjs still enforces diagnostic-versus-assurance authority, independence, and gate eligibility. No valid document carries a credential, key, or account id: secrets are referenced only by environment-variable name.",
   "oneOf": [
     { "$ref": "#/$defs/rubric" },
     { "$ref": "#/$defs/command_configuration" },
@@ -38,8 +38,8 @@
     },
     "backend": {
       "type": "string",
-      "enum": ["jev", "laya"],
-      "description": "Distinct backend identity. `jev` and `laya` share the system1 schema family but are never interchangeable: switching backend is a different binding and a different receipt, and requires a plan amendment. A generic name such as `system1` must not stand in for either."
+      "enum": ["jev", "laya", "validator"],
+      "description": "Distinct backend identity. `jev`, `laya` and `validator` share the system1 schema family but are never interchangeable: switching backend is a different binding and a different receipt, and requires a plan amendment. A generic name such as `system1` must not stand in for any of them. `validator` is a program, not the retired Validator role."
     },
     "status": {
       "type": "string",
@@ -611,6 +611,187 @@
         }
       }
     },
+    "pinned_file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$))[A-Za-z0-9._/-]+$",
+          "description": "Repository-relative path of a file the validator loads. Never absolute, never `..`."
+        },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "validator_pin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["validator_id", "validator_version", "implementation", "support_files", "runtime"],
+      "description": "The deterministic program that decides the rule. The runner refuses to run (ERROR `validator_digest_mismatch`) unless every pinned file hashes to its SHA-256 and the module reports this validator_id and version.",
+      "properties": {
+        "validator_id": { "$ref": "#/$defs/identifier" },
+        "validator_version": { "$ref": "#/$defs/semver" },
+        "implementation": {
+          "$ref": "#/$defs/pinned_file",
+          "description": "The validator module (entry point). SHA-256 over its source bytes."
+        },
+        "support_files": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/pinned_file" },
+          "description": "Every other file the module loads (shared helpers, parsers), each by SHA-256."
+        },
+        "runtime": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["executable", "module_system", "runtime_dependencies", "node_major_min"],
+          "properties": {
+            "executable": { "const": "node" },
+            "module_system": { "const": "commonjs" },
+            "runtime_dependencies": {
+              "const": "none",
+              "description": "Node built-ins only; no package is installed or loaded."
+            },
+            "node_major_min": { "type": "integer", "minimum": 18 }
+          }
+        }
+      }
+    },
+    "validator_rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text", "conditions", "verdict_map"],
+      "description": "The rule the program decides, in words, and its condition list in evaluation order (equal to the module's CONDITIONS).",
+      "properties": {
+        "text": { "$ref": "#/$defs/nonempty" },
+        "conditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "text"],
+            "properties": {
+              "id": { "$ref": "#/$defs/identifier" },
+              "text": { "$ref": "#/$defs/nonempty" }
+            }
+          }
+        },
+        "verdict_map": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["all_conditions_hold", "any_condition_fails", "input_not_decidable"],
+          "description": "Fixed: every condition holds is VERIFIED; any condition fails is REFUTED; input that cannot be read, parsed, or canonicalized is ERROR with a typed reason. A validator has no INCONCLUSIVE outcome of its own (only the runner's control and replay checks produce one).",
+          "properties": {
+            "all_conditions_hold": { "const": "VERIFIED" },
+            "any_condition_fails": { "const": "REFUTED" },
+            "input_not_decidable": { "const": "ERROR" }
+          }
+        }
+      }
+    },
+    "validator_input_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state_shape", "source", "format_by_extension", "canonicalization", "input_digest_basis", "max_input_bytes", "over_limit"],
+      "description": "What the program reads. The claim's input_digest is SHA-256 over the raw target file bytes; the evidence also records the digest of the canonical form the rule was decided on.",
+      "properties": {
+        "state_shape": { "const": "json_document" },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "locator"],
+          "properties": {
+            "kind": { "type": "string", "enum": ["repo_file", "build_artifact", "captured_fixture"] },
+            "locator": { "$ref": "#/$defs/nonempty" },
+            "extractor": { "$ref": "#/$defs/nonempty" }
+          }
+        },
+        "format_by_extension": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "pattern": "^\\.[a-z0-9]+$" },
+          "additionalProperties": { "type": "string", "enum": ["json", "jsonc", "toml"] },
+          "description": "Input format chosen from the target's file extension, never sniffed. An unlisted extension is ERROR `input_unresolvable`."
+        },
+        "canonicalization": {
+          "type": "string",
+          "enum": ["rfc8785_jcs", "jsonc_or_toml_to_rfc8785_jcs"],
+          "description": "Canonical form the rule is decided on and digested as `canonical_input_digest`."
+        },
+        "input_digest_basis": { "const": "raw_file_bytes" },
+        "max_input_bytes": { "type": "integer", "minimum": 1, "maximum": 16777216 },
+        "over_limit": { "const": "ERROR" }
+      }
+    },
+    "validator_replay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["min_runs", "fresh_process", "require_identical_output_digest", "output_digest_basis"],
+      "description": "Determinism check with no epsilon: every run decides the input in a freshly started process, and the SHA-256 of every run's canonical decision record must be byte-identical, else INCONCLUSIVE `replay_output_divergence`.",
+      "properties": {
+        "min_runs": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "fresh_process": { "const": "every_run" },
+        "require_identical_output_digest": { "const": true },
+        "output_digest_basis": { "const": "sha256_rfc8785_decision_record" }
+      }
+    },
+    "validator_rubric": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Frozen rubric for the `validator` backend: a deterministic program, not a model. It carries no model, question, thresholds, calibration, temperature, ECE, epsilon, or gateway: same input bytes, same verdict. Replay requires byte-identical output digests.",
+      "required": ["kind", "schema_family", "schema_version", "rubric_id", "rubric_version", "title", "claim", "assurance_eligible", "backend", "validator", "rule", "input", "controls", "replay", "operations"],
+      "properties": {
+        "kind": { "const": "rubric" },
+        "schema_family": { "const": "system1" },
+        "schema_version": { "type": "string", "const": "1" },
+        "rubric_id": { "type": "string", "pattern": "^RUB-S1-[A-Z0-9][A-Z0-9-]*$" },
+        "rubric_version": { "$ref": "#/$defs/semver" },
+        "title": { "$ref": "#/$defs/nonempty" },
+        "claim": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["claim_type", "statement", "eligibility"],
+          "properties": {
+            "claim_type": { "$ref": "#/$defs/identifier" },
+            "statement": { "$ref": "#/$defs/nonempty" },
+            "eligibility": {
+              "const": "deterministic_rule_conformance",
+              "description": "The rule is expressible as code and is decided exactly by the pinned program."
+            },
+            "spec_refs": { "type": "array", "items": { "$ref": "#/$defs/nonempty" } }
+          }
+        },
+        "assurance_eligible": {
+          "type": "boolean",
+          "description": "True only when the program agrees with an independent labeler on 100% of the rule's labeled dataset and every control lands on its expected verdict."
+        },
+        "backend": { "const": "validator" },
+        "validator": { "$ref": "#/$defs/validator_pin" },
+        "rule": { "$ref": "#/$defs/validator_rule" },
+        "input": { "$ref": "#/$defs/validator_input_policy" },
+        "controls": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/control" },
+          "allOf": [
+            { "contains": { "properties": { "expected": { "const": "VERIFIED" } } } },
+            { "contains": { "properties": { "expected": { "const": "REFUTED" } } } }
+          ]
+        },
+        "replay": { "$ref": "#/$defs/validator_replay" },
+        "operations": {
+          "allOf": [{ "$ref": "#/$defs/backend_operations" }],
+          "properties": {
+            "allowed": { "items": { "const": "check" } }
+          }
+        },
+        "notes": { "type": "array", "items": { "$ref": "#/$defs/nonempty" } }
+      },
+      "if": { "properties": { "assurance_eligible": { "const": true } } },
+      "then": { "properties": { "replay": { "properties": { "min_runs": { "minimum": 2 } } } } }
+    },
     "rubric": {
       "description": "(a) Frozen rubric. Pins exactly one backend; discriminated on `backend`. The rubric's own digest (SHA-256 over canonical JSON of the whole rubric document) is its identity inside claims and evidence; any edit is a new rubric_version and a plan amendment.",
       "type": "object",
@@ -620,7 +801,8 @@
       },
       "oneOf": [
         { "$ref": "#/$defs/laya_rubric" },
-        { "$ref": "#/$defs/jev_rubric" }
+        { "$ref": "#/$defs/jev_rubric" },
+        { "$ref": "#/$defs/validator_rubric" }
       ]
     },
 
@@ -654,7 +836,7 @@
           "type": "string",
           "contentMediaType": "application/json",
           "contentSchema": { "$ref": "#/$defs/claim_binding" },
-          "pattern": "^\\{\"backend\":\"(jev|laya)\",\"input_digest\":\"[0-9a-f]{64}\",\"kind\":\"system1_decision\",\"rubric_digest\":\"[0-9a-f]{64}\",\"rubric_id\":\"RUB-S1-[A-Z0-9][A-Z0-9-]*\",\"rubric_version\":\"[0-9]+\\.[0-9]+\\.[0-9]+\"\\}$"
+          "pattern": "^\\{\"backend\":\"(jev|laya|validator)\",\"input_digest\":\"[0-9a-f]{64}\",\"kind\":\"system1_decision\",\"rubric_digest\":\"[0-9a-f]{64}\",\"rubric_id\":\"RUB-S1-[A-Z0-9][A-Z0-9-]*\",\"rubric_version\":\"[0-9]+\\.[0-9]+\\.[0-9]+\"\\}$"
         },
         "args": {
           "type": "array",
@@ -697,6 +879,10 @@
         {
           "if": { "properties": { "backend": { "const": "jev" } } },
           "then": { "properties": { "claim": { "pattern": "^\\{\"backend\":\"jev\"," } } }
+        },
+        {
+          "if": { "properties": { "backend": { "const": "validator" } } },
+          "then": { "properties": { "claim": { "pattern": "^\\{\"backend\":\"validator\"," } } }
         }
       ]
     },
@@ -924,27 +1110,238 @@
         }
       ]
     },
+    "validator_inconclusive_reason": {
+      "type": "string",
+      "enum": ["control_failed", "replay_output_divergence"]
+    },
+    "validator_error_reason": {
+      "type": "string",
+      "enum": [
+        "claim_malformed",
+        "rubric_unavailable",
+        "rubric_digest_mismatch",
+        "operation_not_allowed",
+        "validator_digest_mismatch",
+        "validator_runtime_mismatch",
+        "validator_runtime_error",
+        "input_unresolvable",
+        "input_over_size_limit",
+        "input_digest_mismatch",
+        "input_unparseable",
+        "input_shape_invalid",
+        "toml_unsupported_construct"
+      ]
+    },
+    "nullable_sha256": {
+      "oneOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }]
+    },
+    "validator_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strength", "engine", "engine_version"],
+      "description": "Evidence of one validator run: the pins actually hashed, the input digests, every control's observed verdict, every fresh-process run's decision-record digest, and the decision with its condition list. No probability exists.",
+      "properties": {
+        "strength": { "const": "observed" },
+        "engine": { "const": "validator" },
+        "engine_version": { "$ref": "#/$defs/nonempty" },
+        "rubric": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["rubric_id", "rubric_version", "rubric_digest"],
+          "properties": {
+            "rubric_id": { "type": "string", "pattern": "^RUB-S1-[A-Z0-9][A-Z0-9-]*$" },
+            "rubric_version": { "$ref": "#/$defs/semver" },
+            "rubric_digest": { "$ref": "#/$defs/sha256" }
+          }
+        },
+        "validator": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["validator_id", "validator_version", "pinned_files", "runner_sha256", "node_major"],
+          "properties": {
+            "validator_id": { "$ref": "#/$defs/identifier" },
+            "validator_version": { "$ref": "#/$defs/semver" },
+            "pinned_files": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["path", "sha256"],
+                "properties": {
+                  "path": { "$ref": "#/$defs/nonempty" },
+                  "sha256": { "$ref": "#/$defs/nullable_sha256" }
+                }
+              }
+            },
+            "runner_sha256": { "$ref": "#/$defs/sha256" },
+            "node_major": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["target", "format", "canonicalization", "input_digest_basis", "claim_input_digest", "max_input_bytes"],
+          "properties": {
+            "target": { "$ref": "#/$defs/nonempty" },
+            "format": { "type": "string", "enum": ["json", "jsonc", "toml", "unresolved"] },
+            "canonicalization": { "$ref": "#/$defs/nonempty" },
+            "input_digest_basis": { "const": "raw_file_bytes" },
+            "claim_input_digest": { "$ref": "#/$defs/sha256" },
+            "max_input_bytes": { "type": "integer", "minimum": 1 },
+            "input_bytes": { "type": "integer", "minimum": 0 },
+            "input_digest": { "$ref": "#/$defs/sha256" },
+            "canonical_input_digest": { "$ref": "#/$defs/nullable_sha256" }
+          }
+        },
+        "controls": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["control_id", "expected", "observed", "output_digest"],
+            "properties": {
+              "control_id": { "$ref": "#/$defs/identifier" },
+              "expected": { "type": "string", "enum": ["VERIFIED", "REFUTED"] },
+              "observed": { "$ref": "#/$defs/status" },
+              "output_digest": { "$ref": "#/$defs/nullable_sha256" }
+            }
+          }
+        },
+        "runs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["run_index", "fresh_process", "verdict", "output_digest"],
+            "properties": {
+              "run_index": { "type": "integer", "minimum": 1 },
+              "fresh_process": { "const": true },
+              "verdict": { "$ref": "#/$defs/status" },
+              "output_digest": { "$ref": "#/$defs/sha256" }
+            }
+          }
+        },
+        "replay": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["runs", "min_runs", "identical_output_digest", "output_digest"],
+          "properties": {
+            "runs": { "type": "integer", "minimum": 0 },
+            "min_runs": { "type": "integer", "minimum": 1 },
+            "identical_output_digest": { "type": "boolean" },
+            "output_digest": { "$ref": "#/$defs/nullable_sha256" }
+          }
+        },
+        "decision": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["verdict", "conditions", "failed_conditions"],
+          "properties": {
+            "verdict": { "$ref": "#/$defs/status" },
+            "conditions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "holds"],
+                "properties": {
+                  "id": { "$ref": "#/$defs/identifier" },
+                  "holds": { "type": ["boolean", "null"] }
+                }
+              }
+            },
+            "failed_conditions": { "type": "array", "items": { "$ref": "#/$defs/identifier" } }
+          }
+        }
+      }
+    },
+    "validator_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim_id", "kind", "verdict", "detail"],
+      "description": "The single claim result of a validator run. sealVerification reads `verdict` as the status. A claim binding the runner cannot parse is ERROR `claim_malformed` whose detail carries the bridge's `malformed claim` marker, so sealVerification rejects it with no receipt; only that result may omit `evidence`.",
+      "properties": {
+        "claim_id": { "$ref": "#/$defs/nonempty" },
+        "kind": { "const": "system1_decision" },
+        "verdict": { "$ref": "#/$defs/status" },
+        "reason": {
+          "anyOf": [
+            { "$ref": "#/$defs/validator_inconclusive_reason" },
+            { "$ref": "#/$defs/validator_error_reason" }
+          ]
+        },
+        "detail": { "type": "string" },
+        "evidence": { "$ref": "#/$defs/validator_evidence" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "verdict": { "enum": ["VERIFIED", "REFUTED"] } } },
+          "then": {
+            "not": { "required": ["reason"] },
+            "required": ["evidence"],
+            "properties": {
+              "evidence": {
+                "required": ["rubric", "validator", "input", "controls", "runs", "replay", "decision"],
+                "properties": {
+                  "runs": { "minItems": 1 },
+                  "replay": { "properties": { "identical_output_digest": { "const": true } } }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "verdict": { "const": "INCONCLUSIVE" } } },
+          "then": { "required": ["reason", "evidence"], "properties": { "reason": { "$ref": "#/$defs/validator_inconclusive_reason" } } }
+        },
+        {
+          "if": { "properties": { "verdict": { "const": "ERROR" } } },
+          "then": { "required": ["reason"], "properties": { "reason": { "$ref": "#/$defs/validator_error_reason" } } }
+        },
+        {
+          "if": { "required": ["reason"], "properties": { "reason": { "not": { "const": "claim_malformed" } } } },
+          "then": { "required": ["evidence"] }
+        },
+        {
+          "if": { "required": ["reason"], "properties": { "reason": { "const": "claim_malformed" } } },
+          "then": { "properties": { "detail": { "pattern": "\\bmalformed claim\\b" } } }
+        }
+      ]
+    },
     "backend_output": {
       "type": "object",
       "additionalProperties": false,
       "required": ["schema_family", "schema_version", "backend", "backend_version", "results"],
-      "description": "(c) What the caller's runner returns and hands to sealVerification. `backend_version` is read from the run and names backend, runtime, and model revision (for example `laya 0.3.20 convaiinnovations/laya@<sha> laya-typed-decisions` or `jev 1.13.0`). `results` holds exactly one claim result. The whole object is digested (SHA-256, canonical JSON) into the receipt `evidence_digest`, so every gateway id and replay value is bound.",
+      "description": "(c) What the caller's runner returns and hands to sealVerification. `backend_version` is read from the run and names backend, runtime, and model revision (for example `laya 0.3.20 convaiinnovations/laya@<sha> laya-typed-decisions`, `jev 1.13.0`, or `validator gtm-purchase-event@1.0.0 node22`). `results` holds exactly one claim result. The whole object is digested (SHA-256, canonical JSON) into the receipt `evidence_digest`, so every gateway id and replay value is bound.",
       "properties": {
         "schema_family": { "const": "system1" },
         "schema_version": { "type": "string", "const": "1" },
         "backend": { "$ref": "#/$defs/backend" },
         "backend_version": {
           "type": "string",
-          "pattern": "^(jev|laya) \\S+.*$"
+          "pattern": "^(jev|laya|validator) \\S+.*$"
         },
         "results": {
           "type": "array",
           "minItems": 1,
           "maxItems": 1,
-          "items": { "$ref": "#/$defs/system1_result" }
+          "description": "Items are `system1_result` for `jev` and `laya`, `validator_result` for `validator`."
         }
       },
       "allOf": [
+        {
+          "if": { "properties": { "backend": { "enum": ["jev", "laya"] } } },
+          "then": { "properties": { "results": { "items": { "$ref": "#/$defs/system1_result" } } } }
+        },
+        {
+          "if": { "properties": { "backend": { "const": "validator" } } },
+          "then": {
+            "properties": {
+              "backend_version": { "pattern": "^validator " },
+              "results": { "items": { "$ref": "#/$defs/validator_result" } }
+            }
+          }
+        },
         {
           "if": { "properties": { "backend": { "const": "laya" } } },
           "then": {

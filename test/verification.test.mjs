@@ -347,7 +347,7 @@ describe("SEIT-BDL-004 deterministic verification adapter", () => {
   });
 
   it("never downloads a backend even when asked", () => {
-    for (const name of ["reverify", "jev", "laya"]) {
+    for (const name of ["reverify", "jev", "laya", "validator"]) {
       let called = 0;
       const got = adapter.evaluateVerification({
         download: true,

@@ -1,0 +1,663 @@
+{
+ "gtm": [
+  {
+   "name": "valid_minimal",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"EUR\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "holds",
+   "reasons": []
+  },
+  {
+   "name": "valid_value_zero",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 0, \"currency\": \"EUR\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "holds",
+   "reasons": []
+  },
+  {
+   "name": "valid_value_false",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": false, \"currency\": \"EUR\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "holds",
+   "reasons": []
+  },
+  {
+   "name": "valid_transaction_id_zero",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": 0, \"value\": 10, \"currency\": \"EUR\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "holds",
+   "reasons": []
+  },
+  {
+   "name": "valid_item_name_only",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"EUR\", \"items\": [{\"item_name\": \"Hoodie\"}]}}",
+   "label": "holds",
+   "reasons": []
+  },
+  {
+   "name": "valid_second_item_identified",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"EUR\", \"items\": [{\"quantity\": 1}, {\"item_id\": \"SKU_2\"}]}}",
+   "label": "holds",
+   "reasons": []
+  },
+  {
+   "name": "valid_ved",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"VED\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "holds",
+   "reasons": []
+  },
+  {
+   "name": "valid_zwg",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"ZWG\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "holds",
+   "reasons": []
+  },
+  {
+   "name": "valid_xcg",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"XCG\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "holds",
+   "reasons": []
+  },
+  {
+   "name": "valid_extra_top_level_keys",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"EUR\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}, \"gtm.uniqueEventId\": 7, \"user_id\": null}",
+   "label": "holds",
+   "reasons": []
+  },
+  {
+   "name": "event_trailing_space",
+   "text": "{\"event\": \"purchase \", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"EUR\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "fails",
+   "reasons": [
+    "event_not_purchase"
+   ]
+  },
+  {
+   "name": "event_uppercase",
+   "text": "{\"event\": \"PURCHASE\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"EUR\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "fails",
+   "reasons": [
+    "event_not_purchase"
+   ]
+  },
+  {
+   "name": "event_missing",
+   "text": "{\"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"EUR\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "fails",
+   "reasons": [
+    "event_not_purchase"
+   ]
+  },
+  {
+   "name": "event_null",
+   "text": "{\"event\": null, \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"EUR\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "fails",
+   "reasons": [
+    "event_not_purchase"
+   ]
+  },
+  {
+   "name": "ecommerce_null",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": null}",
+   "label": "fails",
+   "reasons": [
+    "ecommerce_missing"
+   ]
+  },
+  {
+   "name": "ecommerce_array",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": [{\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"EUR\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}]}",
+   "label": "fails",
+   "reasons": [
+    "ecommerce_missing"
+   ]
+  },
+  {
+   "name": "transaction_id_null",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": null, \"value\": 10, \"currency\": \"EUR\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "fails",
+   "reasons": [
+    "missing_transaction_id"
+   ]
+  },
+  {
+   "name": "transaction_id_empty",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"\", \"value\": 10, \"currency\": \"EUR\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "fails",
+   "reasons": [
+    "missing_transaction_id"
+   ]
+  },
+  {
+   "name": "value_empty_string",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": \"\", \"currency\": \"EUR\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "fails",
+   "reasons": [
+    "missing_value"
+   ]
+  },
+  {
+   "name": "value_missing",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"currency\": \"EUR\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "fails",
+   "reasons": [
+    "missing_value"
+   ]
+  },
+  {
+   "name": "currency_null",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": null, \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "fails",
+   "reasons": [
+    "missing_currency"
+   ]
+  },
+  {
+   "name": "currency_empty",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "fails",
+   "reasons": [
+    "missing_currency"
+   ]
+  },
+  {
+   "name": "currency_number",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": 978, \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "fails",
+   "reasons": [
+    "currency_not_iso4217"
+   ]
+  },
+  {
+   "name": "currency_lowercase",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"eur\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "fails",
+   "reasons": [
+    "currency_not_iso4217"
+   ]
+  },
+  {
+   "name": "currency_padded",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \" EUR\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "fails",
+   "reasons": [
+    "currency_not_iso4217"
+   ]
+  },
+  {
+   "name": "currency_not_a_code",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"EURO\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "fails",
+   "reasons": [
+    "currency_not_iso4217"
+   ]
+  },
+  {
+   "name": "currency_list",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": [\"EUR\"], \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}",
+   "label": "fails",
+   "reasons": [
+    "currency_not_iso4217"
+   ]
+  },
+  {
+   "name": "items_missing",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"EUR\"}}",
+   "label": "fails",
+   "reasons": [
+    "items_not_array"
+   ]
+  },
+  {
+   "name": "items_null",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"EUR\", \"items\": null}}",
+   "label": "fails",
+   "reasons": [
+    "items_not_array"
+   ]
+  },
+  {
+   "name": "items_object",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"EUR\", \"items\": {\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}}}",
+   "label": "fails",
+   "reasons": [
+    "items_not_array"
+   ]
+  },
+  {
+   "name": "items_empty",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"EUR\", \"items\": []}}",
+   "label": "fails",
+   "reasons": [
+    "items_empty"
+   ]
+  },
+  {
+   "name": "items_only_nulls",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"EUR\", \"items\": [null, \"SKU_1\"]}}",
+   "label": "fails",
+   "reasons": [
+    "no_item_with_id_or_name"
+   ]
+  },
+  {
+   "name": "items_nested_array",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"EUR\", \"items\": [[{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]]}}",
+   "label": "fails",
+   "reasons": [
+    "no_item_with_id_or_name"
+   ]
+  },
+  {
+   "name": "items_empty_ids",
+   "text": "{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"EUR\", \"items\": [{\"item_id\": \"\", \"item_name\": null}]}}",
+   "label": "fails",
+   "reasons": [
+    "no_item_with_id_or_name"
+   ]
+  },
+  {
+   "name": "everything_wrong",
+   "text": "{\"event\": \"add_to_cart\", \"ecommerce\": {\"currency\": \"usd\", \"items\": []}}",
+   "label": "fails",
+   "reasons": [
+    "event_not_purchase",
+    "missing_transaction_id",
+    "missing_value",
+    "currency_not_iso4217",
+    "items_empty"
+   ]
+  },
+  {
+   "name": "push_is_array",
+   "text": "[{\"event\": \"purchase\", \"ecommerce\": {\"transaction_id\": \"T-1\", \"value\": 10, \"currency\": \"EUR\", \"items\": [{\"item_id\": \"SKU_1\", \"item_name\": \"Hoodie\"}]}}]",
+   "label": "fails",
+   "reasons": [
+    "not_an_object"
+   ]
+  },
+  {
+   "name": "push_is_string",
+   "text": "\"purchase\"",
+   "label": "fails",
+   "reasons": [
+    "not_an_object"
+   ]
+  },
+  {
+   "name": "push_is_null",
+   "text": "null",
+   "label": "fails",
+   "reasons": [
+    "not_an_object"
+   ]
+  }
+ ],
+ "wrangler": [
+  {
+   "name": "all_bound_with_comments",
+   "format": "jsonc",
+   "source": "{\n  // required bindings\n  \"name\": \"w\",\n  \"d1_databases\": [{ \"binding\": \"DB\", \"database_name\": \"d\", \"database_id\": \"abc\" },],\n  /* kv */ \"kv_namespaces\": [{ \"binding\": \"CACHE\", \"id\": \"k\" }],\n  \"r2_buckets\": [{ \"binding\": \"ASSETS\", \"bucket_name\": \"b\" }],\n}\n",
+   "label": "holds",
+   "reasons": [],
+   "state_digest": "edbdbffea0ee98f0079ea72dcf019e76f5cfb1d406530f9ace9cb009b3ff6298"
+  },
+  {
+   "name": "db_id_number",
+   "format": "jsonc",
+   "source": "{\"d1_databases\":[{\"binding\":\"DB\",\"database_id\":123}],\"kv_namespaces\":[{\"binding\":\"CACHE\",\"id\":\"k\"}],\"r2_buckets\":[{\"binding\":\"ASSETS\",\"bucket_name\":\"b\"}]}",
+   "label": "fails",
+   "reasons": [
+    "empty_or_missing_database_id_for_DB"
+   ],
+   "state_digest": "3221bd55955b7a083ea59553b7a4bb16b396a4daa20ef5680358c2b7d2bd5820"
+  },
+  {
+   "name": "second_db_entry_has_id",
+   "format": "jsonc",
+   "source": "{\"d1_databases\":[{\"binding\":\"DB\",\"database_id\":\"\"},{\"binding\":\"DB\",\"database_id\":\"x\"}],\"kv_namespaces\":[{\"binding\":\"CACHE\",\"id\":\"k\"}],\"r2_buckets\":[{\"binding\":\"ASSETS\",\"bucket_name\":\"b\"}]}",
+   "label": "holds",
+   "reasons": [],
+   "state_digest": "bd3f0b3301fbd5775240fb4702b22ade220ec4f42f93b45a9d6d01dcd78aa372"
+  },
+  {
+   "name": "entries_not_objects",
+   "format": "jsonc",
+   "source": "{\"d1_databases\":[\"DB\"],\"kv_namespaces\":[null,{\"binding\":\"CACHE\",\"id\":\"k\"}],\"r2_buckets\":[{\"binding\":\"ASSETS\",\"bucket_name\":\"b\"}]}",
+   "label": "fails",
+   "reasons": [
+    "no_d1_databases_binding_DB"
+   ],
+   "state_digest": "475353efe2d0b1f42de856202278cf4a7c1a1e4ab66cdd29ee9ea7cedcc11122"
+  },
+  {
+   "name": "arrays_are_objects",
+   "format": "jsonc",
+   "source": "{\"d1_databases\":{\"binding\":\"DB\",\"database_id\":\"x\"},\"kv_namespaces\":[{\"binding\":\"CACHE\",\"id\":\"k\"}],\"r2_buckets\":[{\"binding\":\"ASSETS\",\"bucket_name\":\"b\"}]}",
+   "label": "fails",
+   "reasons": [
+    "missing_d1_databases"
+   ],
+   "state_digest": "9509a6f833a270ae9ebafa8d8ae1d692ecbd89aa423ff9e1ae9f62aa81cfa4d0"
+  },
+  {
+   "name": "binding_case",
+   "format": "jsonc",
+   "source": "{\"d1_databases\":[{\"binding\":\"db\",\"database_id\":\"x\"}],\"kv_namespaces\":[{\"binding\":\"Cache\",\"id\":\"k\"}],\"r2_buckets\":[{\"binding\":\"ASSETS\",\"bucket_name\":\"b\"}]}",
+   "label": "fails",
+   "reasons": [
+    "no_d1_databases_binding_DB",
+    "no_kv_namespaces_binding_CACHE"
+   ],
+   "state_digest": "20e1ef1220deb87e5b4f63bf7bcf1138aaa5a988934e582b6b890b1c10713ff4"
+  },
+  {
+   "name": "only_under_env",
+   "format": "jsonc",
+   "source": "{\"env\":{\"production\":{\"d1_databases\":[{\"binding\":\"DB\",\"database_id\":\"x\"}],\"kv_namespaces\":[{\"binding\":\"CACHE\",\"id\":\"k\"}],\"r2_buckets\":[{\"binding\":\"ASSETS\",\"bucket_name\":\"b\"}]}}}",
+   "label": "fails",
+   "reasons": [
+    "missing_d1_databases",
+    "missing_kv_namespaces",
+    "missing_r2_buckets"
+   ],
+   "state_digest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+  },
+  {
+   "name": "empty_object",
+   "format": "jsonc",
+   "source": "{}",
+   "label": "fails",
+   "reasons": [
+    "missing_d1_databases",
+    "missing_kv_namespaces",
+    "missing_r2_buckets"
+   ],
+   "state_digest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+  },
+  {
+   "name": "inline_tables",
+   "format": "toml",
+   "source": "name = \"w\"\nmain = \"src/index.ts\"\ncompatibility_flags = [\"nodejs_compat\"]  # flags\nd1_databases = [ { binding = \"DB\", database_name = \"d\", database_id = \"abc\" } ]\nkv_namespaces = [\n  { binding = \"CACHE\", id = \"k\" },   # trailing comma follows\n]\nr2_buckets = [{ binding = 'ASSETS', bucket_name = 'b' }]\n",
+   "label": "holds",
+   "reasons": [],
+   "state_digest": "edbdbffea0ee98f0079ea72dcf019e76f5cfb1d406530f9ace9cb009b3ff6298"
+  },
+  {
+   "name": "arrays_of_tables_with_env",
+   "format": "toml",
+   "source": "name = \"w\"\n[vars]\nAPI_HOST = \"example.com\"\n\n[[d1_databases]]\nbinding = \"DB\"\ndatabase_name = \"d\"\ndatabase_id = \"abc\"\n\n[[kv_namespaces]]\nbinding = \"CACHE\"\nid = \"k\"\n\n[[r2_buckets]]\nbinding = \"ASSETS\"\nbucket_name = \"b\"\n\n[env.production]\nname = \"w-prod\"\n\n[[env.production.kv_namespaces]]\nbinding = \"CACHE\"\nid = \"prod\"\n",
+   "label": "holds",
+   "reasons": [],
+   "state_digest": "edbdbffea0ee98f0079ea72dcf019e76f5cfb1d406530f9ace9cb009b3ff6298"
+  },
+  {
+   "name": "only_under_env_toml",
+   "format": "toml",
+   "source": "name = \"w\"\n[[env.staging.d1_databases]]\nbinding = \"DB\"\ndatabase_id = \"abc\"\n[[env.staging.kv_namespaces]]\nbinding = \"CACHE\"\nid = \"k\"\n[[env.staging.r2_buckets]]\nbinding = \"ASSETS\"\nbucket_name = \"b\"\n",
+   "label": "fails",
+   "reasons": [
+    "missing_d1_databases",
+    "missing_kv_namespaces",
+    "missing_r2_buckets"
+   ],
+   "state_digest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+  },
+  {
+   "name": "quoted_keys_and_escapes",
+   "format": "toml",
+   "source": "\"name\" = \"w\\u00e9\"\n[[\"d1_databases\"]]\n\"binding\" = \"DB\"\ndatabase_id = \"a\\tb\"\n[[kv_namespaces]]\nbinding = \"CACHE\"\nid = \"\"\n[[r2_buckets]]\nbinding = \"ASSETS\"\nbucket_name = \"b\"\n",
+   "label": "fails",
+   "reasons": [
+    "empty_or_missing_id_for_CACHE"
+   ],
+   "state_digest": "e0acd2455ccf797dc4fc8028a5c45c17c3e97469443bb67e1c4c4e58cf57c2eb"
+  },
+  {
+   "name": "numbers_and_booleans",
+   "format": "toml",
+   "source": "workers_dev = true\nusage_model = \"standard\"\n[limits]\ncpu_ms = 50_000\n[placement]\nmode = \"smart\"\n[[d1_databases]]\nbinding = \"DB\"\ndatabase_id = \"x\"\nmigrations_dir = \"migrations\"\n[[kv_namespaces]]\nbinding = \"CACHE\"\nid = \"k\"\n[[r2_buckets]]\nbinding = \"ASSETS\"\nbucket_name = \"b\"\n",
+   "label": "holds",
+   "reasons": [],
+   "state_digest": "ec9d6c6ed98b7b11ebb37e008d3ad5ef2fef0d2ce13e3032413f6c8203f42383"
+  }
+ ],
+ "toml": [
+  {
+   "name": "comment_only",
+   "text": "# nothing\n",
+   "tomllib": "{}",
+   "subset": "supported"
+  },
+  {
+   "name": "empty",
+   "text": "",
+   "tomllib": "{}",
+   "subset": "supported"
+  },
+  {
+   "name": "crlf",
+   "text": "a = \"x\"\r\n[t]\r\nb = 1\r\n",
+   "tomllib": "{\"a\":\"x\",\"t\":{\"b\":1}}",
+   "subset": "supported"
+  },
+  {
+   "name": "dotted_keys",
+   "text": "site.bucket = \"./public\"\nsite.include = [\"*.html\"]\n",
+   "tomllib": "{\"site\":{\"bucket\":\"./public\",\"include\":[\"*.html\"]}}",
+   "subset": "supported"
+  },
+  {
+   "name": "dotted_header",
+   "text": "[env.staging.vars]\nX = \"1\"\n",
+   "tomllib": "{\"env\":{\"staging\":{\"vars\":{\"X\":\"1\"}}}}",
+   "subset": "supported"
+  },
+  {
+   "name": "nested_inline",
+   "text": "a = { b = { c = [1, 2.5, -3, +4, 1e3, 6.02E-2] } }\n",
+   "tomllib": "{\"a\":{\"b\":{\"c\":[1,2.5,-3,4,1000,0.0602]}}}",
+   "subset": "supported"
+  },
+  {
+   "name": "literal_string_backslash",
+   "text": "p = 'C:\\\\path\\\\x'\n",
+   "tomllib": "{\"p\":\"C:\\\\\\\\path\\\\\\\\x\"}",
+   "subset": "supported"
+  },
+  {
+   "name": "unicode_escapes",
+   "text": "u = \"\\u00e9\\U0001F600\"\n",
+   "tomllib": "{\"u\":\"é😀\"}",
+   "subset": "supported"
+  },
+  {
+   "name": "array_multiline_comments",
+   "text": "a = [\n  \"x\", # one\n  \"y\",\n  # gap\n]\n",
+   "tomllib": "{\"a\":[\"x\",\"y\"]}",
+   "subset": "supported"
+  },
+  {
+   "name": "array_of_tables_then_subtable",
+   "text": "[[a]]\nx = 1\n[a.b]\ny = 2\n[[a]]\nx = 3\n",
+   "tomllib": "{\"a\":[{\"b\":{\"y\":2},\"x\":1},{\"x\":3}]}",
+   "subset": "supported"
+  },
+  {
+   "name": "int_underscore",
+   "text": "n = 1_000_000\n",
+   "tomllib": "{\"n\":1000000}",
+   "subset": "supported"
+  },
+  {
+   "name": "negative_zero",
+   "text": "n = -0\n",
+   "tomllib": "{\"n\":0}",
+   "subset": "supported"
+  },
+  {
+   "name": "bool_and_float",
+   "text": "t = true\nf = false\nx = 0.5\n",
+   "tomllib": "{\"f\":false,\"t\":true,\"x\":0.5}",
+   "subset": "supported"
+  },
+  {
+   "name": "bom",
+   "text": "﻿a = \"x\"\n",
+   "tomllib": "invalid",
+   "subset": "supported"
+  },
+  {
+   "name": "empty_inline_table",
+   "text": "t = {}\n",
+   "tomllib": "{\"t\":{}}",
+   "subset": "supported"
+  },
+  {
+   "name": "bare_key_digits",
+   "text": "1234 = \"n\"\n",
+   "tomllib": "{\"1234\":\"n\"}",
+   "subset": "supported"
+  },
+  {
+   "name": "multiline_basic",
+   "text": "a = \"\"\"\nline\n\"\"\"\n",
+   "tomllib": "valid",
+   "subset": "unsupported"
+  },
+  {
+   "name": "multiline_literal",
+   "text": "a = '''\nline\n'''\n",
+   "tomllib": "valid",
+   "subset": "unsupported"
+  },
+  {
+   "name": "offset_datetime",
+   "text": "d = 1979-05-27T07:32:00Z\n",
+   "tomllib": "valid",
+   "subset": "unsupported"
+  },
+  {
+   "name": "local_date",
+   "text": "d = 1979-05-27\n",
+   "tomllib": "valid",
+   "subset": "unsupported"
+  },
+  {
+   "name": "local_time",
+   "text": "t = 07:32:00\n",
+   "tomllib": "valid",
+   "subset": "unsupported"
+  },
+  {
+   "name": "hex_int",
+   "text": "h = 0xDEAD\n",
+   "tomllib": "valid",
+   "subset": "unsupported"
+  },
+  {
+   "name": "oct_int",
+   "text": "o = 0o755\n",
+   "tomllib": "valid",
+   "subset": "unsupported"
+  },
+  {
+   "name": "bin_int",
+   "text": "b = 0b1101\n",
+   "tomllib": "valid",
+   "subset": "unsupported"
+  },
+  {
+   "name": "inf",
+   "text": "x = inf\n",
+   "tomllib": "valid",
+   "subset": "unsupported"
+  },
+  {
+   "name": "neg_nan",
+   "text": "x = -nan\n",
+   "tomllib": "valid",
+   "subset": "unsupported"
+  },
+  {
+   "name": "huge_int",
+   "text": "x = 9007199254740993\n",
+   "tomllib": "valid",
+   "subset": "unsupported"
+  },
+  {
+   "name": "duplicate_key",
+   "text": "a = 1\na = 2\n",
+   "tomllib": "invalid",
+   "subset": "supported"
+  },
+  {
+   "name": "duplicate_table",
+   "text": "[t]\n[t]\n",
+   "tomllib": "invalid",
+   "subset": "supported"
+  },
+  {
+   "name": "table_over_value",
+   "text": "a = 1\n[a]\n",
+   "tomllib": "invalid",
+   "subset": "supported"
+  },
+  {
+   "name": "missing_value",
+   "text": "a =\n",
+   "tomllib": "invalid",
+   "subset": "supported"
+  },
+  {
+   "name": "bad_escape",
+   "text": "a = \"\\q\"\n",
+   "tomllib": "invalid",
+   "subset": "supported"
+  },
+  {
+   "name": "unterminated_string",
+   "text": "a = \"x\n",
+   "tomllib": "invalid",
+   "subset": "supported"
+  },
+  {
+   "name": "leading_zero",
+   "text": "a = 01\n",
+   "tomllib": "invalid",
+   "subset": "supported"
+  },
+  {
+   "name": "inline_table_trailing_comma",
+   "text": "a = { b = 1, }\n",
+   "tomllib": "invalid",
+   "subset": "supported"
+  },
+  {
+   "name": "inline_table_extended",
+   "text": "a = { b = 1 }\n[a.c]\nd = 2\n",
+   "tomllib": "invalid",
+   "subset": "supported"
+  },
+  {
+   "name": "header_reopens_dotted",
+   "text": "[t]\nx.y = 1\n[t.x]\nz = 2\n",
+   "tomllib": "invalid",
+   "subset": "supported"
+  },
+  {
+   "name": "value_then_garbage",
+   "text": "a = \"x\" b\n",
+   "tomllib": "invalid",
+   "subset": "supported"
+  },
+  {
+   "name": "array_of_tables_over_static_array",
+   "text": "a = [1]\n[[a]]\n",
+   "tomllib": "invalid",
+   "subset": "supported"
+  },
+  {
+   "name": "header_trailing_comment",
+   "text": "[t] # c\nx = 1\n",
+   "tomllib": "{\"t\":{\"x\":1}}",
+   "subset": "supported"
+  }
+ ]
+}

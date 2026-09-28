@@ -35,18 +35,22 @@ typed gap (`ERROR` / `backend_unavailable`), not success and not invented
 behavior. Required unavailability emits `proceed: "halt"`; enabled-only
 unavailability emits `proceed: "proceed-with-note"`. Only unselected AND unrequired absence stays inactive and is not a
 global failure. Assurance packets consume frozen `deterministic_verification`
-from the Lifecycle snapshot, never the live catalog. Backend identity is `jev`
-or `laya` and stays that name in every request, receipt, and gate declaration.
-`jev` and `laya` are distinct identities: a generic name such as `system1` must
-not stand in for an absent binding, and one backend never substitutes for the
-other inside an assurance receipt; switching backend is a new rubric, a new
-binding, and a plan amendment, never a fallback. Profile `jev.enabled` and
-`laya.enabled` record user configuration; availability does not select a
+from the Lifecycle snapshot, never the live catalog. Backend identity is `jev`,
+`laya`, or `validator` and stays that name in every request, receipt, and gate
+declaration. They are distinct identities: a generic name such as `system1`
+must not stand in for an absent binding, and one backend never substitutes for
+another inside an assurance receipt; switching backend is a new rubric, a new
+binding, and a plan amendment, never a fallback. `validator` is a pinned
+deterministic program (`tools/system1-validators/`), not a model and not the
+retired Validator role. Profile `jev.enabled`, `laya.enabled`, and
+`validator.enabled` record user configuration; availability does not select a
 backend for any task. The Planning Test Engineer selects one only on a SEIT
-claim that passes the eligibility test in `references/system1-rubrics.md` and
-binds it to one frozen rubric (id, version, digest). Plan Integrator copies that
+claim that passes the eligibility test and the selection guide in
+`references/system1-rubrics.md` (validator for rules expressible as code, Laya
+for single-condition semantic questions, Jev for existing Jev rules) and binds
+it to one frozen rubric (id, version, digest). Plan Integrator copies that
 selection and must not invent V&V. `reverify` is a legacy identity: it may not
-be enabled together with `jev` or `laya`.
+be enabled together with `jev`, `laya`, or `validator`.
 
 ## Gates
 
@@ -103,8 +107,13 @@ rubric digest, model revision, checkpoint, gateway request and log ids, and
 every replay run. A verdict reconstructed rather than read (for example from a
 gateway log after a timeout) is marked `DERIVED` and seals INCONCLUSIVE.
 Rubrics, thresholds, and the gate slot are defined in
-`references/system1-rubrics.md`. An `assurance` plan for `jev` or `laya` must
-carry its frozen rubric: `planVerification` refuses it as `rubric_missing`,
+`references/system1-rubrics.md`. For `validator`,
+`tools/system1-validators/run.cjs` prints the same `backend_output` shape with a
+program's evidence instead: the pinned-file digests, the raw and canonical
+input digests, every control's observed verdict, the decision-record digest of
+every fresh-process run, and the conditions that failed; it carries no
+probability. An `assurance` plan for `jev`, `laya`, or `validator` must carry
+its frozen rubric: `planVerification` refuses it as `rubric_missing`,
 `rubric_digest_mismatch` (SHA-256 over `canonicalJson` of the rubric differs
 from the claim's `rubric_digest`), `rubric_backend_mismatch`, or
 `rubric_not_assurance_eligible`; a `diagnostic` plan may use a non-eligible

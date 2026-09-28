@@ -205,7 +205,7 @@ test("System One: gate_order holds deterministic_verification in the seventh slo
   assert.equal(ASSURANCE_BUDGET_POLICY.gate_order[5], "deterministic_verification");
   assert.equal(ASSURANCE_BUDGET_POLICY.gate_order.includes("reverify"), false);
   assert.deepStrictEqual(ASSURANCE_BUDGET_POLICY.deterministic_verification_gate, {
-    tools: ["jev", "laya", "jev+laya"],
+    tools: ["jev", "laya", "validator", "jev+laya", "jev+validator", "laya+validator", "jev+laya+validator"],
     threshold: "all_required_claims_gate_eligible",
     retired_gate_names: ["reverify"],
   });
@@ -218,6 +218,28 @@ test("System One: gate_order holds deterministic_verification in the seventh slo
     deterministic_verification: dvResult([claim(), claim({ claim_id: "SEIT-S1-003", backend: "jev" })]),
   });
   assert.equal(both.outcome, "PASS");
+});
+
+test("System One: validator is a declared tool identity and must be named for its claims", () => {
+  const alone = evaluate(declarations({ deterministic_verification: { ...systemOne, tool: "validator" } }), {
+    deterministic_verification: dvResult([claim({ backend: "validator" })]),
+  });
+  assert.equal(alone.outcome, "PASS");
+  const hybrid = evaluate(declarations({ deterministic_verification: { ...systemOne, tool: "laya+validator" } }), {
+    deterministic_verification: dvResult([claim({ backend: "validator" }), claim({ claim_id: "SEIT-S1-004" })]),
+  });
+  assert.equal(hybrid.outcome, "PASS");
+  // A laya-only declaration does not cover a required validator claim: no backend covers another.
+  const undeclared = evaluate(declarations({ deterministic_verification: systemOne }), {
+    deterministic_verification: dvResult([claim({ backend: "validator" })]),
+  });
+  assert.equal(undeclared.failed_gate, "deterministic_verification");
+  assert.equal(undeclared.reason, "claim_backend_undeclared");
+  // Only the listed, ordered combinations are identities.
+  const reordered = evaluate(declarations({ deterministic_verification: { ...systemOne, tool: "validator+laya" } }), {
+    deterministic_verification: dvResult([claim({ backend: "validator" })]),
+  });
+  assert.equal(reordered.reason, "backend_identity_undeclared");
 });
 
 test("System One: a frozen plan still declaring reverify fails closed at the slot, no alias", () => {

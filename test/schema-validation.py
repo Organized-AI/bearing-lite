@@ -174,6 +174,7 @@ PROFILES_SCHEMA_NAME = "profiles.schema.json"
 SYSTEM1_SCHEMA_NAME = "system1.schema.json"
 SYSTEM1_RUBRICS_DIR = ROOT / "skills" / "bearing-lite" / "references" / "system1-rubrics"
 SYSTEM1_ROUND_TRIP_PATH = ROOT / "test" / "fixtures" / "system1-laya-round-trip.json"
+SYSTEM1_VALIDATOR_TRIP_PATH = ROOT / "test" / "fixtures" / "system1-validator-round-trip.json"
 VERIFICATION_SCHEMA_NAME = "verification.schema.json"
 VERIFICATION_MISSING_SCHEMA = f"missing schemas/{VERIFICATION_SCHEMA_NAME}"
 VERIFICATION_REQUEST_FIELDS = (
@@ -1376,6 +1377,21 @@ def profiles_cases() -> list[tuple[str, str, object, str, str | None]]:
             "laya": {"enabled": False},
             "jev": {"enabled": False},
         }), "accept", None),
+        ("SEIT-BDL-004", "system1_validator_with_laya_accepted", with_deterministic_verification({
+            "reverify": {"enabled": False},
+            "laya": {"enabled": True, "default_checkpoint": "laya-multilingual"},
+            "validator": {"enabled": True, "required": True},
+        }), "accept", None),
+        ("SEIT-BDL-004", "system1_reverify_enabled_with_validator_rejected", with_deterministic_verification({
+            "reverify": {"enabled": True},
+            "validator": {"enabled": True},
+        }), "reject", None),
+        ("SEIT-BDL-004", "system1_validator_without_enabled_rejected", with_deterministic_verification({
+            "validator": {"required": True},
+        }), "reject", None),
+        ("SEIT-BDL-004", "system1_validator_unknown_key_rejected", with_deterministic_verification({
+            "validator": {"enabled": True, "gateway": {"worker_name": "jev-gateway"}},
+        }), "reject", None),
     ])
     return out
 
@@ -1506,6 +1522,55 @@ def system1_cases() -> list[tuple[str, str, str, object, str]]:
          {**verified, "evidence_engine": ""}, "reject"),
         ("SEIT-BDL-004", "system1_command_configuration_with_args_rejected", "system1",
          {**verified["command_configuration"], "args": ["--verify-threshold", "0.5"]}, "reject"),
+    ])
+    out.extend(validator_cases())
+    return out
+
+
+def validator_cases() -> list[tuple[str, str, str, object, str]]:
+    """The `validator` backend: round-trip outputs, requests and receipts, and shapes it must refuse."""
+    out: list[tuple[str, str, str, object, str]] = []
+    with SYSTEM1_VALIDATOR_TRIP_PATH.open(encoding="utf-8") as fh:
+        trip = json.load(fh)
+    for key, t in sorted(trip["trips"].items()):
+        out.append(("SEIT-BDL-004", f"validator_backend_output_{key}", "system1", t["output"], "accept"))
+        out.append(("SEIT-BDL-004", f"validator_request_{key}", "verification", t["request"], "accept"))
+        out.append(("SEIT-BDL-004", f"sealed_validator_receipt_{key}", "verification", t["receipt"], "accept"))
+        out.append(("SEIT-BDL-004", f"validator_command_configuration_{key}", "system1",
+                    t["receipt"]["command_configuration"], "accept"))
+    with (ROOT / trip["rubric_path"]).open(encoding="utf-8") as fh:
+        rubric = json.load(fh)
+    verified = trip["trips"]["verified"]["output"]
+    result = verified["results"][0]
+    laya_like = copy.deepcopy(rubric)
+    laya_like["calibration"] = {"method": "temperature_scaled", "temperature": 1.0, "calibration_set_digest": "0" * 64,
+                                "calibration_set_size": 50, "measured_ece": 0.01, "max_ece": 0.1}
+    generative = copy.deepcopy(rubric)
+    generative["operations"]["allowed"] = ["evaluate"]
+    single_run = copy.deepcopy(rubric)
+    single_run["replay"]["min_runs"] = 1
+    unpinned = copy.deepcopy(rubric)
+    del unpinned["validator"]["implementation"]["sha256"]
+    escaping = copy.deepcopy(rubric)
+    escaping["validator"]["implementation"]["path"] = "../outside/validator.cjs"
+    out.extend([
+        ("SEIT-BDL-004", "validator_rubric_with_calibration_rejected", "system1", laya_like, "reject"),
+        ("SEIT-BDL-004", "validator_rubric_non_check_operation_rejected", "system1", generative, "reject"),
+        ("SEIT-BDL-004", "validator_rubric_eligible_single_run_rejected", "system1", single_run, "reject"),
+        ("SEIT-BDL-004", "validator_rubric_unpinned_implementation_rejected", "system1", unpinned, "reject"),
+        ("SEIT-BDL-004", "validator_rubric_path_escape_rejected", "system1", escaping, "reject"),
+        ("SEIT-BDL-004", "validator_output_verified_with_reason_rejected", "system1",
+         {**verified, "results": [{**result, "reason": "control_failed"}]}, "reject"),
+        ("SEIT-BDL-004", "validator_output_threshold_reason_rejected", "system1",
+         {**verified, "results": [{**result, "verdict": "INCONCLUSIVE", "reason": "below_verify_threshold"}]}, "reject"),
+        ("SEIT-BDL-004", "validator_output_with_probability_rejected", "system1",
+         {**verified, "results": [{**result, "evidence": {**result["evidence"], "thresholded_probability": 1.0}}]},
+         "reject"),
+        ("SEIT-BDL-004", "validator_output_diverged_replay_verified_rejected", "system1",
+         {**verified, "results": [{**result, "evidence": {**result["evidence"], "replay": {
+             **result["evidence"]["replay"], "identical_output_digest": False}}}]}, "reject"),
+        ("SEIT-BDL-004", "validator_output_laya_version_rejected", "system1",
+         {**verified, "backend_version": "laya 0.3.21"}, "reject"),
     ])
     return out
 

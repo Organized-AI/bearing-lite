@@ -1,0 +1,25 @@
+{
+  "event": "purchase",
+  "ecommerce": {
+    "transaction_id": "T-20260928-0107",
+    "value": 129.5,
+    "tax": 10.36,
+    "shipping": 0,
+    "currency": "USD",
+    "coupon": "WELCOME",
+    "items": [
+      {
+        "item_id": "SKU_3307",
+        "item_name": "Waterproof Jacket",
+        "price": 119.5,
+        "quantity": 1
+      },
+      {
+        "item_name": "Merino Wool Socks",
+        "price": 10,
+        "quantity": 1
+      }
+    ]
+  },
+  "gtm.uniqueEventId": 42
+}

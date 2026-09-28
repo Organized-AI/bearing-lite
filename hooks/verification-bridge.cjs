@@ -27,8 +27,8 @@
  *   - An analysis-derived verdict is sealed as INCONCLUSIVE, so a heuristic
  *     answer cannot close a gate. The raw verdict stays visible in the receipt.
  *   - A malformed claim is a typed rejection, never a quiet unproven receipt.
- *   - A System One (`jev`, `laya`) assurance plan carries its frozen rubric;
- *     the rubric must hash to the claim's rubric_digest and be
+ *   - A System One (`jev`, `laya`, `validator`) assurance plan carries its
+ *     frozen rubric; the rubric must hash to the claim's rubric_digest and be
  *     assurance_eligible, or the plan is refused before anything runs.
  */
 
@@ -46,8 +46,12 @@ const EXPECTED = Object.freeze(["VERIFIED", "REFUTED"]);
 const STATUSES = Object.freeze(["VERIFIED", "REFUTED", "INCONCLUSIVE", "ERROR"]);
 const CANDIDATE_REQUIRED = Object.freeze(["candidate_ref", "candidate_revision"]);
 const SHA256 = /^[0-9a-f]{64}$/;
-/** System One backends: an assurance claim must name a frozen, eligible rubric. */
-const SYSTEM1_BACKENDS = Object.freeze(["jev", "laya"]);
+/**
+ * System One backends: an assurance claim must name a frozen, eligible rubric.
+ * `jev` and `laya` are decision models; `validator` is a pinned deterministic
+ * program (tools/system1-validators/). The bridge runs none of them.
+ */
+const SYSTEM1_BACKENDS = Object.freeze(["jev", "laya", "validator"]);
 
 /**
  * Slots a caller template may use. Each names a value the bridge substitutes;

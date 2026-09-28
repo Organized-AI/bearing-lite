@@ -3,7 +3,7 @@
 /**
  * Deterministic verification adapter (DES-BDL-008 / AC-BDL-009 / SEIT-BDL-004).
  * Pure evaluator: no HOOK_CLASS, no host event, no download, no role dispatch.
- * Backends (`jev`, `laya`) are optional; availability never selects one for a task.
+ * Backends (`jev`, `laya`, `validator`) are optional; availability never selects one for a task.
  */
 
 const STATUSES = Object.freeze(["VERIFIED", "REFUTED", "INCONCLUSIVE", "ERROR"]);

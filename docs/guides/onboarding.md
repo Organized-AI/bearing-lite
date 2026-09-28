@@ -14,7 +14,8 @@ Use this page after installing the plugin or copying `skills/`.
 Settings include named role and session routes, fallbacks, session
 enablement, development strategy, planning review, assurance cadence,
 concurrency, planning-to-implementation clean-session, holds, and the optional
-System One backends (Jev, Laya). No value is preselected. When development
+deterministic verification backends (validator, Jev, Laya). No value is
+preselected. When development
 strategy is `tdd`, collect Test Implementer independently of Product
 Implementer. Do not copy Product Implementer, Test Engineer, Light
 Implementer, or a retired role.
@@ -42,25 +43,28 @@ gap. Bearing Lite records only those two booleans under
 `review.coverage_assist`. The capability keeps its own configuration in its own
 tooling; onboard-bearing never selects credentials, providers, or models.
 
-## Deterministic verification (Jev, Laya)
+## Deterministic verification (validator, Jev, Laya)
 
-onboard-bearing asks about Jev and then Laya as separate questions, with no
-preselected value. If you decline Jev or Laya, the named profile records
-`jev.enabled: false` or `laya.enabled: false` and ordinary Lifecycles do not
-ask again. A later explicit onboard-bearing configuration change may revisit
-the setting. Jev is a hosted third-party decision model; Laya is an
-open-weights model you host yourself. Bearing Lite does not bundle,
-download, or call either one; the adapter only judges receipts a caller
-produces from a frozen rubric
-(`skills/bearing-lite/references/system1-rubrics.md`).
+onboard-bearing asks about the code validators, then Jev, then Laya as
+separate questions, with no preselected value. If you decline one, the named
+profile records `validator.enabled: false`, `jev.enabled: false`, or
+`laya.enabled: false` and ordinary Lifecycles do not ask again. A later
+explicit onboard-bearing configuration change may revisit the setting. The
+validators are dependency-free Node programs shipped in
+`tools/system1-validators/` that decide rules expressible as code exactly; Jev
+is a hosted third-party decision model; Laya is an open-weights model you host
+yourself. Bearing Lite does not download or call any of them; the adapter only
+judges receipts a caller produces from a frozen rubric
+(`skills/bearing-lite/references/system1-rubrics.md`, which also says which
+backend to choose for which kind of check).
 
-Both may be enabled; each rubric still pins one. When Laya is enabled,
+Any of them may be enabled together; each rubric still pins one. When Laya is enabled,
 onboard-bearing also asks for `laya.default_checkpoint`. Gateway settings are
 recorded only as env-var names (`JEV_GATEWAY_AI_GATEWAY_ID`,
 `JEV_GATEWAY_ENDPOINT`, `JEV_GATEWAY_TOKEN`); no credential is stored.
 
-Legacy `reverify.enabled: false` stays valid, and enabling Jev or Laya records
-it. `reverify.enabled: true` cannot be combined with Jev or Laya:
+Legacy `reverify.enabled: false` stays valid, and enabling a validator, Jev, or
+Laya records it. `reverify.enabled: true` cannot be combined with any of them:
 onboard-bearing asks whether to disable Reverify first and otherwise returns
 `OWNER_DECISION_REQUIRED`.
 

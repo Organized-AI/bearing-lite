@@ -1,0 +1,170 @@
+{
+  "kind": "rubric",
+  "schema_family": "system1",
+  "schema_version": "1",
+  "rubric_id": "RUB-S1-VAL-WRANGLER-REQUIRED-BINDINGS",
+  "rubric_version": "1.0.0",
+  "title": "Worker bindings satisfy the resource table (validator)",
+  "claim": {
+    "claim_type": "deployment_config_conformance",
+    "statement": "The Worker's wrangler configuration binds a D1 database as DB, a KV namespace as CACHE, and an R2 bucket as ASSETS, each with a non-empty resource identifier, as the design's resource table requires.",
+    "eligibility": "deterministic_rule_conformance",
+    "spec_refs": [
+      "design: Worker resource bindings"
+    ]
+  },
+  "assurance_eligible": true,
+  "backend": "validator",
+  "validator": {
+    "validator_id": "wrangler-required-bindings",
+    "validator_version": "1.0.0",
+    "implementation": {
+      "path": "tools/system1-validators/wrangler-required-bindings.cjs",
+      "sha256": "ad7355aa14662b3d2bc8c81198b0ea00de152538d8773f3da3ecd293276da8b4"
+    },
+    "support_files": [
+      {
+        "path": "tools/system1-validators/lib.cjs",
+        "sha256": "b3452a8b0d907635434fe394ba44e6eaa17d20fd9a05fe9bef3e30d4c956e92c"
+      },
+      {
+        "path": "tools/system1-validators/toml.cjs",
+        "sha256": "316147b4e35f6c76c7c33aed2e2b6d1d34da8e8eba3750faface9f57309ce152"
+      }
+    ],
+    "runtime": {
+      "executable": "node",
+      "module_system": "commonjs",
+      "runtime_dependencies": "none",
+      "node_major_min": 18
+    }
+  },
+  "rule": {
+    "text": "Binding names are case-sensitive and must match exactly. The configuration conforms iff: (1) the top-level d1_databases array contains an entry whose binding is exactly \"DB\" with a non-empty database_id; (2) the top-level kv_namespaces array contains an entry whose binding is exactly \"CACHE\" with a non-empty id; (3) the top-level r2_buckets array contains an entry whose binding is exactly \"ASSETS\" with a non-empty bucket_name. \"Non-empty\" means a string other than \"\". env.<name> sections are not read.",
+    "conditions": [
+      {
+        "id": "d1_databases_is_array",
+        "text": "(1) top-level d1_databases is an array."
+      },
+      {
+        "id": "d1_databases_has_DB",
+        "text": "(1) d1_databases has an object entry whose binding is exactly \"DB\" (evaluated when it is an array)."
+      },
+      {
+        "id": "d1_databases_DB_database_id_nonempty",
+        "text": "(1) an entry bound \"DB\" has a non-empty string database_id (evaluated when such an entry exists)."
+      },
+      {
+        "id": "kv_namespaces_is_array",
+        "text": "(2) top-level kv_namespaces is an array."
+      },
+      {
+        "id": "kv_namespaces_has_CACHE",
+        "text": "(2) kv_namespaces has an object entry whose binding is exactly \"CACHE\" (evaluated when it is an array)."
+      },
+      {
+        "id": "kv_namespaces_CACHE_id_nonempty",
+        "text": "(2) an entry bound \"CACHE\" has a non-empty string id (evaluated when such an entry exists)."
+      },
+      {
+        "id": "r2_buckets_is_array",
+        "text": "(3) top-level r2_buckets is an array."
+      },
+      {
+        "id": "r2_buckets_has_ASSETS",
+        "text": "(3) r2_buckets has an object entry whose binding is exactly \"ASSETS\" (evaluated when it is an array)."
+      },
+      {
+        "id": "r2_buckets_ASSETS_bucket_name_nonempty",
+        "text": "(3) an entry bound \"ASSETS\" has a non-empty string bucket_name (evaluated when such an entry exists)."
+      }
+    ],
+    "verdict_map": {
+      "all_conditions_hold": "VERIFIED",
+      "any_condition_fails": "REFUTED",
+      "input_not_decidable": "ERROR"
+    }
+  },
+  "input": {
+    "state_shape": "json_document",
+    "source": {
+      "kind": "repo_file",
+      "locator": "wrangler.jsonc",
+      "extractor": "keys:d1_databases,kv_namespaces,r2_buckets"
+    },
+    "format_by_extension": {
+      ".json": "jsonc",
+      ".jsonc": "jsonc",
+      ".toml": "toml"
+    },
+    "canonicalization": "jsonc_or_toml_to_rfc8785_jcs",
+    "input_digest_basis": "raw_file_bytes",
+    "max_input_bytes": 262144,
+    "over_limit": "ERROR"
+  },
+  "controls": [
+    {
+      "control_id": "CTL-WRANGLER-ALL-BOUND",
+      "locator": "test/fixtures/wrangler/controls/all-bound.jsonc",
+      "input_digest": "d9b6049b23e5ee512df631a3290f8e473053689878afec8191b456c5807ba69d",
+      "expected": "VERIFIED"
+    },
+    {
+      "control_id": "CTL-WRANGLER-NO-R2",
+      "locator": "test/fixtures/wrangler/controls/missing-r2.jsonc",
+      "input_digest": "bea43ad157769064563cfa37f627689a2c0495da632c3f77c33018f109037f66",
+      "expected": "REFUTED"
+    },
+    {
+      "control_id": "CTL-WRANGLER-WRONG-KV-NAME",
+      "locator": "test/fixtures/wrangler/controls/kv-bound-as-kv.jsonc",
+      "input_digest": "d525d8cf0a6e2e39e71226761e88fce165303fc8c4f18bbbd55518423100d3c4",
+      "expected": "REFUTED"
+    },
+    {
+      "control_id": "CTL-WRANGLER-TOML-ALL-BOUND",
+      "locator": "test/fixtures/wrangler/controls/all-bound.toml",
+      "input_digest": "bccbee123a1cce1c123e830282e12fe021a1315b209f52ce1f6a3767d8da83ca",
+      "expected": "VERIFIED"
+    },
+    {
+      "control_id": "CTL-WRANGLER-TOML-LOWERCASE-DB",
+      "locator": "test/fixtures/wrangler/controls/lowercase-db.toml",
+      "input_digest": "46e8cb8c88e2d160b27db7d899ad86d722a74d464dcb71718ae3de2a09738dd9",
+      "expected": "REFUTED"
+    }
+  ],
+  "replay": {
+    "min_runs": 2,
+    "fresh_process": "every_run",
+    "require_identical_output_digest": true,
+    "output_digest_basis": "sha256_rfc8785_decision_record"
+  },
+  "operations": {
+    "allowed": [
+      "check"
+    ],
+    "denied": [
+      "generate",
+      "propose",
+      "propose_claims",
+      "propose_options",
+      "suggest_options",
+      "rewrite",
+      "rewrite_claim",
+      "rewrite_options",
+      "explain",
+      "complete",
+      "chat",
+      "review"
+    ]
+  },
+  "notes": [
+    "Measured agreement with the independent Python labeler (tools/system1-calibration/labelers.py): 360/360 items of test/fixtures/system1-calibration/wrangler-bindings/ (both splits) and 13/13 edge cases of test/fixtures/system1-validators/cases.json, on the verdict, the failing conditions (mapped to the labeler's reason strings), and the SHA-256 of the canonical state. Controls: 5/5 on their expected verdict. assurance_eligible is true if and only if agreement is 100% and every control passes.",
+    "No model, probability, temperature, threshold, ECE, or epsilon exists for this backend. Replay decides the input in `min_runs` freshly started Node processes and requires byte-identical SHA-256 digests of the RFC 8785 decision record; any difference is INCONCLUSIVE replay_output_divergence.",
+    "Run with: node tools/system1-validators/run.cjs --rubric <this file> check <target> <claim-json>, from the repository root. The runner checks the claim's rubric and input digests and every pinned file digest before deciding, and prints backend_output for sealVerification.",
+    "Supersedes the Laya rubric RUB-S1-WRANGLER-REQUIRED-BINDINGS for this check: the same three conditions, decided by a pinned program instead of asked of a model (which scored them near chance and never caught a misnamed binding).",
+    "The target is the whole wrangler configuration file; the format comes from its extension (.jsonc/.json as JSONC, .toml as TOML), never from sniffing. The dataset items are scored from their original JSONC or TOML source, not from the extracted state. TOML is read by the subset reader tools/system1-validators/toml.cjs; a construct outside the subset (multi-line strings, dates, hex/octal/binary integers, inf/nan, integers beyond 2^53) is ERROR toml_unsupported_construct, never a guess. The reader agrees with Python's tomllib on every case in test/fixtures/system1-validators/cases.json.",
+    "Only top-level d1_databases, kv_namespaces and r2_buckets count; env.<name> sections are parsed but not read, so a binding that exists only under an environment REFUTES."
+  ]
+}

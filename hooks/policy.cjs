@@ -33,7 +33,7 @@ const ASSURANCE_BUDGET_POLICY = Object.freeze({
     "reviewer",
   ],
   deterministic_verification_gate: {
-    tools: ["jev", "laya", "jev+laya"],
+    tools: ["jev", "laya", "validator", "jev+laya", "jev+validator", "laya+validator", "jev+laya+validator"],
     threshold: "all_required_claims_gate_eligible",
     retired_gate_names: ["reverify"],
   },

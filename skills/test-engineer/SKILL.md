@@ -27,9 +27,9 @@ separate catalog roles.
 1. Planning Test Engineer finalizes `seit.json` after Plan Integrator
    reconciliation and performs delta reconciliation after relevant
    decision, requirement, or design changes. Do not invent missing
-   method-skill behavior. Define applicable deterministic claims. Select a System One backend (`jev` or `laya`,
-   Laya preferred for assurance) only on a claim that passes the eligibility test in
-   `bearing-lite/references/system1-rubrics.md`, and bind it to one frozen rubric by id, version, and digest.
+   method-skill behavior. Define applicable deterministic claims. Select a backend only on a claim that passes the
+   eligibility test in `bearing-lite/references/system1-rubrics.md` (`validator` for rules expressible as code; `laya`
+   only for one semantic condition per rubric; `jev` only for existing Jev rules); bind one frozen rubric by id, version, digest.
    Never let a backend propose, generate, or reword a claim or its options. Lifecycle in-document verification
    cases are authored only against the approved, planning-gated register.
 2. Assurance Test Engineer starts a fresh session; reject author ancestry;
@@ -37,8 +37,8 @@ separate catalog roles.
    VALIDATING is owned here. The Assurance Test Engineer independently reruns the gate-chain at the declared cadence boundary for required deterministic claims
    and attaches `assurance` receipts; author gate-chain receipts are diagnostic-only and cannot PASS an assurance gate.
    For System One claims, rerun each frozen rubric with its replay protocol (at least two runs, including an
-   uncached or fresh-process run) and attach the `assurance` receipts; a replay divergence or failed control is
-   INCONCLUSIVE, never PASS.
+   uncached or fresh-process run; `validator` runs in fresh processes with identical output digests) and attach the
+   `assurance` receipts; a replay divergence or failed control is INCONCLUSIVE, never PASS.
 3. When a published standard is cited, verify the document and clause.
 4. Return the smallest missing proof. Never mutate the candidate.
 

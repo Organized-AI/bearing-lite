@@ -1,4 +1,4 @@
-# System One rubrics (Jev and Laya)
+# System One rubrics (Jev, Laya, and validator)
 
 Schema: `schemas/system1.schema.json`. Adapter contract: `references/verification.md`.
 Examples: `references/system1-rubrics/*.rubric.json`.
@@ -19,6 +19,13 @@ controls, the replay protocol, the gateway cache policy, and a verdict-only
 operation allowlist. Its SHA-256 over canonical JSON (the bridge's
 `canonicalJson`) is bound into every claim and every evidence record.
 
+A third backend identity, `validator`, shares the schema family but is **not a
+model**: it is a pinned, dependency-free Node program under
+`tools/system1-validators/` that decides a rule expressible as code exactly
+(section 2a). Same input bytes, same verdict: it has no probability,
+temperature, calibration, threshold, ECE, or epsilon, and the schema forbids
+them on a validator rubric. It is unrelated to the retired Validator role.
+
 ## 1. Eligibility test
 
 A claim is eligible for a System One backend only when **all** hold:
@@ -36,42 +43,91 @@ A claim is eligible for a System One backend only when **all** hold:
    INCONCLUSIVE.
 5. **Known answers exist.** At least one input that must VERIFY and one that
    must REFUTE can be written as controls.
-6. **No cheaper exact oracle.** If a parser, schema, type checker, or test can
-   decide the claim exactly, that is the method; System One is for rules a fixed
-   parser cannot express cheaply (natural-language copy, loosely structured
-   payloads against a prose spec, rule conformance of a diff).
+6. **No cheaper exact oracle (decision models).** If a parser, schema, type
+   checker, or test can decide the claim exactly, that is the method: a
+   `validator` rubric when the check must be a frozen, receipted gate claim,
+   otherwise an ordinary test. `laya` and `jev` are for what code cannot
+   decide: one semantic condition over natural-language text.
+7. **One condition per Laya question.** Measured on the pinned checkpoints,
+   Laya scores multi-condition rules at chance and every control lands on
+   INCONCLUSIVE (`docs/calibration/system1-calibration-report.md`). A rule
+   that is a conjunction is split into one rubric per condition, and the claim
+   holds only when every one of them VERIFIES.
 
 | Eligible | Not eligible |
 | --- | --- |
-| A captured dataLayer push conforms to the prose tracking spec for `purchase` (noul). | "Is our tracking good?" (open-ended). |
-| Each shipped locale's consent banner states purpose, third parties, and withdrawal (choice). | "Write a compliant banner" or "suggest missing disclosures" (generative). |
-| A diff hunk to wrangler config puts no secret value under `vars`, per a written project rule (choice). | "Review this PR" or "is this code correct?" (code review). |
-| Wrangler bindings satisfy a resource table stated in prose (noul), where no parser test encodes it. | Exact binding names already testable with a JSON parser (use a test). |
-| A support-macro reply is classified into fixed escalation categories (choice). | Choosing which claims to verify, or rewording a claim so it passes. |
+| A captured dataLayer push meets the six `purchase` conditions of the tracking spec (`validator`). | "Is our tracking good?" (open-ended). |
+| A locale's consent banner states the purpose of data collection, one disclosure per rubric (`laya`, multilingual). | "Write a compliant banner" or "suggest missing disclosures" (generative). |
+| Wrangler bindings (JSONC or TOML) satisfy the resource table (`validator`). | All three consent disclosures asked of Laya in one question (measured at chance). |
+| A diff hunk to wrangler config puts no secret value under `vars`, per an existing Jev project rule (`jev`). | "Review this PR" or "is this code correct?" (code review). |
+| A support-macro reply is classified into fixed escalation categories (`laya`, choice). | Choosing which claims to verify, or rewording a claim so it passes. |
 
 ## 2. Backend selection by the Planning Test Engineer
 
 This replaces "select Reverify only on an applicable binary-level claim".
 
-> Define applicable deterministic claims. Select a System One backend (`jev`
-> or `laya`) only on a SEIT claim that passes the eligibility test in
-> `references/system1-rubrics.md`, and bind it to exactly one frozen rubric
-> (id, version, digest). Availability or profile enablement never selects a
-> backend. Plan Integrator copies the selection and the rubric binding; it never
-> invents a claim, a rubric, or a backend.
+> Define applicable deterministic claims. Select a backend (`validator`,
+> `laya`, or `jev`) only on a SEIT claim that passes the eligibility test in
+> `references/system1-rubrics.md`, in the order of the selection guide, and
+> bind it to exactly one frozen rubric (id, version, digest). Availability or
+> profile enablement never selects a backend. Plan Integrator copies the
+> selection and the rubric binding; it never invents a claim, a rubric, or a
+> backend.
 
-Selection guide:
+Selection guide, in order:
 
-| Choose **Laya** when | Choose **Jev** when |
-| --- | --- |
-| Assurance is intended (default). Open weights pin to an immutable commit; replay can run on a fresh process; CPU fp32 is near bit-exact. | A calibrated Jev rule already exists for this exact check (for example an abide project rule) and re-deriving it for Laya would change the rule. |
-| Multilingual input: pin `laya-multilingual`. | Many options in one question (more than about 20): Jev handles high-cardinality option sets that exceed Laya's option-prompt budget. |
-| Latency or cost matter (tens of ms, self-hosted). | Self-hosting is not possible for this project. |
-| The domain has a fine-tuned checkpoint (`laya-typed-decisions` or a project fine-tune published as its own pinned revision). | |
+1. **`validator` first** for anything expressible as code: field presence and
+   values, exact names, enumerations, structure of JSON, JSONC, or TOML, and
+   any conjunction of such conditions. It decides the rule exactly; its bar is
+   100% agreement with an independent labeler plus passing controls.
+2. **`laya` only** for a single-condition semantic question over text that
+   code cannot decide reliably (for example whether a consent banner in any of
+   eight languages states a purpose; keyword lists are brittle there). One
+   condition per rubric; pin `laya-multilingual` for multilingual input, or a
+   fine-tuned checkpoint published as its own pinned revision.
+3. **`jev` only** where a calibrated Jev rule already exists for this exact
+   check (for example an abide project rule) and re-deriving it would change
+   the rule, or where the option set exceeds Laya's option-prompt budget.
 
-Both may be enabled in a profile; each rubric still pins one. Choosing the
-other backend for an existing claim is a new rubric, a new binding, and a plan
-amendment, never a fallback.
+Any of the three may be enabled in a profile; each rubric still pins one.
+Choosing another backend for an existing claim is a new rubric, a new binding,
+and a plan amendment, never a fallback. Which shipped rubric owns which check,
+and the measurements behind each `assurance_eligible` flag, are in the Hybrid
+section of `docs/calibration/system1-calibration-report.md`.
+
+## 2a. Validator rubrics
+
+A validator rubric (`backend: "validator"`) pins, instead of a model:
+
+- `validator`: `validator_id` and version, the implementation path and the
+  SHA-256 of its source, every support file it loads by SHA-256, and the
+  runtime (`node`, CommonJS, no runtime dependencies, minimum Node major);
+- `rule`: the rule text, the conditions in evaluation order (equal to the
+  module's `CONDITIONS`), and the fixed verdict map: every condition holds is
+  VERIFIED, any fails is REFUTED, undecidable input is ERROR;
+- `input`: the format chosen by file extension (never sniffed), the
+  canonicalization the rule is decided on, `input_digest_basis:
+  "raw_file_bytes"` (the claim's `input_digest` is SHA-256 of the target
+  file), and `max_input_bytes`;
+- known-answer `controls` with real input digests (at least one VERIFIED and
+  one REFUTED) and `replay`: every run in a fresh process, byte-identical
+  SHA-256 of the canonical decision record across at least two runs;
+- `operations.allowed: ["check"]`.
+
+The caller runs the backend client like any other; the bridge never runs it:
+`node tools/system1-validators/run.cjs --rubric <rubric> check <target>
+<claim-json>`, from the repository root (an `invocation` of `executable:
+"node"` with that argv template). It checks the claim's rubric digest, every
+pinned file digest, the target's size and digest, runs every control, decides
+the target in fresh processes, and prints `backend_output` for
+`sealVerification`. Failures are typed: ERROR `claim_malformed` (the bridge's
+malformed-claim rejection), `rubric_digest_mismatch`,
+`validator_digest_mismatch`, `input_unresolvable`, `input_digest_mismatch`,
+`input_over_size_limit`, `input_unparseable`, `input_shape_invalid`, or
+`toml_unsupported_construct`; INCONCLUSIVE `control_failed` or
+`replay_output_divergence`. A rubric is `assurance_eligible` only when the
+program agrees with an independent labeler on 100% of the rule's labeled
+dataset and every control passes.
 
 Checkpoint pinning (Laya): assurance rubrics set `model.selection: "pinned"`.
 The Laya `Router` chooses a checkpoint from the input's language and script, so
@@ -149,6 +205,11 @@ never satisfy an assurance gate.
 | Calibration artifact missing or its digest differs | ERROR | `calibration_unavailable` |
 | Gateway or backend unreachable, timed out, or returned a malformed response | ERROR | `backend_unavailable` / `gateway_error` / `gateway_timeout` / `backend_response_invalid` |
 
+The table is for decision models. A validator run maps as section 2a says:
+VERIFIED or REFUTED from the program, INCONCLUSIVE only for `control_failed`
+or `replay_output_divergence`, ERROR for anything that stops the pinned program
+from deciding the input as frozen.
+
 INCONCLUSIVE and ERROR never become PASS. An over-limit input is ERROR (the
 rubric could not execute as frozen), and is never silently truncated. A claim
 binding the runner cannot parse is a `claim_malformed` rejection with no receipt,
@@ -156,7 +217,8 @@ exactly as `verification.md` defines.
 
 ## 6. Operations
 
-Allowed (verdict-only): `evaluate`, `check`, `score`. Denied, so they are
+Allowed (verdict-only): `evaluate`, `check`, `score`; a validator rubric
+allows exactly `check`. Denied, so they are
 refused as `generative_backend_operation_denied`: `generate`, `propose`,
 `propose_claims`, `propose_options`, `suggest_options`, `rewrite`,
 `rewrite_claim`, `rewrite_options`, `explain`, `complete`, `chat`, `review`.
@@ -166,7 +228,8 @@ policy.
 
 ## 7. Identity, authority, and amendment
 
-- Backend identity is `jev` or `laya`, never a generic `system1` name. A
+- Backend identity is `jev`, `laya`, or `validator`, never a generic
+  `system1` name. A
   receipt's `backend` equals its rubric's backend. No fallback inside an
   assurance receipt: an unavailable backend is ERROR `backend_unavailable`
   (`halt` when required, `proceed-with-note` when only selected).
@@ -175,13 +238,14 @@ policy.
   diagnostic. Only an independent Test Engineer assurance session, rerunning the
   frozen rubric on the exact stable candidate, produces assurance receipts.
 - Only a rubric with `assurance_eligible: true` may back an assurance request:
-  `planVerification` requires the rubric object on a `jev`/`laya` assurance
-  plan, checks its digest against the claim's `rubric_digest`, and refuses a
-  non-eligible rubric as `rubric_not_assurance_eligible` before anything runs.
+  `planVerification` requires the rubric object on a `jev`/`laya`/`validator`
+  assurance plan, checks its digest against the claim's `rubric_digest`, and
+  refuses a non-eligible rubric as `rubric_not_assurance_eligible` before
+  anything runs.
   Diagnostic plans may use it.
 - Any change to backend, model revision, checkpoint, question, options,
-  thresholds, calibration, controls, input policy, replay, or cache policy is a
-  new rubric version and requires a plan amendment before an assurance packet may
+  thresholds, calibration, validator source, rule, controls, input policy,
+  replay, or cache policy is a new rubric version and requires a plan amendment before an assurance packet may
   consume it.
 - Credentials never appear in a rubric, profile, request, receipt, or output.
   Gateway identifiers, endpoints, and tokens are referenced by env-var name only.
@@ -196,7 +260,7 @@ The seventh-gate slot is renamed from `reverify` to the backend-neutral
 
 Why rename rather than keep the slot name: the slot is a gate class, not a
 backend. The profile key is already `deterministic_verification`; a gate named
-`reverify` that holds `jev` or `laya` receipts would let a backend name stand
+`reverify` that holds `jev`, `laya`, or `validator` receipts would let a backend name stand
 in for a different binding, which `verification.md` forbids. Keeping position
 means deterministic evidence is complete before Reviewer consumes the gate-chain
 receipt. The slot passes only when every required claim's receipt is
@@ -211,7 +275,7 @@ fails a declaration that still names `reverify` closed at this slot
 
 Reviewer **may** request a deterministic rerun of an existing frozen rubric,
 through the parent controller, to adjudicate one specific suspected defect on
-the current candidate, for example "rerun `RUB-S1-CONSENT-BANNER-DISCLOSURES`
+the current candidate, for example "rerun `RUB-S1-CONSENT-EXPLAINS-WITHDRAWAL`
 on the `fr` locale". The result is a receipt like any other and is recorded as
 evidence for that finding.
 

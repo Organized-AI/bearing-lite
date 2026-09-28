@@ -107,7 +107,7 @@ describe("#111 required vs enabled unavailable semantics", () => {
   });
 
   it("System One backends follow the same split and never fall back to each other", () => {
-    for (const backend of ["jev", "laya"]) {
+    for (const backend of ["jev", "laya", "validator"]) {
       const selectedOnly = evaluateUnavailable({ selected: true, required: false, backend });
       const required = evaluateUnavailable({ selected: false, required: true, backend });
       assert.equal(selectedOnly.outcome, "ERROR", backend);

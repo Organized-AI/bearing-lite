@@ -64,20 +64,22 @@ If Bearing Lite helps keep a long agent task scoped and reviewable,
 3. Configure named role and session routes, fallbacks, development strategy
    (`single_implementer` or `tdd`), planning review, assurance cadence,
    concurrency, the planning-to-implementation clean-session boolean, holds,
-   and optional System One verification backends (Jev, Laya). Enabling Coordinator adds value only when a wave has
+   and optional deterministic verification backends (code validators, Jev, Laya). Enabling Coordinator adds value only when a wave has
    two or more proven-independent packets, shared wave evidence to integrate
    once, or aggregate repair ownership; an explicit disabled choice is allowed,
    and disabling Coordinator on a true direct packet is not a capability gap.
    No value is preselected.
-4. If you decline Jev or Laya, onboard-bearing persists `jev.enabled: false`
-   or `laya.enabled: false` for that named profile and does not ask again
-   during ordinary Lifecycles. Jev is a hosted third-party decision model;
-   Laya is an open-weights model you host yourself. Bearing Lite does not
-   bundle, download, or call either one; the adapter only judges receipts a
-   caller produces from a frozen rubric
+4. If you decline a backend, onboard-bearing persists `validator.enabled:
+   false`, `jev.enabled: false`, or `laya.enabled: false` for that named
+   profile and does not ask again during ordinary Lifecycles. The validators
+   are dependency-free Node programs shipped in `tools/system1-validators/`
+   that decide rules expressible as code exactly; Jev is a hosted third-party
+   decision model; Laya is an open-weights model you host yourself. Bearing
+   Lite does not download or call any of them; the adapter only judges
+   receipts a caller produces from a frozen rubric
    (`skills/bearing-lite/references/system1-rubrics.md`). Legacy
    `reverify.enabled: false` stays valid; `reverify.enabled: true` cannot be
-   combined with Jev or Laya.
+   combined with any of them.
 5. A leftover `~/.agents/bearing-lite/lineups.json` is not live configuration.
    Runtime returns `MIGRATION_REQUIRED` until onboard-bearing migrates it.
 

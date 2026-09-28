@@ -404,9 +404,27 @@
                   "description": "Default checkpoint offered when authoring a rubric. A rubric always pins its own checkpoint and revision; this default never overrides a rubric."
                 }
               }
+            },
+            "validator": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "enabled"
+              ],
+              "description": "Deterministic code validators (tools/system1-validators/, dependency-free Node) for rules expressible as code. A pinned program, not a model and not the retired Validator role. Backend identity stays `validator`.",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "User configuration only. Availability or enablement never selects this backend for a task; the Planning Test Engineer selects it per eligible SEIT claim."
+                },
+                "required": {
+                  "type": "boolean",
+                  "description": "When true, an activated-but-unavailable backend halts instead of proceeding with a note. Omitted is false; no migration."
+                }
+              }
             }
           },
-          "description": "Optional deterministic-verification backends. `jev` and `laya` are the System One decision-model backends (schemas/system1.schema.json) and are exclusive with `reverify`: `reverify.enabled: true` is invalid while `jev.enabled` or `laya.enabled` is true. `jev` and `laya` may both be enabled; each rubric still pins exactly one.",
+          "description": "Optional deterministic-verification backends. `jev` and `laya` are the System One decision-model backends and `validator` the deterministic code-validator backend (schemas/system1.schema.json). All three are exclusive with `reverify`: `reverify.enabled: true` is invalid while `jev.enabled`, `laya.enabled`, or `validator.enabled` is true. Any of `jev`, `laya`, and `validator` may be enabled together; each rubric still pins exactly one.",
           "allOf": [
             {
               "if": {
@@ -452,6 +470,23 @@
                       ],
                       "properties": {
                         "laya": {
+                          "required": [
+                            "enabled"
+                          ],
+                          "properties": {
+                            "enabled": {
+                              "const": true
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "required": [
+                        "validator"
+                      ],
+                      "properties": {
+                        "validator": {
                           "required": [
                             "enabled"
                           ],

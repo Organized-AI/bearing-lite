@@ -36,7 +36,7 @@ the five artifacts, and generates `implementation.json` and
    requirement, or design changes. Do not author V&V. Copy selected
    deterministic-verification backends from Planning Test Engineer;
    never invent claims, methods, rubrics, or System One backend selection
-   (`jev` / `laya`).
+   (`validator` / `laya` / `jev`).
 
 ## Return and recovery
 

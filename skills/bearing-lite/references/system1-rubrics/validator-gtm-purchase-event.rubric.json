@@ -1,0 +1,155 @@
+{
+  "kind": "rubric",
+  "schema_family": "system1",
+  "schema_version": "1",
+  "rubric_id": "RUB-S1-VAL-GTM-PURCHASE-EVENT",
+  "rubric_version": "1.0.0",
+  "title": "GTM dataLayer purchase event conforms to the tracking spec (validator)",
+  "claim": {
+    "claim_type": "tracking_event_conformance",
+    "statement": "The dataLayer push captured for the checkout-complete step is a GA4 `purchase` event that carries transaction_id, value, currency, and a non-empty items array, as the tracking spec requires.",
+    "eligibility": "deterministic_rule_conformance",
+    "spec_refs": [
+      "tracking-spec: purchase event"
+    ]
+  },
+  "assurance_eligible": true,
+  "backend": "validator",
+  "validator": {
+    "validator_id": "gtm-purchase-event",
+    "validator_version": "1.0.0",
+    "implementation": {
+      "path": "tools/system1-validators/gtm-purchase-event.cjs",
+      "sha256": "10cb5faeb83cfff0a4ef096eb4bcb62f9419a8ef32bc40e4341f011b07be9512"
+    },
+    "support_files": [
+      {
+        "path": "tools/system1-validators/lib.cjs",
+        "sha256": "b3452a8b0d907635434fe394ba44e6eaa17d20fd9a05fe9bef3e30d4c956e92c"
+      }
+    ],
+    "runtime": {
+      "executable": "node",
+      "module_system": "commonjs",
+      "runtime_dependencies": "none",
+      "node_major_min": 18
+    }
+  },
+  "rule": {
+    "text": "One dataLayer push conforms iff: (1) the top-level `event` value is exactly \"purchase\"; (2) there is an `ecommerce` object; (3) ecommerce.transaction_id is present and not empty; (4) ecommerce.value is present; (5) ecommerce.currency is an uppercase 3-letter ISO 4217 currency code; (6) ecommerce.items is an array containing at least one item (an object) with item_id or item_name. \"Present\" means the key exists and its value is neither null nor the empty string. The currency must be a string exactly equal to a code in the validator's pinned ISO 4217 list.",
+    "conditions": [
+      {
+        "id": "push_is_object",
+        "text": "The push is a JSON object."
+      },
+      {
+        "id": "event_is_purchase",
+        "text": "(1) The top-level `event` value is exactly \"purchase\"."
+      },
+      {
+        "id": "ecommerce_is_object",
+        "text": "(2) `ecommerce` is a JSON object."
+      },
+      {
+        "id": "transaction_id_present",
+        "text": "(3) ecommerce.transaction_id is present (not null, not \"\")."
+      },
+      {
+        "id": "value_present",
+        "text": "(4) ecommerce.value is present (not null, not \"\")."
+      },
+      {
+        "id": "currency_present",
+        "text": "(5) ecommerce.currency is present (not null, not \"\")."
+      },
+      {
+        "id": "currency_is_iso4217",
+        "text": "(5) ecommerce.currency is a string in the pinned ISO 4217 list (evaluated when present)."
+      },
+      {
+        "id": "items_is_array",
+        "text": "(6) ecommerce.items is an array."
+      },
+      {
+        "id": "items_nonempty",
+        "text": "(6) ecommerce.items has at least one element (evaluated when it is an array)."
+      },
+      {
+        "id": "items_has_identified_item",
+        "text": "(6) some element of ecommerce.items is an object with item_id or item_name present (evaluated when non-empty)."
+      }
+    ],
+    "verdict_map": {
+      "all_conditions_hold": "VERIFIED",
+      "any_condition_fails": "REFUTED",
+      "input_not_decidable": "ERROR"
+    }
+  },
+  "input": {
+    "state_shape": "json_document",
+    "source": {
+      "kind": "captured_fixture",
+      "locator": "test/fixtures/datalayer/purchase-push.json"
+    },
+    "format_by_extension": {
+      ".json": "json"
+    },
+    "canonicalization": "rfc8785_jcs",
+    "input_digest_basis": "raw_file_bytes",
+    "max_input_bytes": 65536,
+    "over_limit": "ERROR"
+  },
+  "controls": [
+    {
+      "control_id": "CTL-GTM-PURCHASE-VALID",
+      "locator": "test/fixtures/datalayer/controls/purchase-valid.json",
+      "input_digest": "01e43114dc7a72eba277bb57e58dc5bca144cbc62f7f9f653341c704dc41f4a2",
+      "expected": "VERIFIED"
+    },
+    {
+      "control_id": "CTL-GTM-PURCHASE-NO-CURRENCY",
+      "locator": "test/fixtures/datalayer/controls/purchase-missing-currency.json",
+      "input_digest": "ea7875b02b28a69b3edab638708a0d39e2825273f01efa0f1d12b4ba9b90d842",
+      "expected": "REFUTED"
+    },
+    {
+      "control_id": "CTL-GTM-ADD-TO-CART",
+      "locator": "test/fixtures/datalayer/controls/add-to-cart.json",
+      "input_digest": "ac8359930a47ddb06baee8cf8940b44679ba202f0e3668eada3cd04d241476ce",
+      "expected": "REFUTED"
+    }
+  ],
+  "replay": {
+    "min_runs": 2,
+    "fresh_process": "every_run",
+    "require_identical_output_digest": true,
+    "output_digest_basis": "sha256_rfc8785_decision_record"
+  },
+  "operations": {
+    "allowed": [
+      "check"
+    ],
+    "denied": [
+      "generate",
+      "propose",
+      "propose_claims",
+      "propose_options",
+      "suggest_options",
+      "rewrite",
+      "rewrite_claim",
+      "rewrite_options",
+      "explain",
+      "complete",
+      "chat",
+      "review"
+    ]
+  },
+  "notes": [
+    "Measured agreement with the independent Python labeler (tools/system1-calibration/labelers.py): 360/360 items of test/fixtures/system1-calibration/gtm-datalayer-event/ (both splits) and 38/38 edge cases of test/fixtures/system1-validators/cases.json, on the verdict, the failing conditions (mapped to the labeler's reason strings), and the SHA-256 of the canonical state. Controls: 3/3 on their expected verdict. assurance_eligible is true if and only if agreement is 100% and every control passes.",
+    "No model, probability, temperature, threshold, ECE, or epsilon exists for this backend. Replay decides the input in `min_runs` freshly started Node processes and requires byte-identical SHA-256 digests of the RFC 8785 decision record; any difference is INCONCLUSIVE replay_output_divergence.",
+    "Run with: node tools/system1-validators/run.cjs --rubric <this file> check <target> <claim-json>, from the repository root. The runner checks the claim's rubric and input digests and every pinned file digest before deciding, and prints backend_output for sealVerification.",
+    "Supersedes the Laya rubric RUB-S1-GTM-DATALAYER-PURCHASE for this check: the same six conditions, decided by a pinned program instead of asked of a model (which scored them at chance).",
+    "The target file holds exactly one push as JSON (no extractor). `claim.input_digest` is SHA-256 of the file bytes; the evidence also records the SHA-256 of its RFC 8785 form, which equals the Laya datasets' `input_digest` for the same push.",
+    "The accepted currency set is the ISO 4217 list pinned in the module source (the Python labeler carries an independent copy). Adding or retiring a code is a new validator version and a new rubric version."
+  ]
+}

@@ -1,0 +1,781 @@
+{
+  "description": "Validator backend round trip (assurance authority): specs planned against the frozen, assurance-eligible GTM validator rubric, the backend_output tools/system1-validators/run.cjs printed for each, and the receipt sealVerification emitted. Rebuilt by tools/system1-calibration/build-validator-rubrics.mjs. test/system1-validators.test.mjs reseals every output and must reproduce the receipt; test/schema-validation.py validates outputs, requests and receipts.",
+  "rubric_path": "skills/bearing-lite/references/system1-rubrics/validator-gtm-purchase-event.rubric.json",
+  "produced_by": {
+    "role": "test_engineer.assurance",
+    "identity": "ate-val",
+    "session": "sess-ate-val"
+  },
+  "trips": {
+    "verified": {
+      "spec": {
+        "backend": "validator",
+        "backend_operation": "check",
+        "backend_operations": {
+          "allowed": [
+            "check"
+          ],
+          "denied": [
+            "generate",
+            "propose",
+            "propose_claims",
+            "propose_options",
+            "suggest_options",
+            "rewrite",
+            "rewrite_claim",
+            "rewrite_options",
+            "explain",
+            "complete",
+            "chat",
+            "review"
+          ]
+        },
+        "invocation": {
+          "executable": "node",
+          "argv_template": [
+            "tools/system1-validators/run.cjs",
+            "--rubric",
+            "skills/bearing-lite/references/system1-rubrics/validator-gtm-purchase-event.rubric.json",
+            "--claim-id",
+            "SEIT-VAL-GTM-001",
+            "{operation}",
+            "{target}",
+            "{claim}"
+          ]
+        },
+        "claim_id": "SEIT-VAL-GTM-001",
+        "claim_type": "tracking_event_conformance",
+        "claim": {
+          "kind": "system1_decision",
+          "backend": "validator",
+          "rubric_id": "RUB-S1-VAL-GTM-PURCHASE-EVENT",
+          "rubric_version": "1.0.0",
+          "rubric_digest": "8634c97700752172d4320013dbf9bae8ab707c9d95fbbc8b36e126089dbec4d4",
+          "input_digest": "154e91cce575fe7b748b8c0c435b3dc1b4192dc1a0e03ac5560706528f8cc55e"
+        },
+        "target": "test/fixtures/datalayer/purchase-push.json",
+        "candidate": {
+          "candidate_ref": "cand-val-1",
+          "candidate_revision": "5f1e0c3a9b7d2e4f6a8c0b1d3e5f7a9c1b3d5e7f"
+        },
+        "stage": "assurance",
+        "authority": "assurance",
+        "expected_result": "VERIFIED",
+        "selected": true,
+        "required": true
+      },
+      "request": {
+        "schema_version": "1",
+        "kind": "request",
+        "candidate_ref": "cand-val-1",
+        "candidate_revision": "5f1e0c3a9b7d2e4f6a8c0b1d3e5f7a9c1b3d5e7f",
+        "claim_id": "SEIT-VAL-GTM-001",
+        "claim_type": "tracking_event_conformance",
+        "backend": "validator",
+        "stage": "assurance",
+        "authority": "assurance",
+        "expected_result": "VERIFIED",
+        "command_configuration": {
+          "backend": "validator",
+          "operation": "check",
+          "target": "test/fixtures/datalayer/purchase-push.json",
+          "claim": "{\"backend\":\"validator\",\"input_digest\":\"154e91cce575fe7b748b8c0c435b3dc1b4192dc1a0e03ac5560706528f8cc55e\",\"kind\":\"system1_decision\",\"rubric_digest\":\"8634c97700752172d4320013dbf9bae8ab707c9d95fbbc8b36e126089dbec4d4\",\"rubric_id\":\"RUB-S1-VAL-GTM-PURCHASE-EVENT\",\"rubric_version\":\"1.0.0\"}",
+          "args": [],
+          "invocation": {
+            "executable": "node",
+            "argv_template": [
+              "tools/system1-validators/run.cjs",
+              "--rubric",
+              "skills/bearing-lite/references/system1-rubrics/validator-gtm-purchase-event.rubric.json",
+              "--claim-id",
+              "SEIT-VAL-GTM-001",
+              "{operation}",
+              "{target}",
+              "{claim}"
+            ]
+          }
+        },
+        "selected": true,
+        "required": true
+      },
+      "output": {
+        "backend": "validator",
+        "backend_version": "validator gtm-purchase-event@1.0.0 node22",
+        "results": [
+          {
+            "claim_id": "SEIT-VAL-GTM-001",
+            "detail": "all 10 conditions hold (gtm-purchase-event@1.0.0)",
+            "evidence": {
+              "controls": [
+                {
+                  "control_id": "CTL-GTM-PURCHASE-VALID",
+                  "expected": "VERIFIED",
+                  "observed": "VERIFIED",
+                  "output_digest": "35b2186f31a4224a2888aecc29bd8c1a05b2d331bf81a9a5b8a0607dcb817e00"
+                },
+                {
+                  "control_id": "CTL-GTM-PURCHASE-NO-CURRENCY",
+                  "expected": "REFUTED",
+                  "observed": "REFUTED",
+                  "output_digest": "7a779f202e2aee70cc1d467f0a677f8bf783d4f3a081174193a44115487f68aa"
+                },
+                {
+                  "control_id": "CTL-GTM-ADD-TO-CART",
+                  "expected": "REFUTED",
+                  "observed": "REFUTED",
+                  "output_digest": "3f3e9521c363bbdf8de0270ccde0870289ad941f435034d22a39a6488787af8f"
+                }
+              ],
+              "decision": {
+                "conditions": [
+                  {
+                    "holds": true,
+                    "id": "push_is_object"
+                  },
+                  {
+                    "holds": true,
+                    "id": "event_is_purchase"
+                  },
+                  {
+                    "holds": true,
+                    "id": "ecommerce_is_object"
+                  },
+                  {
+                    "holds": true,
+                    "id": "transaction_id_present"
+                  },
+                  {
+                    "holds": true,
+                    "id": "value_present"
+                  },
+                  {
+                    "holds": true,
+                    "id": "currency_present"
+                  },
+                  {
+                    "holds": true,
+                    "id": "currency_is_iso4217"
+                  },
+                  {
+                    "holds": true,
+                    "id": "items_is_array"
+                  },
+                  {
+                    "holds": true,
+                    "id": "items_nonempty"
+                  },
+                  {
+                    "holds": true,
+                    "id": "items_has_identified_item"
+                  }
+                ],
+                "failed_conditions": [],
+                "verdict": "VERIFIED"
+              },
+              "engine": "validator",
+              "engine_version": "gtm-purchase-event@1.0.0",
+              "input": {
+                "canonical_input_digest": "4e6f0355f5c0af83cbb79e426a64e3a15487461fefd6b44156fa7af0fb473762",
+                "canonicalization": "rfc8785_jcs",
+                "claim_input_digest": "154e91cce575fe7b748b8c0c435b3dc1b4192dc1a0e03ac5560706528f8cc55e",
+                "format": "json",
+                "input_bytes": 479,
+                "input_digest": "154e91cce575fe7b748b8c0c435b3dc1b4192dc1a0e03ac5560706528f8cc55e",
+                "input_digest_basis": "raw_file_bytes",
+                "max_input_bytes": 65536,
+                "target": "test/fixtures/datalayer/purchase-push.json"
+              },
+              "replay": {
+                "identical_output_digest": true,
+                "min_runs": 2,
+                "output_digest": "b6e3aaefb3f58c443c2d628734a2237df86243637dde2f75ab7c78555528b18f",
+                "runs": 2
+              },
+              "rubric": {
+                "rubric_digest": "8634c97700752172d4320013dbf9bae8ab707c9d95fbbc8b36e126089dbec4d4",
+                "rubric_id": "RUB-S1-VAL-GTM-PURCHASE-EVENT",
+                "rubric_version": "1.0.0"
+              },
+              "runs": [
+                {
+                  "fresh_process": true,
+                  "output_digest": "b6e3aaefb3f58c443c2d628734a2237df86243637dde2f75ab7c78555528b18f",
+                  "run_index": 1,
+                  "verdict": "VERIFIED"
+                },
+                {
+                  "fresh_process": true,
+                  "output_digest": "b6e3aaefb3f58c443c2d628734a2237df86243637dde2f75ab7c78555528b18f",
+                  "run_index": 2,
+                  "verdict": "VERIFIED"
+                }
+              ],
+              "strength": "observed",
+              "validator": {
+                "node_major": 22,
+                "pinned_files": [
+                  {
+                    "path": "tools/system1-validators/gtm-purchase-event.cjs",
+                    "sha256": "10cb5faeb83cfff0a4ef096eb4bcb62f9419a8ef32bc40e4341f011b07be9512"
+                  },
+                  {
+                    "path": "tools/system1-validators/lib.cjs",
+                    "sha256": "b3452a8b0d907635434fe394ba44e6eaa17d20fd9a05fe9bef3e30d4c956e92c"
+                  }
+                ],
+                "runner_sha256": "039d88ebb85f5b7cf29a10635123e17d2b0f6a276f7825980972c650faf06c97",
+                "validator_id": "gtm-purchase-event",
+                "validator_version": "1.0.0"
+              }
+            },
+            "kind": "system1_decision",
+            "verdict": "VERIFIED"
+          }
+        ],
+        "schema_family": "system1",
+        "schema_version": "1"
+      },
+      "receipt": {
+        "schema_version": "1",
+        "kind": "receipt",
+        "status": "VERIFIED",
+        "candidate_ref": "cand-val-1",
+        "candidate_revision": "5f1e0c3a9b7d2e4f6a8c0b1d3e5f7a9c1b3d5e7f",
+        "claim_id": "SEIT-VAL-GTM-001",
+        "backend": "validator",
+        "backend_version": "validator gtm-purchase-event@1.0.0 node22",
+        "command_configuration": {
+          "backend": "validator",
+          "operation": "check",
+          "target": "test/fixtures/datalayer/purchase-push.json",
+          "claim": "{\"backend\":\"validator\",\"input_digest\":\"154e91cce575fe7b748b8c0c435b3dc1b4192dc1a0e03ac5560706528f8cc55e\",\"kind\":\"system1_decision\",\"rubric_digest\":\"8634c97700752172d4320013dbf9bae8ab707c9d95fbbc8b36e126089dbec4d4\",\"rubric_id\":\"RUB-S1-VAL-GTM-PURCHASE-EVENT\",\"rubric_version\":\"1.0.0\"}",
+          "args": [],
+          "invocation": {
+            "executable": "node",
+            "argv_template": [
+              "tools/system1-validators/run.cjs",
+              "--rubric",
+              "skills/bearing-lite/references/system1-rubrics/validator-gtm-purchase-event.rubric.json",
+              "--claim-id",
+              "SEIT-VAL-GTM-001",
+              "{operation}",
+              "{target}",
+              "{claim}"
+            ]
+          }
+        },
+        "evidence_digest": "545299c5b789b531417e4dec69283d6fcb91d289f1bfe8499e60d2284582b581",
+        "authority": "assurance",
+        "produced_by": {
+          "role": "test_engineer.assurance",
+          "identity": "ate-val",
+          "session": "sess-ate-val"
+        },
+        "stage": "assurance",
+        "evidence_tier": "observed",
+        "backend_verdict": "VERIFIED"
+      }
+    },
+    "refuted": {
+      "spec": {
+        "backend": "validator",
+        "backend_operation": "check",
+        "backend_operations": {
+          "allowed": [
+            "check"
+          ],
+          "denied": [
+            "generate",
+            "propose",
+            "propose_claims",
+            "propose_options",
+            "suggest_options",
+            "rewrite",
+            "rewrite_claim",
+            "rewrite_options",
+            "explain",
+            "complete",
+            "chat",
+            "review"
+          ]
+        },
+        "invocation": {
+          "executable": "node",
+          "argv_template": [
+            "tools/system1-validators/run.cjs",
+            "--rubric",
+            "skills/bearing-lite/references/system1-rubrics/validator-gtm-purchase-event.rubric.json",
+            "--claim-id",
+            "SEIT-VAL-GTM-001",
+            "{operation}",
+            "{target}",
+            "{claim}"
+          ]
+        },
+        "claim_id": "SEIT-VAL-GTM-001",
+        "claim_type": "tracking_event_conformance",
+        "claim": {
+          "kind": "system1_decision",
+          "backend": "validator",
+          "rubric_id": "RUB-S1-VAL-GTM-PURCHASE-EVENT",
+          "rubric_version": "1.0.0",
+          "rubric_digest": "8634c97700752172d4320013dbf9bae8ab707c9d95fbbc8b36e126089dbec4d4",
+          "input_digest": "ac8359930a47ddb06baee8cf8940b44679ba202f0e3668eada3cd04d241476ce"
+        },
+        "target": "test/fixtures/datalayer/controls/add-to-cart.json",
+        "candidate": {
+          "candidate_ref": "cand-val-1",
+          "candidate_revision": "5f1e0c3a9b7d2e4f6a8c0b1d3e5f7a9c1b3d5e7f"
+        },
+        "stage": "assurance",
+        "authority": "assurance",
+        "expected_result": "VERIFIED",
+        "selected": true,
+        "required": true
+      },
+      "request": {
+        "schema_version": "1",
+        "kind": "request",
+        "candidate_ref": "cand-val-1",
+        "candidate_revision": "5f1e0c3a9b7d2e4f6a8c0b1d3e5f7a9c1b3d5e7f",
+        "claim_id": "SEIT-VAL-GTM-001",
+        "claim_type": "tracking_event_conformance",
+        "backend": "validator",
+        "stage": "assurance",
+        "authority": "assurance",
+        "expected_result": "VERIFIED",
+        "command_configuration": {
+          "backend": "validator",
+          "operation": "check",
+          "target": "test/fixtures/datalayer/controls/add-to-cart.json",
+          "claim": "{\"backend\":\"validator\",\"input_digest\":\"ac8359930a47ddb06baee8cf8940b44679ba202f0e3668eada3cd04d241476ce\",\"kind\":\"system1_decision\",\"rubric_digest\":\"8634c97700752172d4320013dbf9bae8ab707c9d95fbbc8b36e126089dbec4d4\",\"rubric_id\":\"RUB-S1-VAL-GTM-PURCHASE-EVENT\",\"rubric_version\":\"1.0.0\"}",
+          "args": [],
+          "invocation": {
+            "executable": "node",
+            "argv_template": [
+              "tools/system1-validators/run.cjs",
+              "--rubric",
+              "skills/bearing-lite/references/system1-rubrics/validator-gtm-purchase-event.rubric.json",
+              "--claim-id",
+              "SEIT-VAL-GTM-001",
+              "{operation}",
+              "{target}",
+              "{claim}"
+            ]
+          }
+        },
+        "selected": true,
+        "required": true
+      },
+      "output": {
+        "backend": "validator",
+        "backend_version": "validator gtm-purchase-event@1.0.0 node22",
+        "results": [
+          {
+            "claim_id": "SEIT-VAL-GTM-001",
+            "detail": "failed condition(s): event_is_purchase, transaction_id_present",
+            "evidence": {
+              "controls": [
+                {
+                  "control_id": "CTL-GTM-PURCHASE-VALID",
+                  "expected": "VERIFIED",
+                  "observed": "VERIFIED",
+                  "output_digest": "35b2186f31a4224a2888aecc29bd8c1a05b2d331bf81a9a5b8a0607dcb817e00"
+                },
+                {
+                  "control_id": "CTL-GTM-PURCHASE-NO-CURRENCY",
+                  "expected": "REFUTED",
+                  "observed": "REFUTED",
+                  "output_digest": "7a779f202e2aee70cc1d467f0a677f8bf783d4f3a081174193a44115487f68aa"
+                },
+                {
+                  "control_id": "CTL-GTM-ADD-TO-CART",
+                  "expected": "REFUTED",
+                  "observed": "REFUTED",
+                  "output_digest": "3f3e9521c363bbdf8de0270ccde0870289ad941f435034d22a39a6488787af8f"
+                }
+              ],
+              "decision": {
+                "conditions": [
+                  {
+                    "holds": true,
+                    "id": "push_is_object"
+                  },
+                  {
+                    "holds": false,
+                    "id": "event_is_purchase"
+                  },
+                  {
+                    "holds": true,
+                    "id": "ecommerce_is_object"
+                  },
+                  {
+                    "holds": false,
+                    "id": "transaction_id_present"
+                  },
+                  {
+                    "holds": true,
+                    "id": "value_present"
+                  },
+                  {
+                    "holds": true,
+                    "id": "currency_present"
+                  },
+                  {
+                    "holds": true,
+                    "id": "currency_is_iso4217"
+                  },
+                  {
+                    "holds": true,
+                    "id": "items_is_array"
+                  },
+                  {
+                    "holds": true,
+                    "id": "items_nonempty"
+                  },
+                  {
+                    "holds": true,
+                    "id": "items_has_identified_item"
+                  }
+                ],
+                "failed_conditions": [
+                  "event_is_purchase",
+                  "transaction_id_present"
+                ],
+                "verdict": "REFUTED"
+              },
+              "engine": "validator",
+              "engine_version": "gtm-purchase-event@1.0.0",
+              "input": {
+                "canonical_input_digest": "ac8359930a47ddb06baee8cf8940b44679ba202f0e3668eada3cd04d241476ce",
+                "canonicalization": "rfc8785_jcs",
+                "claim_input_digest": "ac8359930a47ddb06baee8cf8940b44679ba202f0e3668eada3cd04d241476ce",
+                "format": "json",
+                "input_bytes": 154,
+                "input_digest": "ac8359930a47ddb06baee8cf8940b44679ba202f0e3668eada3cd04d241476ce",
+                "input_digest_basis": "raw_file_bytes",
+                "max_input_bytes": 65536,
+                "target": "test/fixtures/datalayer/controls/add-to-cart.json"
+              },
+              "replay": {
+                "identical_output_digest": true,
+                "min_runs": 2,
+                "output_digest": "3f3e9521c363bbdf8de0270ccde0870289ad941f435034d22a39a6488787af8f",
+                "runs": 2
+              },
+              "rubric": {
+                "rubric_digest": "8634c97700752172d4320013dbf9bae8ab707c9d95fbbc8b36e126089dbec4d4",
+                "rubric_id": "RUB-S1-VAL-GTM-PURCHASE-EVENT",
+                "rubric_version": "1.0.0"
+              },
+              "runs": [
+                {
+                  "fresh_process": true,
+                  "output_digest": "3f3e9521c363bbdf8de0270ccde0870289ad941f435034d22a39a6488787af8f",
+                  "run_index": 1,
+                  "verdict": "REFUTED"
+                },
+                {
+                  "fresh_process": true,
+                  "output_digest": "3f3e9521c363bbdf8de0270ccde0870289ad941f435034d22a39a6488787af8f",
+                  "run_index": 2,
+                  "verdict": "REFUTED"
+                }
+              ],
+              "strength": "observed",
+              "validator": {
+                "node_major": 22,
+                "pinned_files": [
+                  {
+                    "path": "tools/system1-validators/gtm-purchase-event.cjs",
+                    "sha256": "10cb5faeb83cfff0a4ef096eb4bcb62f9419a8ef32bc40e4341f011b07be9512"
+                  },
+                  {
+                    "path": "tools/system1-validators/lib.cjs",
+                    "sha256": "b3452a8b0d907635434fe394ba44e6eaa17d20fd9a05fe9bef3e30d4c956e92c"
+                  }
+                ],
+                "runner_sha256": "039d88ebb85f5b7cf29a10635123e17d2b0f6a276f7825980972c650faf06c97",
+                "validator_id": "gtm-purchase-event",
+                "validator_version": "1.0.0"
+              }
+            },
+            "kind": "system1_decision",
+            "verdict": "REFUTED"
+          }
+        ],
+        "schema_family": "system1",
+        "schema_version": "1"
+      },
+      "receipt": {
+        "schema_version": "1",
+        "kind": "receipt",
+        "status": "REFUTED",
+        "candidate_ref": "cand-val-1",
+        "candidate_revision": "5f1e0c3a9b7d2e4f6a8c0b1d3e5f7a9c1b3d5e7f",
+        "claim_id": "SEIT-VAL-GTM-001",
+        "backend": "validator",
+        "backend_version": "validator gtm-purchase-event@1.0.0 node22",
+        "command_configuration": {
+          "backend": "validator",
+          "operation": "check",
+          "target": "test/fixtures/datalayer/controls/add-to-cart.json",
+          "claim": "{\"backend\":\"validator\",\"input_digest\":\"ac8359930a47ddb06baee8cf8940b44679ba202f0e3668eada3cd04d241476ce\",\"kind\":\"system1_decision\",\"rubric_digest\":\"8634c97700752172d4320013dbf9bae8ab707c9d95fbbc8b36e126089dbec4d4\",\"rubric_id\":\"RUB-S1-VAL-GTM-PURCHASE-EVENT\",\"rubric_version\":\"1.0.0\"}",
+          "args": [],
+          "invocation": {
+            "executable": "node",
+            "argv_template": [
+              "tools/system1-validators/run.cjs",
+              "--rubric",
+              "skills/bearing-lite/references/system1-rubrics/validator-gtm-purchase-event.rubric.json",
+              "--claim-id",
+              "SEIT-VAL-GTM-001",
+              "{operation}",
+              "{target}",
+              "{claim}"
+            ]
+          }
+        },
+        "evidence_digest": "3aba13610a03d3ee5e07a82d85e14a079abbe28259faeae5b97666e72995beab",
+        "authority": "assurance",
+        "produced_by": {
+          "role": "test_engineer.assurance",
+          "identity": "ate-val",
+          "session": "sess-ate-val"
+        },
+        "stage": "assurance",
+        "evidence_tier": "observed",
+        "backend_verdict": "REFUTED"
+      }
+    },
+    "error_unparseable": {
+      "spec": {
+        "backend": "validator",
+        "backend_operation": "check",
+        "backend_operations": {
+          "allowed": [
+            "check"
+          ],
+          "denied": [
+            "generate",
+            "propose",
+            "propose_claims",
+            "propose_options",
+            "suggest_options",
+            "rewrite",
+            "rewrite_claim",
+            "rewrite_options",
+            "explain",
+            "complete",
+            "chat",
+            "review"
+          ]
+        },
+        "invocation": {
+          "executable": "node",
+          "argv_template": [
+            "tools/system1-validators/run.cjs",
+            "--rubric",
+            "skills/bearing-lite/references/system1-rubrics/validator-gtm-purchase-event.rubric.json",
+            "--claim-id",
+            "SEIT-VAL-GTM-001",
+            "{operation}",
+            "{target}",
+            "{claim}"
+          ]
+        },
+        "claim_id": "SEIT-VAL-GTM-001",
+        "claim_type": "tracking_event_conformance",
+        "claim": {
+          "kind": "system1_decision",
+          "backend": "validator",
+          "rubric_id": "RUB-S1-VAL-GTM-PURCHASE-EVENT",
+          "rubric_version": "1.0.0",
+          "rubric_digest": "8634c97700752172d4320013dbf9bae8ab707c9d95fbbc8b36e126089dbec4d4",
+          "input_digest": "c9af0953637ce3930d731178481e4175d999fc97160a78f698aedb0d022b8586"
+        },
+        "target": "test/fixtures/datalayer/purchase-push-truncated.json",
+        "candidate": {
+          "candidate_ref": "cand-val-1",
+          "candidate_revision": "5f1e0c3a9b7d2e4f6a8c0b1d3e5f7a9c1b3d5e7f"
+        },
+        "stage": "assurance",
+        "authority": "assurance",
+        "expected_result": "VERIFIED",
+        "selected": true,
+        "required": true
+      },
+      "request": {
+        "schema_version": "1",
+        "kind": "request",
+        "candidate_ref": "cand-val-1",
+        "candidate_revision": "5f1e0c3a9b7d2e4f6a8c0b1d3e5f7a9c1b3d5e7f",
+        "claim_id": "SEIT-VAL-GTM-001",
+        "claim_type": "tracking_event_conformance",
+        "backend": "validator",
+        "stage": "assurance",
+        "authority": "assurance",
+        "expected_result": "VERIFIED",
+        "command_configuration": {
+          "backend": "validator",
+          "operation": "check",
+          "target": "test/fixtures/datalayer/purchase-push-truncated.json",
+          "claim": "{\"backend\":\"validator\",\"input_digest\":\"c9af0953637ce3930d731178481e4175d999fc97160a78f698aedb0d022b8586\",\"kind\":\"system1_decision\",\"rubric_digest\":\"8634c97700752172d4320013dbf9bae8ab707c9d95fbbc8b36e126089dbec4d4\",\"rubric_id\":\"RUB-S1-VAL-GTM-PURCHASE-EVENT\",\"rubric_version\":\"1.0.0\"}",
+          "args": [],
+          "invocation": {
+            "executable": "node",
+            "argv_template": [
+              "tools/system1-validators/run.cjs",
+              "--rubric",
+              "skills/bearing-lite/references/system1-rubrics/validator-gtm-purchase-event.rubric.json",
+              "--claim-id",
+              "SEIT-VAL-GTM-001",
+              "{operation}",
+              "{target}",
+              "{claim}"
+            ]
+          }
+        },
+        "selected": true,
+        "required": true
+      },
+      "output": {
+        "backend": "validator",
+        "backend_version": "validator gtm-purchase-event@1.0.0 node22",
+        "results": [
+          {
+            "claim_id": "SEIT-VAL-GTM-001",
+            "detail": "JSON: expected a string key at offset 121",
+            "evidence": {
+              "controls": [
+                {
+                  "control_id": "CTL-GTM-PURCHASE-VALID",
+                  "expected": "VERIFIED",
+                  "observed": "VERIFIED",
+                  "output_digest": "35b2186f31a4224a2888aecc29bd8c1a05b2d331bf81a9a5b8a0607dcb817e00"
+                },
+                {
+                  "control_id": "CTL-GTM-PURCHASE-NO-CURRENCY",
+                  "expected": "REFUTED",
+                  "observed": "REFUTED",
+                  "output_digest": "7a779f202e2aee70cc1d467f0a677f8bf783d4f3a081174193a44115487f68aa"
+                },
+                {
+                  "control_id": "CTL-GTM-ADD-TO-CART",
+                  "expected": "REFUTED",
+                  "observed": "REFUTED",
+                  "output_digest": "3f3e9521c363bbdf8de0270ccde0870289ad941f435034d22a39a6488787af8f"
+                }
+              ],
+              "decision": {
+                "conditions": [],
+                "failed_conditions": [],
+                "verdict": "ERROR"
+              },
+              "engine": "validator",
+              "engine_version": "gtm-purchase-event@1.0.0",
+              "input": {
+                "canonical_input_digest": null,
+                "canonicalization": "rfc8785_jcs",
+                "claim_input_digest": "c9af0953637ce3930d731178481e4175d999fc97160a78f698aedb0d022b8586",
+                "format": "json",
+                "input_bytes": 121,
+                "input_digest": "c9af0953637ce3930d731178481e4175d999fc97160a78f698aedb0d022b8586",
+                "input_digest_basis": "raw_file_bytes",
+                "max_input_bytes": 65536,
+                "target": "test/fixtures/datalayer/purchase-push-truncated.json"
+              },
+              "replay": {
+                "identical_output_digest": true,
+                "min_runs": 2,
+                "output_digest": "43888e4081e904b491b31e612d994c2e03186767b91fe39a2f43ddcc83ae7248",
+                "runs": 2
+              },
+              "rubric": {
+                "rubric_digest": "8634c97700752172d4320013dbf9bae8ab707c9d95fbbc8b36e126089dbec4d4",
+                "rubric_id": "RUB-S1-VAL-GTM-PURCHASE-EVENT",
+                "rubric_version": "1.0.0"
+              },
+              "runs": [
+                {
+                  "fresh_process": true,
+                  "output_digest": "43888e4081e904b491b31e612d994c2e03186767b91fe39a2f43ddcc83ae7248",
+                  "run_index": 1,
+                  "verdict": "ERROR"
+                },
+                {
+                  "fresh_process": true,
+                  "output_digest": "43888e4081e904b491b31e612d994c2e03186767b91fe39a2f43ddcc83ae7248",
+                  "run_index": 2,
+                  "verdict": "ERROR"
+                }
+              ],
+              "strength": "observed",
+              "validator": {
+                "node_major": 22,
+                "pinned_files": [
+                  {
+                    "path": "tools/system1-validators/gtm-purchase-event.cjs",
+                    "sha256": "10cb5faeb83cfff0a4ef096eb4bcb62f9419a8ef32bc40e4341f011b07be9512"
+                  },
+                  {
+                    "path": "tools/system1-validators/lib.cjs",
+                    "sha256": "b3452a8b0d907635434fe394ba44e6eaa17d20fd9a05fe9bef3e30d4c956e92c"
+                  }
+                ],
+                "runner_sha256": "039d88ebb85f5b7cf29a10635123e17d2b0f6a276f7825980972c650faf06c97",
+                "validator_id": "gtm-purchase-event",
+                "validator_version": "1.0.0"
+              }
+            },
+            "kind": "system1_decision",
+            "reason": "input_unparseable",
+            "verdict": "ERROR"
+          }
+        ],
+        "schema_family": "system1",
+        "schema_version": "1"
+      },
+      "receipt": {
+        "schema_version": "1",
+        "kind": "receipt",
+        "status": "ERROR",
+        "candidate_ref": "cand-val-1",
+        "candidate_revision": "5f1e0c3a9b7d2e4f6a8c0b1d3e5f7a9c1b3d5e7f",
+        "claim_id": "SEIT-VAL-GTM-001",
+        "backend": "validator",
+        "backend_version": "validator gtm-purchase-event@1.0.0 node22",
+        "command_configuration": {
+          "backend": "validator",
+          "operation": "check",
+          "target": "test/fixtures/datalayer/purchase-push-truncated.json",
+          "claim": "{\"backend\":\"validator\",\"input_digest\":\"c9af0953637ce3930d731178481e4175d999fc97160a78f698aedb0d022b8586\",\"kind\":\"system1_decision\",\"rubric_digest\":\"8634c97700752172d4320013dbf9bae8ab707c9d95fbbc8b36e126089dbec4d4\",\"rubric_id\":\"RUB-S1-VAL-GTM-PURCHASE-EVENT\",\"rubric_version\":\"1.0.0\"}",
+          "args": [],
+          "invocation": {
+            "executable": "node",
+            "argv_template": [
+              "tools/system1-validators/run.cjs",
+              "--rubric",
+              "skills/bearing-lite/references/system1-rubrics/validator-gtm-purchase-event.rubric.json",
+              "--claim-id",
+              "SEIT-VAL-GTM-001",
+              "{operation}",
+              "{target}",
+              "{claim}"
+            ]
+          }
+        },
+        "evidence_digest": "041aac989798ec2c5a1511a02dee07482f7ef425a42217b2d35472dd04c27d1d",
+        "authority": "assurance",
+        "produced_by": {
+          "role": "test_engineer.assurance",
+          "identity": "ate-val",
+          "session": "sess-ate-val"
+        },
+        "stage": "assurance",
+        "evidence_tier": "observed",
+        "backend_verdict": "ERROR"
+      }
+    }
+  }
+}
