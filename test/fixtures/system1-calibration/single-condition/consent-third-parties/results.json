@@ -1,0 +1,705 @@
+{
+ "rubric": "consent-third-parties",
+ "verify_threshold": 0.85,
+ "refute_threshold": 0.85,
+ "max_ece": 0.12,
+ "calibration_size": 256,
+ "test_size": 256,
+ "formulations": {
+  "noul": {
+   "question": {
+    "key": "names_third_parties",
+    "type": "noul",
+    "instructions": "The state is the visible text of a website cookie or consent notice, in any language. Does the text say that the data is shared with, passed to, or received by third parties, partners or other companies?"
+   },
+   "temperature": 6.170187450219553,
+   "shipped_temperature": 1.0,
+   "calibration_calibrated": {
+    "n": 256,
+    "accuracy": 0.58984375,
+    "ece": 0.11236841895224664,
+    "nll": 0.6430329828322058,
+    "coverage": 0.0078125,
+    "precision": 1.0,
+    "verified": 2,
+    "verified_correct": 2,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 254,
+    "pred_counts": {
+     "no": 23,
+     "yes": 233
+    }
+   },
+   "test_raw": {
+    "n": 256,
+    "accuracy": 0.57421875,
+    "ece": 0.36994757881371687,
+    "nll": 1.4987885467384232,
+    "coverage": 0.875,
+    "precision": 0.6026785714285714,
+    "verified": 216,
+    "verified_correct": 127,
+    "refuted": 8,
+    "refuted_correct": 8,
+    "inconclusive": 32,
+    "pred_counts": {
+     "no": 19,
+     "yes": 237
+    }
+   },
+   "test_shipped": {
+    "n": 256,
+    "accuracy": 0.57421875,
+    "ece": 0.36994757881371687,
+    "nll": 1.4987885467384232,
+    "coverage": 0.875,
+    "precision": 0.6026785714285714,
+    "verified": 216,
+    "verified_correct": 127,
+    "refuted": 8,
+    "refuted_correct": 8,
+    "inconclusive": 32,
+    "pred_counts": {
+     "no": 19,
+     "yes": 237
+    }
+   },
+   "test_calibrated": {
+    "n": 256,
+    "accuracy": 0.57421875,
+    "ece": 0.08474412220813446,
+    "nll": 0.6662850482819764,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 256,
+    "pred_counts": {
+     "no": 19,
+     "yes": 237
+    }
+   },
+   "controls": {
+    "CTL-CONSENT-DE-COMPLETE": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.700202,
+     "pass": false
+    },
+    "CTL-CONSENT-ES-NO-WITHDRAW": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.665895,
+     "pass": false
+    },
+    "CTL-CONSENT-JA-NO-THIRD-PARTY": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.623019,
+     "pass": false
+    }
+   },
+   "test_gated": {
+    "verdicts": 0,
+    "correct": 0,
+    "wilson_lower": null
+   },
+   "test_accuracy_by_lang": {
+    "de": 0.59375,
+    "en": 0.59375,
+    "es": 0.59375,
+    "fr": 0.5625,
+    "it": 0.53125,
+    "ja": 0.5625,
+    "nl": 0.625,
+    "pt": 0.53125
+   },
+   "test_accuracy_by_variant": {
+    "000": 0.5,
+    "000_not_banner": 0.5,
+    "001": 0.0625,
+    "010": 1.0,
+    "011": 1.0,
+    "100": 0.03125,
+    "101": 0.0,
+    "110": 1.0,
+    "111": 1.0
+   },
+   "test_status_by_variant": {
+    "000": {
+     "INCONCLUSIVE": 16
+    },
+    "000_not_banner": {
+     "INCONCLUSIVE": 16
+    },
+    "001": {
+     "INCONCLUSIVE": 32
+    },
+    "010": {
+     "INCONCLUSIVE": 32
+    },
+    "011": {
+     "INCONCLUSIVE": 32
+    },
+    "100": {
+     "INCONCLUSIVE": 32
+    },
+    "101": {
+     "INCONCLUSIVE": 32
+    },
+    "110": {
+     "INCONCLUSIVE": 32
+    },
+    "111": {
+     "INCONCLUSIVE": 32
+    }
+   },
+   "controls_pass": false
+  },
+  "choice2_neutral": {
+   "question": {
+    "key": "names_third_parties",
+    "type": "choice",
+    "instructions": "The state is the visible text of a website cookie or consent notice, in any language. Which option describes the text?",
+    "criteria": {
+     "A": "it says the data is shared with or received by third parties, partners or other companies",
+     "B": "it does not say that anyone else receives the data"
+    }
+   },
+   "temperature": 1.2410289283483165,
+   "shipped_temperature": 1.0,
+   "calibration_calibrated": {
+    "n": 256,
+    "accuracy": 0.64453125,
+    "ece": 0.02357657162156969,
+    "nll": 0.6233544741192852,
+    "coverage": 0.03125,
+    "precision": 0.875,
+    "verified": 6,
+    "verified_correct": 6,
+    "refuted": 2,
+    "refuted_correct": 1,
+    "inconclusive": 248,
+    "pred_counts": {
+     "A": 81,
+     "B": 175
+    }
+   },
+   "test_raw": {
+    "n": 256,
+    "accuracy": 0.6796875,
+    "ece": 0.06406510963614305,
+    "nll": 0.5959698525292942,
+    "coverage": 0.0390625,
+    "precision": 0.9,
+    "verified": 6,
+    "verified_correct": 5,
+    "refuted": 4,
+    "refuted_correct": 4,
+    "inconclusive": 246,
+    "pred_counts": {
+     "A": 100,
+     "B": 156
+    }
+   },
+   "test_shipped": {
+    "n": 256,
+    "accuracy": 0.6796875,
+    "ece": 0.06406510963614305,
+    "nll": 0.5959698525292942,
+    "coverage": 0.0390625,
+    "precision": 0.9,
+    "verified": 6,
+    "verified_correct": 5,
+    "refuted": 4,
+    "refuted_correct": 4,
+    "inconclusive": 246,
+    "pred_counts": {
+     "A": 100,
+     "B": 156
+    }
+   },
+   "test_calibrated": {
+    "n": 256,
+    "accuracy": 0.6796875,
+    "ece": 0.039862118144351956,
+    "nll": 0.6015985965073196,
+    "coverage": 0.01171875,
+    "precision": 1.0,
+    "verified": 2,
+    "verified_correct": 2,
+    "refuted": 1,
+    "refuted_correct": 1,
+    "inconclusive": 253,
+    "pred_counts": {
+     "A": 100,
+     "B": 156
+    }
+   },
+   "controls": {
+    "CTL-CONSENT-DE-COMPLETE": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.665001,
+     "pass": false
+    },
+    "CTL-CONSENT-ES-NO-WITHDRAW": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.692421,
+     "pass": false
+    },
+    "CTL-CONSENT-JA-NO-THIRD-PARTY": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "B",
+     "thresholded_probability": 0.628274,
+     "pass": false
+    }
+   },
+   "test_gated": {
+    "verdicts": 3,
+    "correct": 3,
+    "wilson_lower": 0.4384939195509822
+   },
+   "test_accuracy_by_lang": {
+    "de": 0.71875,
+    "en": 0.71875,
+    "es": 0.59375,
+    "fr": 0.71875,
+    "it": 0.625,
+    "ja": 0.625,
+    "nl": 0.78125,
+    "pt": 0.65625
+   },
+   "test_accuracy_by_variant": {
+    "000": 1.0,
+    "000_not_banner": 0.75,
+    "001": 1.0,
+    "010": 0.84375,
+    "011": 0.15625,
+    "100": 0.59375,
+    "101": 0.6875,
+    "110": 0.71875,
+    "111": 0.5625
+   },
+   "test_status_by_variant": {
+    "000": {
+     "INCONCLUSIVE": 16
+    },
+    "000_not_banner": {
+     "INCONCLUSIVE": 16
+    },
+    "001": {
+     "INCONCLUSIVE": 32
+    },
+    "010": {
+     "INCONCLUSIVE": 32
+    },
+    "011": {
+     "INCONCLUSIVE": 32
+    },
+    "100": {
+     "INCONCLUSIVE": 32
+    },
+    "101": {
+     "INCONCLUSIVE": 31,
+     "REFUTED": 1
+    },
+    "110": {
+     "INCONCLUSIVE": 30,
+     "VERIFIED": 2
+    },
+    "111": {
+     "INCONCLUSIVE": 32
+    }
+   },
+   "controls_pass": false
+  },
+  "choice2_contrastive": {
+   "question": {
+    "key": "names_third_parties",
+    "type": "choice",
+    "instructions": "The state is the visible text of a website cookie or consent notice, in any language. Consider only whether it says that other companies, partners or third parties receive or are passed the data. Accept buttons, titles, other disclosures and a link to a privacy policy do not count. Which option describes the text?",
+    "criteria": {
+     "A": "yes: it says other companies, partners or third parties receive the data",
+     "B": "no: it never says that anyone other than the website receives the data"
+    }
+   },
+   "temperature": 19.999999999999993,
+   "shipped_temperature": 1.0,
+   "calibration_calibrated": {
+    "n": 256,
+    "accuracy": 0.50390625,
+    "ece": 0.026457145535750362,
+    "nll": 0.6922763417923166,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 256,
+    "pred_counts": {
+     "A": 245,
+     "B": 11
+    }
+   },
+   "test_raw": {
+    "n": 256,
+    "accuracy": 0.49609375,
+    "ece": 0.4037479471463574,
+    "nll": 1.3873824497348546,
+    "coverage": 0.75390625,
+    "precision": 0.49740932642487046,
+    "verified": 193,
+    "verified_correct": 96,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 63,
+    "pred_counts": {
+     "A": 253,
+     "B": 3
+    }
+   },
+   "test_shipped": {
+    "n": 256,
+    "accuracy": 0.49609375,
+    "ece": 0.4037479471463574,
+    "nll": 1.3873824497348546,
+    "coverage": 0.75390625,
+    "precision": 0.49740932642487046,
+    "verified": 193,
+    "verified_correct": 96,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 63,
+    "pred_counts": {
+     "A": 253,
+     "B": 3
+    }
+   },
+   "test_calibrated": {
+    "n": 256,
+    "accuracy": 0.49609375,
+    "ece": 0.035318887598743215,
+    "nll": 0.6958522630454005,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 256,
+    "pred_counts": {
+     "A": 253,
+     "B": 3
+    }
+   },
+   "controls": {
+    "CTL-CONSENT-DE-COMPLETE": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.546508,
+     "pass": false
+    },
+    "CTL-CONSENT-ES-NO-WITHDRAW": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.544961,
+     "pass": false
+    },
+    "CTL-CONSENT-JA-NO-THIRD-PARTY": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.526494,
+     "pass": false
+    }
+   },
+   "test_gated": {
+    "verdicts": 0,
+    "correct": 0,
+    "wilson_lower": null
+   },
+   "test_accuracy_by_lang": {
+    "de": 0.5,
+    "en": 0.46875,
+    "es": 0.46875,
+    "fr": 0.5,
+    "it": 0.5,
+    "ja": 0.53125,
+    "nl": 0.5,
+    "pt": 0.5
+   },
+   "test_accuracy_by_variant": {
+    "000": 0.0,
+    "000_not_banner": 0.0,
+    "001": 0.03125,
+    "010": 0.96875,
+    "011": 0.96875,
+    "100": 0.0,
+    "101": 0.0,
+    "110": 1.0,
+    "111": 1.0
+   },
+   "test_status_by_variant": {
+    "000": {
+     "INCONCLUSIVE": 16
+    },
+    "000_not_banner": {
+     "INCONCLUSIVE": 16
+    },
+    "001": {
+     "INCONCLUSIVE": 32
+    },
+    "010": {
+     "INCONCLUSIVE": 32
+    },
+    "011": {
+     "INCONCLUSIVE": 32
+    },
+    "100": {
+     "INCONCLUSIVE": 32
+    },
+    "101": {
+     "INCONCLUSIVE": 32
+    },
+    "110": {
+     "INCONCLUSIVE": 32
+    },
+    "111": {
+     "INCONCLUSIVE": 32
+    }
+   },
+   "controls_pass": false
+  },
+  "noul_sentence": {
+   "question": {
+    "key": "names_third_parties",
+    "type": "noul",
+    "instructions": "The state is the visible text of a website cookie or consent notice, in any language. Accept buttons, titles, other disclosures and a link to a privacy policy do not count. Does the text contain a sentence that says the data is shared with, passed to or received by other companies, partners or third parties?"
+   },
+   "temperature": 2.966464131776452,
+   "shipped_temperature": 1.0,
+   "calibration_calibrated": {
+    "n": 256,
+    "accuracy": 0.640625,
+    "ece": 0.045068483192784586,
+    "nll": 0.606614357428653,
+    "coverage": 0.0625,
+    "precision": 0.9375,
+    "verified": 16,
+    "verified_correct": 15,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 240,
+    "pred_counts": {
+     "no": 36,
+     "yes": 220
+    }
+   },
+   "test_raw": {
+    "n": 256,
+    "accuracy": 0.58984375,
+    "ece": 0.287455333318642,
+    "nll": 1.091868553531484,
+    "coverage": 0.703125,
+    "precision": 0.6555555555555556,
+    "verified": 177,
+    "verified_correct": 115,
+    "refuted": 3,
+    "refuted_correct": 3,
+    "inconclusive": 76,
+    "pred_counts": {
+     "no": 25,
+     "yes": 231
+    }
+   },
+   "test_shipped": {
+    "n": 256,
+    "accuracy": 0.58984375,
+    "ece": 0.287455333318642,
+    "nll": 1.091868553531484,
+    "coverage": 0.703125,
+    "precision": 0.6555555555555556,
+    "verified": 177,
+    "verified_correct": 115,
+    "refuted": 3,
+    "refuted_correct": 3,
+    "inconclusive": 76,
+    "pred_counts": {
+     "no": 25,
+     "yes": 231
+    }
+   },
+   "test_calibrated": {
+    "n": 256,
+    "accuracy": 0.58984375,
+    "ece": 0.11434709229561127,
+    "nll": 0.6815554445716513,
+    "coverage": 0.078125,
+    "precision": 0.65,
+    "verified": 20,
+    "verified_correct": 13,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 236,
+    "pred_counts": {
+     "no": 25,
+     "yes": 231
+    }
+   },
+   "controls": {
+    "CTL-CONSENT-DE-COMPLETE": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.816,
+     "pass": false
+    },
+    "CTL-CONSENT-ES-NO-WITHDRAW": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.751932,
+     "pass": false
+    },
+    "CTL-CONSENT-JA-NO-THIRD-PARTY": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.653022,
+     "pass": false
+    }
+   },
+   "test_gated": {
+    "verdicts": 20,
+    "correct": 13,
+    "wilson_lower": 0.43285051021946475
+   },
+   "test_accuracy_by_lang": {
+    "de": 0.59375,
+    "en": 0.59375,
+    "es": 0.65625,
+    "fr": 0.5625,
+    "it": 0.5625,
+    "ja": 0.59375,
+    "nl": 0.625,
+    "pt": 0.53125
+   },
+   "test_accuracy_by_variant": {
+    "000": 0.625,
+    "000_not_banner": 0.4375,
+    "001": 0.1875,
+    "010": 0.96875,
+    "011": 1.0,
+    "100": 0.03125,
+    "101": 0.0,
+    "110": 1.0,
+    "111": 1.0
+   },
+   "test_status_by_variant": {
+    "000": {
+     "INCONCLUSIVE": 16
+    },
+    "000_not_banner": {
+     "INCONCLUSIVE": 16
+    },
+    "001": {
+     "INCONCLUSIVE": 32
+    },
+    "010": {
+     "INCONCLUSIVE": 32
+    },
+    "011": {
+     "INCONCLUSIVE": 31,
+     "VERIFIED": 1
+    },
+    "100": {
+     "INCONCLUSIVE": 32
+    },
+    "101": {
+     "INCONCLUSIVE": 25,
+     "VERIFIED": 7
+    },
+    "110": {
+     "INCONCLUSIVE": 29,
+     "VERIFIED": 3
+    },
+    "111": {
+     "VERIFIED": 9,
+     "INCONCLUSIVE": 23
+    }
+   },
+   "controls_pass": false
+  }
+ },
+ "chosen": {
+  "formulation": "choice2_neutral",
+  "measured_ece": 0.039862118144351956,
+  "assurance_eligible_before_replay": false,
+  "reasons": [
+   "Wilson 95% lower bound of held-out gated precision 0.438 (3/3) is below 0.90",
+   "controls land on the wrong status: CTL-CONSENT-DE-COMPLETE, CTL-CONSENT-ES-NO-WITHDRAW, CTL-CONSENT-JA-NO-THIRD-PARTY"
+  ]
+ }
+}

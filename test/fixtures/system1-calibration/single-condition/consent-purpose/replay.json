@@ -1,0 +1,90 @@
+{
+ "rubric": "consent-purpose",
+ "formulation": "choice2_neutral",
+ "temperature": 1.3439988373693263,
+ "controls": {
+  "CTL-CONSENT-DE-COMPLETE": {
+   "runs": 5,
+   "fresh_process_runs": 2,
+   "statuses": [
+    "INCONCLUSIVE",
+    "INCONCLUSIVE",
+    "INCONCLUSIVE",
+    "INCONCLUSIVE",
+    "INCONCLUSIVE"
+   ],
+   "answers": [
+    "A",
+    "A",
+    "A",
+    "A",
+    "A"
+   ],
+   "thresholded_probability": [
+    0.6819577891689894,
+    0.6819577891689894,
+    0.6819577891689894,
+    0.6819577891689894,
+    0.6819577891689894
+   ],
+   "max_probability_delta": 0.0,
+   "max_logit_delta": 0.0
+  },
+  "CTL-CONSENT-FR-NO-PURPOSE": {
+   "runs": 5,
+   "fresh_process_runs": 2,
+   "statuses": [
+    "INCONCLUSIVE",
+    "INCONCLUSIVE",
+    "INCONCLUSIVE",
+    "INCONCLUSIVE",
+    "INCONCLUSIVE"
+   ],
+   "answers": [
+    "B",
+    "B",
+    "B",
+    "B",
+    "B"
+   ],
+   "thresholded_probability": [
+    0.5556322776769544,
+    0.5556322776769544,
+    0.5556322776769544,
+    0.5556322776769544,
+    0.5556322776769544
+   ],
+   "max_probability_delta": 0.0,
+   "max_logit_delta": 0.0
+  },
+  "CTL-CONSENT-EN-SHOP-NOTICE": {
+   "runs": 5,
+   "fresh_process_runs": 2,
+   "statuses": [
+    "INCONCLUSIVE",
+    "INCONCLUSIVE",
+    "INCONCLUSIVE",
+    "INCONCLUSIVE",
+    "INCONCLUSIVE"
+   ],
+   "answers": [
+    "A",
+    "A",
+    "A",
+    "A",
+    "A"
+   ],
+   "thresholded_probability": [
+    0.5438947994984246,
+    0.5438947994984246,
+    0.5438947994984246,
+    0.5438947994984246,
+    0.5438947994984246
+   ],
+   "max_probability_delta": 0.0,
+   "max_logit_delta": 0.0
+  }
+ },
+ "max_probability_delta": 0.0,
+ "max_logit_delta": 0.0
+}

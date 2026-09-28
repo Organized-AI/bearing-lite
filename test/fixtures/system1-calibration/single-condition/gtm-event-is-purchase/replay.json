@@ -1,0 +1,90 @@
+{
+ "rubric": "gtm-event-is-purchase",
+ "formulation": "choice5_events",
+ "temperature": 1.4035008323438354,
+ "controls": {
+  "CTL-GTM-PURCHASE-VALID": {
+   "runs": 5,
+   "fresh_process_runs": 2,
+   "statuses": [
+    "VERIFIED",
+    "VERIFIED",
+    "VERIFIED",
+    "VERIFIED",
+    "VERIFIED"
+   ],
+   "answers": [
+    "A",
+    "A",
+    "A",
+    "A",
+    "A"
+   ],
+   "thresholded_probability": [
+    0.977326637446133,
+    0.977326637446133,
+    0.977326637446133,
+    0.977326637446133,
+    0.977326637446133
+   ],
+   "max_probability_delta": 0.0,
+   "max_logit_delta": 0.0
+  },
+  "CTL-GTM-PURCHASE-NO-CURRENCY": {
+   "runs": 5,
+   "fresh_process_runs": 2,
+   "statuses": [
+    "VERIFIED",
+    "VERIFIED",
+    "VERIFIED",
+    "VERIFIED",
+    "VERIFIED"
+   ],
+   "answers": [
+    "A",
+    "A",
+    "A",
+    "A",
+    "A"
+   ],
+   "thresholded_probability": [
+    0.9805375281846772,
+    0.9805375281846772,
+    0.9805375281846772,
+    0.9805375281846772,
+    0.9805375281846772
+   ],
+   "max_probability_delta": 0.0,
+   "max_logit_delta": 0.0
+  },
+  "CTL-GTM-ADD-TO-CART": {
+   "runs": 5,
+   "fresh_process_runs": 2,
+   "statuses": [
+    "REFUTED",
+    "REFUTED",
+    "REFUTED",
+    "REFUTED",
+    "REFUTED"
+   ],
+   "answers": [
+    "B",
+    "B",
+    "B",
+    "B",
+    "B"
+   ],
+   "thresholded_probability": [
+    0.9947394502432922,
+    0.9947394502432922,
+    0.9947394502432922,
+    0.9947394502432922,
+    0.9947394502432922
+   ],
+   "max_probability_delta": 0.0,
+   "max_logit_delta": 0.0
+  }
+ },
+ "max_probability_delta": 0.0,
+ "max_logit_delta": 0.0
+}

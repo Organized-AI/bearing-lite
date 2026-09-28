@@ -1,0 +1,152 @@
+{
+  "kind": "rubric",
+  "schema_family": "system1",
+  "schema_version": "1",
+  "rubric_id": "RUB-S1-CONSENT-EXPLAINS-WITHDRAWAL",
+  "rubric_version": "1.0.0",
+  "title": "Localized consent banner tells the visitor how to refuse or withdraw consent",
+  "claim": {
+    "claim_type": "localized_copy_disclosure",
+    "statement": "The rendered consent banner text for the locale tells the visitor how to refuse or withdraw consent.",
+    "eligibility": "closed_option_conformance",
+    "spec_refs": [
+      "consent spec: banner disclosures"
+    ]
+  },
+  "assurance_eligible": false,
+  "backend": "laya",
+  "model": {
+    "provider": "huggingface",
+    "repo": "convaiinnovations/laya",
+    "checkpoint": "laya-multilingual",
+    "revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+    "selection": "pinned",
+    "runtime": {
+      "package": "laya",
+      "package_version": "0.3.21",
+      "precision": "fp32",
+      "device_class": "cpu",
+      "eval_mode": true,
+      "fast_path": false,
+      "max_len": 1024,
+      "head_max_len": 256
+    }
+  },
+  "question": {
+    "key": "explains_withdrawal",
+    "type": "noul",
+    "instructions": "The state is the visible text of a website cookie or consent notice, in any language. Does the text tell the visitor that they can refuse, reject or withdraw consent, or how to do so?"
+  },
+  "question_digest": "92a64fc1e5a5e946cfd06c0b7a4faf51451865fcde86f7cf6b155e7603fcb756",
+  "decision": {
+    "claim_holds_options": [
+      "yes"
+    ],
+    "claim_fails_options": [
+      "no"
+    ],
+    "verify_threshold": 0.85,
+    "refute_threshold": 0.85,
+    "probability_basis": "calibrated_option_set_mass",
+    "tie_rule": "INCONCLUSIVE"
+  },
+  "calibration": {
+    "method": "temperature_scaled",
+    "temperature": 3.374904,
+    "calibration_set_digest": "fb9559cc7f0b9793f33837f1228da9cde559b1a1f90a0f6032b407c535423870",
+    "calibration_set_size": 256,
+    "measured_ece": 0.0833,
+    "max_ece": 0.12
+  },
+  "input": {
+    "state_shape": "text",
+    "source": {
+      "kind": "build_artifact",
+      "locator": "dist/locales/*/consent-banner.txt",
+      "extractor": "one claim per locale file"
+    },
+    "canonicalization": "utf8_nfc_lf_trim_trailing",
+    "token_limit": 768,
+    "tokenizer": "pinned_checkpoint",
+    "truncation": "never",
+    "over_limit": "ERROR"
+  },
+  "controls": [
+    {
+      "control_id": "CTL-CONSENT-DE-COMPLETE",
+      "locator": "test/fixtures/consent/controls/de-complete.txt",
+      "input_digest": "21a735ee0f63003ef1a9881d32bcd11d0baa70cef874036ff1e31d8ae409cc2e",
+      "expected": "VERIFIED"
+    },
+    {
+      "control_id": "CTL-CONSENT-JA-NO-THIRD-PARTY",
+      "locator": "test/fixtures/consent/controls/ja-missing-third-parties.txt",
+      "input_digest": "b46b800e2c6a33ea5aa5788a870defdbea8e4cdbddba72ab1b01174d217ac40d",
+      "expected": "VERIFIED"
+    },
+    {
+      "control_id": "CTL-CONSENT-ES-NO-WITHDRAW",
+      "locator": "test/fixtures/consent/controls/es-missing-withdrawal.txt",
+      "input_digest": "7ae7f1ab159b2ed1721d84a65d20be414343ab6bbfd9632fa76d994effcace5c",
+      "expected": "REFUTED"
+    }
+  ],
+  "replay": {
+    "min_runs": 2,
+    "probability_epsilon": 0.0005,
+    "require_identical_answer": true,
+    "require_identical_status": true,
+    "freshness": "uncached_and_fresh_process"
+  },
+  "gateway": {
+    "worker_name": "jev-gateway",
+    "ai_gateway_id_env": "JEV_GATEWAY_AI_GATEWAY_ID",
+    "endpoint_env": "JEV_GATEWAY_ENDPOINT",
+    "auth_token_env": "JEV_GATEWAY_TOKEN",
+    "route": "/v1/systemone",
+    "cache": {
+      "mode": "enabled_with_bypass_run",
+      "ttl_seconds": 86400,
+      "key_binds": [
+        "backend",
+        "model_revision",
+        "checkpoint",
+        "rubric_digest",
+        "question_digest",
+        "input_digest",
+        "calibration"
+      ]
+    },
+    "logging": true
+  },
+  "operations": {
+    "allowed": [
+      "evaluate"
+    ],
+    "denied": [
+      "generate",
+      "propose",
+      "propose_claims",
+      "propose_options",
+      "suggest_options",
+      "rewrite",
+      "rewrite_claim",
+      "rewrite_options",
+      "explain",
+      "complete",
+      "chat",
+      "review"
+    ]
+  },
+  "notes": [
+    "Measured on the pinned checkpoint, CPU fp32, eval mode, one state per forward pass: formulation `noul` chosen on the calibration split only (highest accuracy, then lowest NLL at the fitted temperature). Held-out accuracy 0.641 (n=256); ECE (15 bins) 0.263 raw logits, 0.263 at the checkpoint's shipped temperature, 0.083 at the fitted temperature 3.375; at verify 0.85 / refute 0.85, coverage 0.086 (VERIFIED 20, REFUTED 2, INCONCLUSIVE 234) with gated precision 0.773 (Wilson 95% lower bound 0.566). Calibration split: accuracy 0.699, ECE after fitting 0.067 (n=256). Dataset: test/fixtures/system1-calibration/single-condition/consent-withdrawal/ (report: docs/calibration/system1-calibration-report.md, Hybrid section).",
+    "Formulations tried: noul: calibration accuracy 0.699, NLL 0.574 at T 3.375; held-out accuracy 0.641; choice2_neutral: calibration accuracy 0.531, NLL 0.662 at T 1.568; held-out accuracy 0.488; choice2_contrastive: calibration accuracy 0.500, NLL 0.689 at T 16; held-out accuracy 0.500; noul_sentence: calibration accuracy 0.684, NLL 0.549 at T 2.236; held-out accuracy 0.664. Controls at the fitted T: CTL-CONSENT-DE-COMPLETE VERIFIED->INCONCLUSIVE (p=0.818); CTL-CONSENT-JA-NO-THIRD-PARTY VERIFIED->INCONCLUSIVE (p=0.739); CTL-CONSENT-ES-NO-WITHDRAW REFUTED->INCONCLUSIVE (p=0.671). Replay: 5 runs per control (2 in fresh processes), max thresholded-probability delta 0, max logit delta 0; epsilon is 10x the larger of the measured delta and the delta the worst logit wobble seen on any checkpoint would cause at this temperature, rounded up.",
+    "Temperature semantics: `calibration.temperature` replaces the checkpoint's own temperature for this question's (type, option count) bucket, i.e. probabilities are softmax(option logits / T); a runner sets agent.temperature_by_options[temp_bucket] = T and passes no `lang`. `measured_ece` is the larger of the calibration-split and held-out ECE at the fitted temperature.",
+    "Held-out accuracy by variant (presence of purpose, third parties, withdrawal as 0/1): 000 0.44, 000_not_banner 0.56, 001 1.00, 010 0.38, 011 1.00, 100 0.16, 101 0.97, 110 0.12, 111 1.00. By language: de 0.59, en 0.66, es 0.66, fr 0.59, it 0.50, ja 0.78, nl 0.75, pt 0.59.",
+    "Formulations were registered in two stages: noul and choice2_neutral first; choice2_contrastive and noul_sentence after stage 1 failed on the calibration split (stage-1 held-out numbers had already been computed for two of the three disclosures). The choice among all four used the calibration split only.",
+    "Single condition: this rubric asks about one disclosure only. The consent-banner rule (purpose, third parties, withdrawal) holds for a locale when all three single-disclosure rubrics VERIFY on its banner; it replaces the multi-condition rubric RUB-S1-CONSENT-BANNER-DISCLOSURES, which scored at chance.",
+    "The held-out split is paraphrase-disjoint: calibration banners use the generator's original three paraphrases per disclosure and language, held-out banners two new ones, so held-out wording was never seen while choosing the formulation or fitting T. The paraphrases were written for this exercise; they are not reviewed native copy.",
+    "Checkpoint is pinned to laya-multilingual; Router auto-selection is not used. This checks that the disclosure is stated, not that the wording satisfies any particular law.",
+    "Not assurance-eligible: held-out gated precision 0.773 is below 0.95; Wilson 95% lower bound of held-out gated precision 0.566 (17/22) is below 0.90; controls land on the wrong status: CTL-CONSENT-DE-COMPLETE, CTL-CONSENT-JA-NO-THIRD-PARTY, CTL-CONSENT-ES-NO-WITHDRAW; controls off their expected status in a replay run: CTL-CONSENT-DE-COMPLETE, CTL-CONSENT-JA-NO-THIRD-PARTY, CTL-CONSENT-ES-NO-WITHDRAW. Thresholds were not lowered to compensate."
+  ]
+}

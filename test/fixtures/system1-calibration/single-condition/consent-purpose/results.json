@@ -1,0 +1,702 @@
+{
+ "rubric": "consent-purpose",
+ "verify_threshold": 0.85,
+ "refute_threshold": 0.85,
+ "max_ece": 0.12,
+ "calibration_size": 256,
+ "test_size": 256,
+ "formulations": {
+  "noul": {
+   "question": {
+    "key": "states_purpose",
+    "type": "noul",
+    "instructions": "The state is the visible text of a website cookie or consent notice, in any language. Does the text state why data or cookies are used, for example to measure visits, analyse traffic, personalise content or show advertising?"
+   },
+   "temperature": 13.138690695944106,
+   "shipped_temperature": 1.0,
+   "calibration_calibrated": {
+    "n": 256,
+    "accuracy": 0.5,
+    "ece": 0.10858283619130232,
+    "nll": 0.6812977911754196,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 256,
+    "pred_counts": {
+     "no": 0,
+     "yes": 256
+    }
+   },
+   "test_raw": {
+    "n": 256,
+    "accuracy": 0.5,
+    "ece": 0.4651857722370124,
+    "nll": 1.7553130947702869,
+    "coverage": 0.97265625,
+    "precision": 0.5100401606425703,
+    "verified": 249,
+    "verified_correct": 127,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 7,
+    "pred_counts": {
+     "no": 0,
+     "yes": 256
+    }
+   },
+   "test_shipped": {
+    "n": 256,
+    "accuracy": 0.5,
+    "ece": 0.4651857722370124,
+    "nll": 1.7553130947702869,
+    "coverage": 0.97265625,
+    "precision": 0.5100401606425703,
+    "verified": 249,
+    "verified_correct": 127,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 7,
+    "pred_counts": {
+     "no": 0,
+     "yes": 256
+    }
+   },
+   "test_calibrated": {
+    "n": 256,
+    "accuracy": 0.5,
+    "ece": 0.1903692628486226,
+    "nll": 0.6815843837223841,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 256,
+    "pred_counts": {
+     "no": 0,
+     "yes": 256
+    }
+   },
+   "controls": {
+    "CTL-CONSENT-DE-COMPLETE": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.590211,
+     "pass": false
+    },
+    "CTL-CONSENT-FR-NO-PURPOSE": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.554404,
+     "pass": false
+    },
+    "CTL-CONSENT-EN-SHOP-NOTICE": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.563345,
+     "pass": false
+    }
+   },
+   "test_gated": {
+    "verdicts": 0,
+    "correct": 0,
+    "wilson_lower": null
+   },
+   "test_accuracy_by_lang": {
+    "de": 0.5,
+    "en": 0.5,
+    "es": 0.5,
+    "fr": 0.5,
+    "it": 0.5,
+    "ja": 0.5,
+    "nl": 0.5,
+    "pt": 0.5
+   },
+   "test_accuracy_by_variant": {
+    "000": 0.0,
+    "000_not_banner": 0.0,
+    "001": 0.0,
+    "010": 0.0,
+    "011": 0.0,
+    "100": 1.0,
+    "101": 1.0,
+    "110": 1.0,
+    "111": 1.0
+   },
+   "test_status_by_variant": {
+    "000": {
+     "INCONCLUSIVE": 16
+    },
+    "000_not_banner": {
+     "INCONCLUSIVE": 16
+    },
+    "001": {
+     "INCONCLUSIVE": 32
+    },
+    "010": {
+     "INCONCLUSIVE": 32
+    },
+    "011": {
+     "INCONCLUSIVE": 32
+    },
+    "100": {
+     "INCONCLUSIVE": 32
+    },
+    "101": {
+     "INCONCLUSIVE": 32
+    },
+    "110": {
+     "INCONCLUSIVE": 32
+    },
+    "111": {
+     "INCONCLUSIVE": 32
+    }
+   },
+   "controls_pass": false
+  },
+  "choice2_neutral": {
+   "question": {
+    "key": "states_purpose",
+    "type": "choice",
+    "instructions": "The state is the visible text of a website cookie or consent notice, in any language. Which option describes the text?",
+    "criteria": {
+     "A": "it states why data or cookies are used (for example measurement, analytics, personalisation or advertising)",
+     "B": "it does not state why data or cookies are used"
+    }
+   },
+   "temperature": 1.3439988373693263,
+   "shipped_temperature": 1.0,
+   "calibration_calibrated": {
+    "n": 256,
+    "accuracy": 0.6484375,
+    "ece": 0.05687407678554772,
+    "nll": 0.6438119981340827,
+    "coverage": 0.01953125,
+    "precision": 1.0,
+    "verified": 2,
+    "verified_correct": 2,
+    "refuted": 3,
+    "refuted_correct": 3,
+    "inconclusive": 251,
+    "pred_counts": {
+     "A": 152,
+     "B": 104
+    }
+   },
+   "test_raw": {
+    "n": 256,
+    "accuracy": 0.66796875,
+    "ece": 0.06526026800737722,
+    "nll": 0.6030502730018081,
+    "coverage": 0.05078125,
+    "precision": 0.7692307692307693,
+    "verified": 11,
+    "verified_correct": 8,
+    "refuted": 2,
+    "refuted_correct": 2,
+    "inconclusive": 243,
+    "pred_counts": {
+     "A": 175,
+     "B": 81
+    }
+   },
+   "test_shipped": {
+    "n": 256,
+    "accuracy": 0.66796875,
+    "ece": 0.06526026800737722,
+    "nll": 0.6030502730018081,
+    "coverage": 0.05078125,
+    "precision": 0.7692307692307693,
+    "verified": 11,
+    "verified_correct": 8,
+    "refuted": 2,
+    "refuted_correct": 2,
+    "inconclusive": 243,
+    "pred_counts": {
+     "A": 175,
+     "B": 81
+    }
+   },
+   "test_calibrated": {
+    "n": 256,
+    "accuracy": 0.66796875,
+    "ece": 0.08481420963484765,
+    "nll": 0.6127768629080079,
+    "coverage": 0.0078125,
+    "precision": 0.5,
+    "verified": 1,
+    "verified_correct": 0,
+    "refuted": 1,
+    "refuted_correct": 1,
+    "inconclusive": 254,
+    "pred_counts": {
+     "A": 175,
+     "B": 81
+    }
+   },
+   "controls": {
+    "CTL-CONSENT-DE-COMPLETE": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.681958,
+     "pass": false
+    },
+    "CTL-CONSENT-FR-NO-PURPOSE": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "B",
+     "thresholded_probability": 0.555632,
+     "pass": false
+    },
+    "CTL-CONSENT-EN-SHOP-NOTICE": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.543895,
+     "pass": false
+    }
+   },
+   "test_gated": {
+    "verdicts": 2,
+    "correct": 1,
+    "wilson_lower": 0.09452865480086611
+   },
+   "test_accuracy_by_lang": {
+    "de": 0.5625,
+    "en": 0.65625,
+    "es": 0.8125,
+    "fr": 0.625,
+    "it": 0.75,
+    "ja": 0.65625,
+    "nl": 0.6875,
+    "pt": 0.59375
+   },
+   "test_accuracy_by_variant": {
+    "000": 0.8125,
+    "000_not_banner": 0.25,
+    "001": 0.46875,
+    "010": 0.5625,
+    "011": 0.375,
+    "100": 0.84375,
+    "101": 0.75,
+    "110": 0.84375,
+    "111": 0.96875
+   },
+   "test_status_by_variant": {
+    "000": {
+     "INCONCLUSIVE": 15,
+     "REFUTED": 1
+    },
+    "000_not_banner": {
+     "INCONCLUSIVE": 16
+    },
+    "001": {
+     "INCONCLUSIVE": 32
+    },
+    "010": {
+     "INCONCLUSIVE": 32
+    },
+    "011": {
+     "INCONCLUSIVE": 31,
+     "VERIFIED": 1
+    },
+    "100": {
+     "INCONCLUSIVE": 32
+    },
+    "101": {
+     "INCONCLUSIVE": 32
+    },
+    "110": {
+     "INCONCLUSIVE": 32
+    },
+    "111": {
+     "INCONCLUSIVE": 32
+    }
+   },
+   "controls_pass": false
+  },
+  "choice2_contrastive": {
+   "question": {
+    "key": "states_purpose",
+    "type": "choice",
+    "instructions": "The state is the visible text of a website cookie or consent notice, in any language. Consider only whether it names a use of the data or cookies (measuring visits, analysing traffic, improving the service, personalising content or ads). Accept buttons, titles, other disclosures and a link to a privacy policy do not count. Which option describes the text?",
+    "criteria": {
+     "A": "yes: it names at least one use of the data or cookies",
+     "B": "no: it names no use of the data or cookies"
+    }
+   },
+   "temperature": 3.868201902888309,
+   "shipped_temperature": 1.0,
+   "calibration_calibrated": {
+    "n": 256,
+    "accuracy": 0.546875,
+    "ece": 0.17289121727195436,
+    "nll": 0.6479545730113359,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 256,
+    "pred_counts": {
+     "A": 238,
+     "B": 18
+    }
+   },
+   "test_raw": {
+    "n": 256,
+    "accuracy": 0.5,
+    "ece": 0.37471213725687524,
+    "nll": 0.9942981755317589,
+    "coverage": 0.6796875,
+    "precision": 0.6609195402298851,
+    "verified": 174,
+    "verified_correct": 115,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 82,
+    "pred_counts": {
+     "A": 254,
+     "B": 2
+    }
+   },
+   "test_shipped": {
+    "n": 256,
+    "accuracy": 0.5,
+    "ece": 0.37471213725687524,
+    "nll": 0.9942981755317589,
+    "coverage": 0.6796875,
+    "precision": 0.6609195402298851,
+    "verified": 174,
+    "verified_correct": 115,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 82,
+    "pred_counts": {
+     "A": 254,
+     "B": 2
+    }
+   },
+   "test_calibrated": {
+    "n": 256,
+    "accuracy": 0.5,
+    "ece": 0.22643024380889673,
+    "nll": 0.6681327163924075,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 256,
+    "pred_counts": {
+     "A": 254,
+     "B": 2
+    }
+   },
+   "controls": {
+    "CTL-CONSENT-DE-COMPLETE": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.711957,
+     "pass": false
+    },
+    "CTL-CONSENT-FR-NO-PURPOSE": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "B",
+     "thresholded_probability": 0.616567,
+     "pass": false
+    },
+    "CTL-CONSENT-EN-SHOP-NOTICE": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.537652,
+     "pass": false
+    }
+   },
+   "test_gated": {
+    "verdicts": 0,
+    "correct": 0,
+    "wilson_lower": null
+   },
+   "test_accuracy_by_lang": {
+    "de": 0.5,
+    "en": 0.5,
+    "es": 0.5,
+    "fr": 0.5,
+    "it": 0.5,
+    "ja": 0.46875,
+    "nl": 0.53125,
+    "pt": 0.5
+   },
+   "test_accuracy_by_variant": {
+    "000": 0.0,
+    "000_not_banner": 0.0,
+    "001": 0.0,
+    "010": 0.03125,
+    "011": 0.0,
+    "100": 1.0,
+    "101": 1.0,
+    "110": 0.96875,
+    "111": 1.0
+   },
+   "test_status_by_variant": {
+    "000": {
+     "INCONCLUSIVE": 16
+    },
+    "000_not_banner": {
+     "INCONCLUSIVE": 16
+    },
+    "001": {
+     "INCONCLUSIVE": 32
+    },
+    "010": {
+     "INCONCLUSIVE": 32
+    },
+    "011": {
+     "INCONCLUSIVE": 32
+    },
+    "100": {
+     "INCONCLUSIVE": 32
+    },
+    "101": {
+     "INCONCLUSIVE": 32
+    },
+    "110": {
+     "INCONCLUSIVE": 32
+    },
+    "111": {
+     "INCONCLUSIVE": 32
+    }
+   },
+   "controls_pass": false
+  },
+  "noul_sentence": {
+   "question": {
+    "key": "states_purpose",
+    "type": "noul",
+    "instructions": "The state is the visible text of a website cookie or consent notice, in any language. Accept buttons, titles, other disclosures and a link to a privacy policy do not count. Does the text contain a sentence that says what the cookies or data are used for, such as measuring visits, analytics, personalisation or advertising?"
+   },
+   "temperature": 5.284050017753826,
+   "shipped_temperature": 1.0,
+   "calibration_calibrated": {
+    "n": 256,
+    "accuracy": 0.53125,
+    "ece": 0.2037304641993904,
+    "nll": 0.6517960058019869,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 256,
+    "pred_counts": {
+     "no": 10,
+     "yes": 246
+    }
+   },
+   "test_raw": {
+    "n": 256,
+    "accuracy": 0.51171875,
+    "ece": 0.39791341120767276,
+    "nll": 1.2250668390651682,
+    "coverage": 0.78125,
+    "precision": 0.6,
+    "verified": 200,
+    "verified_correct": 120,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 56,
+    "pred_counts": {
+     "no": 3,
+     "yes": 253
+    }
+   },
+   "test_shipped": {
+    "n": 256,
+    "accuracy": 0.51171875,
+    "ece": 0.39791341120767276,
+    "nll": 1.2250668390651682,
+    "coverage": 0.78125,
+    "precision": 0.6,
+    "verified": 200,
+    "verified_correct": 120,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 56,
+    "pred_counts": {
+     "no": 3,
+     "yes": 253
+    }
+   },
+   "test_calibrated": {
+    "n": 256,
+    "accuracy": 0.51171875,
+    "ece": 0.18747997526728372,
+    "nll": 0.6682209865874982,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 256,
+    "pred_counts": {
+     "no": 3,
+     "yes": 253
+    }
+   },
+   "controls": {
+    "CTL-CONSENT-DE-COMPLETE": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.661416,
+     "pass": false
+    },
+    "CTL-CONSENT-FR-NO-PURPOSE": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.554407,
+     "pass": false
+    },
+    "CTL-CONSENT-EN-SHOP-NOTICE": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.598141,
+     "pass": false
+    }
+   },
+   "test_gated": {
+    "verdicts": 0,
+    "correct": 0,
+    "wilson_lower": null
+   },
+   "test_accuracy_by_lang": {
+    "de": 0.5,
+    "en": 0.5,
+    "es": 0.53125,
+    "fr": 0.5,
+    "it": 0.53125,
+    "ja": 0.53125,
+    "nl": 0.5,
+    "pt": 0.5
+   },
+   "test_accuracy_by_variant": {
+    "000": 0.125,
+    "000_not_banner": 0.0,
+    "001": 0.0,
+    "010": 0.03125,
+    "011": 0.0,
+    "100": 1.0,
+    "101": 1.0,
+    "110": 1.0,
+    "111": 1.0
+   },
+   "test_status_by_variant": {
+    "000": {
+     "INCONCLUSIVE": 16
+    },
+    "000_not_banner": {
+     "INCONCLUSIVE": 16
+    },
+    "001": {
+     "INCONCLUSIVE": 32
+    },
+    "010": {
+     "INCONCLUSIVE": 32
+    },
+    "011": {
+     "INCONCLUSIVE": 32
+    },
+    "100": {
+     "INCONCLUSIVE": 32
+    },
+    "101": {
+     "INCONCLUSIVE": 32
+    },
+    "110": {
+     "INCONCLUSIVE": 32
+    },
+    "111": {
+     "INCONCLUSIVE": 32
+    }
+   },
+   "controls_pass": false
+  }
+ },
+ "chosen": {
+  "formulation": "choice2_neutral",
+  "measured_ece": 0.08481420963484765,
+  "assurance_eligible_before_replay": false,
+  "reasons": [
+   "held-out gated precision 0.500 is below 0.95",
+   "Wilson 95% lower bound of held-out gated precision 0.095 (1/2) is below 0.90",
+   "controls land on the wrong status: CTL-CONSENT-DE-COMPLETE, CTL-CONSENT-FR-NO-PURPOSE, CTL-CONSENT-EN-SHOP-NOTICE"
+  ]
+ }
+}

@@ -1,0 +1,713 @@
+{
+ "rubric": "consent-withdrawal",
+ "verify_threshold": 0.85,
+ "refute_threshold": 0.85,
+ "max_ece": 0.12,
+ "calibration_size": 256,
+ "test_size": 256,
+ "formulations": {
+  "noul": {
+   "question": {
+    "key": "explains_withdrawal",
+    "type": "noul",
+    "instructions": "The state is the visible text of a website cookie or consent notice, in any language. Does the text tell the visitor that they can refuse, reject or withdraw consent, or how to do so?"
+   },
+   "temperature": 3.3749039266050804,
+   "shipped_temperature": 1.0,
+   "calibration_calibrated": {
+    "n": 256,
+    "accuracy": 0.69921875,
+    "ece": 0.06743996524450593,
+    "nll": 0.5737488383401009,
+    "coverage": 0.05859375,
+    "precision": 0.8,
+    "verified": 13,
+    "verified_correct": 10,
+    "refuted": 2,
+    "refuted_correct": 2,
+    "inconclusive": 241,
+    "pred_counts": {
+     "no": 51,
+     "yes": 205
+    }
+   },
+   "test_raw": {
+    "n": 256,
+    "accuracy": 0.640625,
+    "ece": 0.2634482186140863,
+    "nll": 1.1966887112630555,
+    "coverage": 0.7734375,
+    "precision": 0.6717171717171717,
+    "verified": 182,
+    "verified_correct": 117,
+    "refuted": 16,
+    "refuted_correct": 16,
+    "inconclusive": 58,
+    "pred_counts": {
+     "no": 38,
+     "yes": 218
+    }
+   },
+   "test_shipped": {
+    "n": 256,
+    "accuracy": 0.640625,
+    "ece": 0.2634482186140863,
+    "nll": 1.1966887112630555,
+    "coverage": 0.7734375,
+    "precision": 0.6717171717171717,
+    "verified": 182,
+    "verified_correct": 117,
+    "refuted": 16,
+    "refuted_correct": 16,
+    "inconclusive": 58,
+    "pred_counts": {
+     "no": 38,
+     "yes": 218
+    }
+   },
+   "test_calibrated": {
+    "n": 256,
+    "accuracy": 0.640625,
+    "ece": 0.08331117093160906,
+    "nll": 0.6596648758332536,
+    "coverage": 0.0859375,
+    "precision": 0.7727272727272727,
+    "verified": 20,
+    "verified_correct": 15,
+    "refuted": 2,
+    "refuted_correct": 2,
+    "inconclusive": 234,
+    "pred_counts": {
+     "no": 38,
+     "yes": 218
+    }
+   },
+   "controls": {
+    "CTL-CONSENT-DE-COMPLETE": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.817512,
+     "pass": false
+    },
+    "CTL-CONSENT-JA-NO-THIRD-PARTY": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.738894,
+     "pass": false
+    },
+    "CTL-CONSENT-ES-NO-WITHDRAW": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.670766,
+     "pass": false
+    }
+   },
+   "test_gated": {
+    "verdicts": 22,
+    "correct": 17,
+    "wilson_lower": 0.5655964393704065
+   },
+   "test_accuracy_by_lang": {
+    "de": 0.59375,
+    "en": 0.65625,
+    "es": 0.65625,
+    "fr": 0.59375,
+    "it": 0.5,
+    "ja": 0.78125,
+    "nl": 0.75,
+    "pt": 0.59375
+   },
+   "test_accuracy_by_variant": {
+    "000": 0.4375,
+    "000_not_banner": 0.5625,
+    "001": 1.0,
+    "010": 0.375,
+    "011": 1.0,
+    "100": 0.15625,
+    "101": 0.96875,
+    "110": 0.125,
+    "111": 1.0
+   },
+   "test_status_by_variant": {
+    "000": {
+     "INCONCLUSIVE": 16
+    },
+    "000_not_banner": {
+     "INCONCLUSIVE": 14,
+     "REFUTED": 2
+    },
+    "001": {
+     "INCONCLUSIVE": 32
+    },
+    "010": {
+     "INCONCLUSIVE": 32
+    },
+    "011": {
+     "INCONCLUSIVE": 32
+    },
+    "100": {
+     "INCONCLUSIVE": 31,
+     "VERIFIED": 1
+    },
+    "101": {
+     "INCONCLUSIVE": 24,
+     "VERIFIED": 8
+    },
+    "110": {
+     "INCONCLUSIVE": 28,
+     "VERIFIED": 4
+    },
+    "111": {
+     "INCONCLUSIVE": 25,
+     "VERIFIED": 7
+    }
+   },
+   "controls_pass": false
+  },
+  "choice2_neutral": {
+   "question": {
+    "key": "explains_withdrawal",
+    "type": "choice",
+    "instructions": "The state is the visible text of a website cookie or consent notice, in any language. Which option describes the text?",
+    "criteria": {
+     "A": "it tells the visitor they can refuse, reject or withdraw consent",
+     "B": "it does not tell the visitor how to refuse or withdraw consent"
+    }
+   },
+   "temperature": 1.5677937402792388,
+   "shipped_temperature": 1.0,
+   "calibration_calibrated": {
+    "n": 256,
+    "accuracy": 0.53125,
+    "ece": 0.0974744655115043,
+    "nll": 0.6624058593261059,
+    "coverage": 0.0078125,
+    "precision": 1.0,
+    "verified": 2,
+    "verified_correct": 2,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 254,
+    "pred_counts": {
+     "A": 210,
+     "B": 46
+    }
+   },
+   "test_raw": {
+    "n": 256,
+    "accuracy": 0.48828125,
+    "ece": 0.12025127308202395,
+    "nll": 0.738692450420996,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 256,
+    "pred_counts": {
+     "A": 197,
+     "B": 59
+    }
+   },
+   "test_shipped": {
+    "n": 256,
+    "accuracy": 0.48828125,
+    "ece": 0.12025127308202395,
+    "nll": 0.738692450420996,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 256,
+    "pred_counts": {
+     "A": 197,
+     "B": 59
+    }
+   },
+   "test_calibrated": {
+    "n": 256,
+    "accuracy": 0.48828125,
+    "ece": 0.09213999955436786,
+    "nll": 0.7135581233718247,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 256,
+    "pred_counts": {
+     "A": 197,
+     "B": 59
+    }
+   },
+   "controls": {
+    "CTL-CONSENT-DE-COMPLETE": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.554922,
+     "pass": false
+    },
+    "CTL-CONSENT-JA-NO-THIRD-PARTY": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.644087,
+     "pass": false
+    },
+    "CTL-CONSENT-ES-NO-WITHDRAW": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.54789,
+     "pass": false
+    }
+   },
+   "test_gated": {
+    "verdicts": 0,
+    "correct": 0,
+    "wilson_lower": null
+   },
+   "test_accuracy_by_lang": {
+    "de": 0.5,
+    "en": 0.53125,
+    "es": 0.53125,
+    "fr": 0.5,
+    "it": 0.46875,
+    "ja": 0.46875,
+    "nl": 0.4375,
+    "pt": 0.46875
+   },
+   "test_accuracy_by_variant": {
+    "000": 0.4375,
+    "000_not_banner": 0.125,
+    "001": 0.84375,
+    "010": 0.25,
+    "011": 0.71875,
+    "100": 0.21875,
+    "101": 0.84375,
+    "110": 0.125,
+    "111": 0.625
+   },
+   "test_status_by_variant": {
+    "000": {
+     "INCONCLUSIVE": 16
+    },
+    "000_not_banner": {
+     "INCONCLUSIVE": 16
+    },
+    "001": {
+     "INCONCLUSIVE": 32
+    },
+    "010": {
+     "INCONCLUSIVE": 32
+    },
+    "011": {
+     "INCONCLUSIVE": 32
+    },
+    "100": {
+     "INCONCLUSIVE": 32
+    },
+    "101": {
+     "INCONCLUSIVE": 32
+    },
+    "110": {
+     "INCONCLUSIVE": 32
+    },
+    "111": {
+     "INCONCLUSIVE": 32
+    }
+   },
+   "controls_pass": false
+  },
+  "choice2_contrastive": {
+   "question": {
+    "key": "explains_withdrawal",
+    "type": "choice",
+    "instructions": "The state is the visible text of a website cookie or consent notice, in any language. Consider only whether it tells the visitor they can refuse, reject, decline or withdraw consent. Accept buttons, titles, other disclosures and a link to a privacy policy do not count. Which option describes the text?",
+    "criteria": {
+     "A": "yes: it says the visitor can refuse, reject, decline or withdraw consent",
+     "B": "no: it gives no way to refuse, reject, decline or withdraw consent"
+    }
+   },
+   "temperature": 15.996251586573315,
+   "shipped_temperature": 1.0,
+   "calibration_calibrated": {
+    "n": 256,
+    "accuracy": 0.5,
+    "ece": 0.05596169239446753,
+    "nll": 0.6889559276032282,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 256,
+    "pred_counts": {
+     "A": 256,
+     "B": 0
+    }
+   },
+   "test_raw": {
+    "n": 256,
+    "accuracy": 0.5,
+    "ece": 0.4243784629797861,
+    "nll": 1.3748395642612454,
+    "coverage": 0.953125,
+    "precision": 0.5122950819672131,
+    "verified": 244,
+    "verified_correct": 125,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 12,
+    "pred_counts": {
+     "A": 256,
+     "B": 0
+    }
+   },
+   "test_shipped": {
+    "n": 256,
+    "accuracy": 0.5,
+    "ece": 0.4243784629797861,
+    "nll": 1.3748395642612454,
+    "coverage": 0.953125,
+    "precision": 0.5122950819672131,
+    "verified": 244,
+    "verified_correct": 125,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 12,
+    "pred_counts": {
+     "A": 256,
+     "B": 0
+    }
+   },
+   "test_calibrated": {
+    "n": 256,
+    "accuracy": 0.5,
+    "ece": 0.0411788957871554,
+    "nll": 0.6951109316766569,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 256,
+    "pred_counts": {
+     "A": 256,
+     "B": 0
+    }
+   },
+   "controls": {
+    "CTL-CONSENT-DE-COMPLETE": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.550035,
+     "pass": false
+    },
+    "CTL-CONSENT-JA-NO-THIRD-PARTY": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.552709,
+     "pass": false
+    },
+    "CTL-CONSENT-ES-NO-WITHDRAW": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.525273,
+     "pass": false
+    }
+   },
+   "test_gated": {
+    "verdicts": 0,
+    "correct": 0,
+    "wilson_lower": null
+   },
+   "test_accuracy_by_lang": {
+    "de": 0.5,
+    "en": 0.5,
+    "es": 0.5,
+    "fr": 0.5,
+    "it": 0.5,
+    "ja": 0.5,
+    "nl": 0.5,
+    "pt": 0.5
+   },
+   "test_accuracy_by_variant": {
+    "000": 0.0,
+    "000_not_banner": 0.0,
+    "001": 1.0,
+    "010": 0.0,
+    "011": 1.0,
+    "100": 0.0,
+    "101": 1.0,
+    "110": 0.0,
+    "111": 1.0
+   },
+   "test_status_by_variant": {
+    "000": {
+     "INCONCLUSIVE": 16
+    },
+    "000_not_banner": {
+     "INCONCLUSIVE": 16
+    },
+    "001": {
+     "INCONCLUSIVE": 32
+    },
+    "010": {
+     "INCONCLUSIVE": 32
+    },
+    "011": {
+     "INCONCLUSIVE": 32
+    },
+    "100": {
+     "INCONCLUSIVE": 32
+    },
+    "101": {
+     "INCONCLUSIVE": 32
+    },
+    "110": {
+     "INCONCLUSIVE": 32
+    },
+    "111": {
+     "INCONCLUSIVE": 32
+    }
+   },
+   "controls_pass": false
+  },
+  "noul_sentence": {
+   "question": {
+    "key": "explains_withdrawal",
+    "type": "noul",
+    "instructions": "The state is the visible text of a website cookie or consent notice, in any language. Accept buttons, titles, other disclosures and a link to a privacy policy do not count. Does the text contain a sentence that tells the visitor they can refuse, reject, decline or withdraw consent?"
+   },
+   "temperature": 2.2358476828164076,
+   "shipped_temperature": 1.0,
+   "calibration_calibrated": {
+    "n": 256,
+    "accuracy": 0.68359375,
+    "ece": 0.07677844023566316,
+    "nll": 0.5487675289300903,
+    "coverage": 0.1796875,
+    "precision": 0.9347826086956522,
+    "verified": 45,
+    "verified_correct": 42,
+    "refuted": 1,
+    "refuted_correct": 1,
+    "inconclusive": 210,
+    "pred_counts": {
+     "no": 49,
+     "yes": 207
+    }
+   },
+   "test_raw": {
+    "n": 256,
+    "accuracy": 0.6640625,
+    "ece": 0.19088208869911108,
+    "nll": 0.7423778483683094,
+    "coverage": 0.6015625,
+    "precision": 0.7467532467532467,
+    "verified": 144,
+    "verified_correct": 105,
+    "refuted": 10,
+    "refuted_correct": 10,
+    "inconclusive": 102,
+    "pred_counts": {
+     "no": 42,
+     "yes": 214
+    }
+   },
+   "test_shipped": {
+    "n": 256,
+    "accuracy": 0.6640625,
+    "ece": 0.19088208869911108,
+    "nll": 0.7423778483683094,
+    "coverage": 0.6015625,
+    "precision": 0.7467532467532467,
+    "verified": 144,
+    "verified_correct": 105,
+    "refuted": 10,
+    "refuted_correct": 10,
+    "inconclusive": 102,
+    "pred_counts": {
+     "no": 42,
+     "yes": 214
+    }
+   },
+   "test_calibrated": {
+    "n": 256,
+    "accuracy": 0.6640625,
+    "ece": 0.07540538156450612,
+    "nll": 0.5908777704818937,
+    "coverage": 0.1796875,
+    "precision": 0.8913043478260869,
+    "verified": 45,
+    "verified_correct": 40,
+    "refuted": 1,
+    "refuted_correct": 1,
+    "inconclusive": 210,
+    "pred_counts": {
+     "no": 42,
+     "yes": 214
+    }
+   },
+   "controls": {
+    "CTL-CONSENT-DE-COMPLETE": {
+     "expected": "VERIFIED",
+     "observed": [
+      "VERIFIED",
+      "VERIFIED",
+      "VERIFIED"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.863303,
+     "pass": true
+    },
+    "CTL-CONSENT-JA-NO-THIRD-PARTY": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.789819,
+     "pass": false
+    },
+    "CTL-CONSENT-ES-NO-WITHDRAW": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.560061,
+     "pass": false
+    }
+   },
+   "test_gated": {
+    "verdicts": 46,
+    "correct": 41,
+    "wilson_lower": 0.7696189698736854
+   },
+   "test_accuracy_by_lang": {
+    "de": 0.625,
+    "en": 0.6875,
+    "es": 0.71875,
+    "fr": 0.5625,
+    "it": 0.59375,
+    "ja": 0.75,
+    "nl": 0.78125,
+    "pt": 0.59375
+   },
+   "test_accuracy_by_variant": {
+    "000": 0.3125,
+    "000_not_banner": 0.5,
+    "001": 1.0,
+    "010": 0.46875,
+    "011": 1.0,
+    "100": 0.21875,
+    "101": 1.0,
+    "110": 0.21875,
+    "111": 1.0
+   },
+   "test_status_by_variant": {
+    "000": {
+     "INCONCLUSIVE": 16
+    },
+    "000_not_banner": {
+     "VERIFIED": 2,
+     "INCONCLUSIVE": 13,
+     "REFUTED": 1
+    },
+    "001": {
+     "INCONCLUSIVE": 28,
+     "VERIFIED": 4
+    },
+    "010": {
+     "INCONCLUSIVE": 32
+    },
+    "011": {
+     "INCONCLUSIVE": 27,
+     "VERIFIED": 5
+    },
+    "100": {
+     "INCONCLUSIVE": 31,
+     "VERIFIED": 1
+    },
+    "101": {
+     "INCONCLUSIVE": 18,
+     "VERIFIED": 14
+    },
+    "110": {
+     "INCONCLUSIVE": 30,
+     "VERIFIED": 2
+    },
+    "111": {
+     "INCONCLUSIVE": 15,
+     "VERIFIED": 17
+    }
+   },
+   "controls_pass": false
+  }
+ },
+ "chosen": {
+  "formulation": "noul",
+  "measured_ece": 0.08331117093160906,
+  "assurance_eligible_before_replay": false,
+  "reasons": [
+   "held-out gated precision 0.773 is below 0.95",
+   "Wilson 95% lower bound of held-out gated precision 0.566 (17/22) is below 0.90",
+   "controls land on the wrong status: CTL-CONSENT-DE-COMPLETE, CTL-CONSENT-JA-NO-THIRD-PARTY, CTL-CONSENT-ES-NO-WITHDRAW"
+  ]
+ }
+}

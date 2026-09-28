@@ -1,0 +1,156 @@
+{
+  "kind": "rubric",
+  "schema_family": "system1",
+  "schema_version": "1",
+  "rubric_id": "RUB-S1-CONSENT-STATES-PURPOSE",
+  "rubric_version": "1.0.0",
+  "title": "Localized consent banner states the purpose of data collection",
+  "claim": {
+    "claim_type": "localized_copy_disclosure",
+    "statement": "The rendered consent banner text for the locale states what data is collected or why it is used.",
+    "eligibility": "closed_option_conformance",
+    "spec_refs": [
+      "consent spec: banner disclosures"
+    ]
+  },
+  "assurance_eligible": false,
+  "backend": "laya",
+  "model": {
+    "provider": "huggingface",
+    "repo": "convaiinnovations/laya",
+    "checkpoint": "laya-multilingual",
+    "revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+    "selection": "pinned",
+    "runtime": {
+      "package": "laya",
+      "package_version": "0.3.21",
+      "precision": "fp32",
+      "device_class": "cpu",
+      "eval_mode": true,
+      "fast_path": false,
+      "max_len": 1024,
+      "head_max_len": 256
+    }
+  },
+  "question": {
+    "key": "states_purpose",
+    "type": "choice",
+    "instructions": "The state is the visible text of a website cookie or consent notice, in any language. Which option describes the text?",
+    "criteria": {
+      "A": "it states why data or cookies are used (for example measurement, analytics, personalisation or advertising)",
+      "B": "it does not state why data or cookies are used"
+    }
+  },
+  "question_digest": "5773c47dd8a6a433637d065de41f24d8eda7cad205c666ec4e96fafb62b8a823",
+  "decision": {
+    "claim_holds_options": [
+      "A"
+    ],
+    "claim_fails_options": [
+      "B"
+    ],
+    "verify_threshold": 0.85,
+    "refute_threshold": 0.85,
+    "probability_basis": "calibrated_option_set_mass",
+    "tie_rule": "INCONCLUSIVE"
+  },
+  "calibration": {
+    "method": "temperature_scaled",
+    "temperature": 1.343999,
+    "calibration_set_digest": "127b42869556cd11a85e7a18be6c4822fd992fed2d48917964a5128e20676eaa",
+    "calibration_set_size": 256,
+    "measured_ece": 0.0848,
+    "max_ece": 0.12
+  },
+  "input": {
+    "state_shape": "text",
+    "source": {
+      "kind": "build_artifact",
+      "locator": "dist/locales/*/consent-banner.txt",
+      "extractor": "one claim per locale file"
+    },
+    "canonicalization": "utf8_nfc_lf_trim_trailing",
+    "token_limit": 768,
+    "tokenizer": "pinned_checkpoint",
+    "truncation": "never",
+    "over_limit": "ERROR"
+  },
+  "controls": [
+    {
+      "control_id": "CTL-CONSENT-DE-COMPLETE",
+      "locator": "test/fixtures/consent/controls/de-complete.txt",
+      "input_digest": "21a735ee0f63003ef1a9881d32bcd11d0baa70cef874036ff1e31d8ae409cc2e",
+      "expected": "VERIFIED"
+    },
+    {
+      "control_id": "CTL-CONSENT-FR-NO-PURPOSE",
+      "locator": "test/fixtures/consent/controls/fr-missing-purpose.txt",
+      "input_digest": "6d95f7da9bdae226957aff5935346a9040dafbd705fc1fdeb0f09ef0c865d974",
+      "expected": "REFUTED"
+    },
+    {
+      "control_id": "CTL-CONSENT-EN-SHOP-NOTICE",
+      "locator": "test/fixtures/consent/controls/en-shop-notice.txt",
+      "input_digest": "2e2f56f8385253b27e4f2cdea345fc7dc07e8f553d2316cd3b888fdc689f4ac5",
+      "expected": "REFUTED"
+    }
+  ],
+  "replay": {
+    "min_runs": 2,
+    "probability_epsilon": 0.002,
+    "require_identical_answer": true,
+    "require_identical_status": true,
+    "freshness": "uncached_and_fresh_process"
+  },
+  "gateway": {
+    "worker_name": "jev-gateway",
+    "ai_gateway_id_env": "JEV_GATEWAY_AI_GATEWAY_ID",
+    "endpoint_env": "JEV_GATEWAY_ENDPOINT",
+    "auth_token_env": "JEV_GATEWAY_TOKEN",
+    "route": "/v1/systemone",
+    "cache": {
+      "mode": "enabled_with_bypass_run",
+      "ttl_seconds": 86400,
+      "key_binds": [
+        "backend",
+        "model_revision",
+        "checkpoint",
+        "rubric_digest",
+        "question_digest",
+        "input_digest",
+        "calibration"
+      ]
+    },
+    "logging": true
+  },
+  "operations": {
+    "allowed": [
+      "evaluate"
+    ],
+    "denied": [
+      "generate",
+      "propose",
+      "propose_claims",
+      "propose_options",
+      "suggest_options",
+      "rewrite",
+      "rewrite_claim",
+      "rewrite_options",
+      "explain",
+      "complete",
+      "chat",
+      "review"
+    ]
+  },
+  "notes": [
+    "Measured on the pinned checkpoint, CPU fp32, eval mode, one state per forward pass: formulation `choice2_neutral` chosen on the calibration split only (highest accuracy, then lowest NLL at the fitted temperature). Held-out accuracy 0.668 (n=256); ECE (15 bins) 0.065 raw logits, 0.065 at the checkpoint's shipped temperature, 0.085 at the fitted temperature 1.344; at verify 0.85 / refute 0.85, coverage 0.008 (VERIFIED 1, REFUTED 1, INCONCLUSIVE 254) with gated precision 0.500 (Wilson 95% lower bound 0.095). Calibration split: accuracy 0.648, ECE after fitting 0.057 (n=256). Dataset: test/fixtures/system1-calibration/single-condition/consent-purpose/ (report: docs/calibration/system1-calibration-report.md, Hybrid section).",
+    "Formulations tried: noul: calibration accuracy 0.500, NLL 0.681 at T 13.14; held-out accuracy 0.500; choice2_neutral: calibration accuracy 0.648, NLL 0.644 at T 1.344; held-out accuracy 0.668; choice2_contrastive: calibration accuracy 0.547, NLL 0.648 at T 3.868; held-out accuracy 0.500; noul_sentence: calibration accuracy 0.531, NLL 0.652 at T 5.284; held-out accuracy 0.512. Controls at the fitted T: CTL-CONSENT-DE-COMPLETE VERIFIED->INCONCLUSIVE (p=0.682); CTL-CONSENT-FR-NO-PURPOSE REFUTED->INCONCLUSIVE (p=0.556); CTL-CONSENT-EN-SHOP-NOTICE REFUTED->INCONCLUSIVE (p=0.544). Replay: 5 runs per control (2 in fresh processes), max thresholded-probability delta 0, max logit delta 0; epsilon is 10x the larger of the measured delta and the delta the worst logit wobble seen on any checkpoint would cause at this temperature, rounded up.",
+    "Temperature semantics: `calibration.temperature` replaces the checkpoint's own temperature for this question's (type, option count) bucket, i.e. probabilities are softmax(option logits / T); a runner sets agent.temperature_by_options[temp_bucket] = T and passes no `lang`. `measured_ece` is the larger of the calibration-split and held-out ECE at the fitted temperature.",
+    "Held-out accuracy by variant (presence of purpose, third parties, withdrawal as 0/1): 000 0.81, 000_not_banner 0.25, 001 0.47, 010 0.56, 011 0.38, 100 0.84, 101 0.75, 110 0.84, 111 0.97. By language: de 0.56, en 0.66, es 0.81, fr 0.62, it 0.75, ja 0.66, nl 0.69, pt 0.59.",
+    "Formulations were registered in two stages: noul and choice2_neutral first; choice2_contrastive and noul_sentence after stage 1 failed on the calibration split (stage-1 held-out numbers had already been computed for two of the three disclosures). The choice among all four used the calibration split only.",
+    "Single condition: this rubric asks about one disclosure only. The consent-banner rule (purpose, third parties, withdrawal) holds for a locale when all three single-disclosure rubrics VERIFY on its banner; it replaces the multi-condition rubric RUB-S1-CONSENT-BANNER-DISCLOSURES, which scored at chance.",
+    "The held-out split is paraphrase-disjoint: calibration banners use the generator's original three paraphrases per disclosure and language, held-out banners two new ones, so held-out wording was never seen while choosing the formulation or fitting T. The paraphrases were written for this exercise; they are not reviewed native copy.",
+    "Checkpoint is pinned to laya-multilingual; Router auto-selection is not used. This checks that the disclosure is stated, not that the wording satisfies any particular law.",
+    "Not assurance-eligible: held-out gated precision 0.500 is below 0.95; Wilson 95% lower bound of held-out gated precision 0.095 (1/2) is below 0.90; controls land on the wrong status: CTL-CONSENT-DE-COMPLETE, CTL-CONSENT-FR-NO-PURPOSE, CTL-CONSENT-EN-SHOP-NOTICE; controls off their expected status in a replay run: CTL-CONSENT-DE-COMPLETE, CTL-CONSENT-FR-NO-PURPOSE, CTL-CONSENT-EN-SHOP-NOTICE. Thresholds were not lowered to compensate."
+  ]
+}

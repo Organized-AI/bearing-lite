@@ -1,0 +1,446 @@
+{
+ "rubric": "gtm-event-is-purchase",
+ "verify_threshold": 0.9,
+ "refute_threshold": 0.9,
+ "max_ece": 0.1,
+ "calibration_size": 180,
+ "test_size": 180,
+ "formulations": {
+  "noul": {
+   "question": {
+    "key": "event_is_purchase",
+    "type": "noul",
+    "instructions": "The state is one dataLayer push as JSON. Is the value of its top-level `event` field exactly \"purchase\"?"
+   },
+   "temperature": 6.613212435142172,
+   "shipped_temperature": 1.983399510383606,
+   "calibration_calibrated": {
+    "n": 180,
+    "accuracy": 0.6388888888888888,
+    "ece": 0.1514664548952318,
+    "nll": 0.6100375741327799,
+    "coverage": 0.022222222222222223,
+    "precision": 0.75,
+    "verified": 4,
+    "verified_correct": 3,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 176,
+    "pred_counts": {
+     "no": 25,
+     "yes": 155
+    }
+   },
+   "test_raw": {
+    "n": 180,
+    "accuracy": 0.6166666666666667,
+    "ece": 0.33716800636419736,
+    "nll": 1.67361204602378,
+    "coverage": 0.8611111111111112,
+    "precision": 0.6580645161290323,
+    "verified": 143,
+    "verified_correct": 90,
+    "refuted": 12,
+    "refuted_correct": 12,
+    "inconclusive": 25,
+    "pred_counts": {
+     "no": 21,
+     "yes": 159
+    }
+   },
+   "test_shipped": {
+    "n": 180,
+    "accuracy": 0.6166666666666667,
+    "ece": 0.2697853234606066,
+    "nll": 0.9473298861746919,
+    "coverage": 0.6444444444444445,
+    "precision": 0.7844827586206896,
+    "verified": 114,
+    "verified_correct": 89,
+    "refuted": 2,
+    "refuted_correct": 2,
+    "inconclusive": 64,
+    "pred_counts": {
+     "no": 21,
+     "yes": 159
+    }
+   },
+   "test_calibrated": {
+    "n": 180,
+    "accuracy": 0.6166666666666667,
+    "ece": 0.1506737297833671,
+    "nll": 0.6360923126815259,
+    "coverage": 0.03333333333333333,
+    "precision": 0.6666666666666666,
+    "verified": 6,
+    "verified_correct": 4,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 174,
+    "pred_counts": {
+     "no": 21,
+     "yes": 159
+    }
+   },
+   "controls": {
+    "CTL-GTM-PURCHASE-VALID": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.727542,
+     "pass": false
+    },
+    "CTL-GTM-PURCHASE-NO-CURRENCY": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.740872,
+     "pass": false
+    },
+    "CTL-GTM-ADD-TO-CART": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.582151,
+     "pass": false
+    }
+   },
+   "test_gated": {
+    "verdicts": 6,
+    "correct": 4,
+    "wilson_lower": 0.2999883213415286
+   },
+   "test_accuracy_by_variant": {
+    "near_miss": 0.13636363636363635,
+    "other_event": 0.2647058823529412,
+    "purchase": 1.0
+   },
+   "test_status_by_variant": {
+    "purchase": {
+     "INCONCLUSIVE": 86,
+     "VERIFIED": 4
+    },
+    "other_event": {
+     "INCONCLUSIVE": 68
+    },
+    "near_miss": {
+     "INCONCLUSIVE": 20,
+     "VERIFIED": 2
+    }
+   },
+   "controls_pass": false
+  },
+  "choice2_neutral": {
+   "question": {
+    "key": "event_is_purchase",
+    "type": "choice",
+    "instructions": "The state is one dataLayer push as JSON. Which option describes the value of its top-level `event` field?",
+    "criteria": {
+     "A": "exactly purchase",
+     "B": "any other value"
+    }
+   },
+   "temperature": 3.2425689005834313,
+   "shipped_temperature": 1.9063563346862793,
+   "calibration_calibrated": {
+    "n": 180,
+    "accuracy": 0.6444444444444445,
+    "ece": 0.19911597599841263,
+    "nll": 0.5676088938423416,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 180,
+    "pred_counts": {
+     "A": 154,
+     "B": 26
+    }
+   },
+   "test_raw": {
+    "n": 180,
+    "accuracy": 0.6055555555555555,
+    "ece": 0.2751692688030108,
+    "nll": 0.9003039389028249,
+    "coverage": 0.6333333333333333,
+    "precision": 0.7982456140350878,
+    "verified": 113,
+    "verified_correct": 90,
+    "refuted": 1,
+    "refuted_correct": 1,
+    "inconclusive": 66,
+    "pred_counts": {
+     "A": 161,
+     "B": 19
+    }
+   },
+   "test_shipped": {
+    "n": 180,
+    "accuracy": 0.6055555555555555,
+    "ece": 0.21174623813834917,
+    "nll": 0.6405390625728202,
+    "coverage": 0.40555555555555556,
+    "precision": 0.9041095890410958,
+    "verified": 73,
+    "verified_correct": 66,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 107,
+    "pred_counts": {
+     "A": 161,
+     "B": 19
+    }
+   },
+   "test_calibrated": {
+    "n": 180,
+    "accuracy": 0.6055555555555555,
+    "ece": 0.19025190099659187,
+    "nll": 0.5878165759485777,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 180,
+    "pred_counts": {
+     "A": 161,
+     "B": 19
+    }
+   },
+   "controls": {
+    "CTL-GTM-PURCHASE-VALID": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.844271,
+     "pass": false
+    },
+    "CTL-GTM-PURCHASE-NO-CURRENCY": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.839826,
+     "pass": false
+    },
+    "CTL-GTM-ADD-TO-CART": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.65339,
+     "pass": false
+    }
+   },
+   "test_gated": {
+    "verdicts": 0,
+    "correct": 0,
+    "wilson_lower": null
+   },
+   "test_accuracy_by_variant": {
+    "near_miss": 0.045454545454545456,
+    "other_event": 0.2647058823529412,
+    "purchase": 1.0
+   },
+   "test_status_by_variant": {
+    "purchase": {
+     "INCONCLUSIVE": 90
+    },
+    "other_event": {
+     "INCONCLUSIVE": 68
+    },
+    "near_miss": {
+     "INCONCLUSIVE": 22
+    }
+   },
+   "controls_pass": false
+  },
+  "choice5_events": {
+   "question": {
+    "key": "event_is_purchase",
+    "type": "choice",
+    "instructions": "The state is one dataLayer push as JSON. Which GA4 event is it?",
+    "criteria": {
+     "A": "purchase",
+     "B": "add_to_cart",
+     "C": "begin_checkout",
+     "D": "view_item",
+     "E": "another event"
+    }
+   },
+   "temperature": 1.4035008323438354,
+   "shipped_temperature": 1.7601518630981445,
+   "calibration_calibrated": {
+    "n": 180,
+    "accuracy": 0.8055555555555556,
+    "ece": 0.07237681465193543,
+    "nll": 0.5093365130665557,
+    "coverage": 0.7444444444444445,
+    "precision": 0.9850746268656716,
+    "verified": 80,
+    "verified_correct": 78,
+    "refuted": 54,
+    "refuted_correct": 54,
+    "inconclusive": 46,
+    "pred_counts": {
+     "A": 108,
+     "B": 28,
+     "C": 20,
+     "D": 16,
+     "E": 8
+    }
+   },
+   "test_raw": {
+    "n": 180,
+    "accuracy": 0.8111111111111111,
+    "ece": 0.09681368156154935,
+    "nll": 0.6455333564909086,
+    "coverage": 0.8111111111111111,
+    "precision": 0.9452054794520548,
+    "verified": 95,
+    "verified_correct": 87,
+    "refuted": 51,
+    "refuted_correct": 51,
+    "inconclusive": 34,
+    "pred_counts": {
+     "A": 116,
+     "B": 29,
+     "C": 9,
+     "D": 16,
+     "E": 10
+    }
+   },
+   "test_shipped": {
+    "n": 180,
+    "accuracy": 0.8111111111111111,
+    "ece": 0.07472046515372813,
+    "nll": 0.5832161213609129,
+    "coverage": 0.4666666666666667,
+    "precision": 0.9642857142857143,
+    "verified": 36,
+    "verified_correct": 33,
+    "refuted": 48,
+    "refuted_correct": 48,
+    "inconclusive": 96,
+    "pred_counts": {
+     "A": 116,
+     "B": 29,
+     "C": 9,
+     "D": 16,
+     "E": 10
+    }
+   },
+   "test_calibrated": {
+    "n": 180,
+    "accuracy": 0.8111111111111111,
+    "ece": 0.05291219597440458,
+    "nll": 0.5777847532764961,
+    "coverage": 0.7166666666666667,
+    "precision": 0.9534883720930233,
+    "verified": 80,
+    "verified_correct": 74,
+    "refuted": 49,
+    "refuted_correct": 49,
+    "inconclusive": 51,
+    "pred_counts": {
+     "A": 116,
+     "B": 29,
+     "C": 9,
+     "D": 16,
+     "E": 10
+    }
+   },
+   "controls": {
+    "CTL-GTM-PURCHASE-VALID": {
+     "expected": "VERIFIED",
+     "observed": [
+      "VERIFIED",
+      "VERIFIED",
+      "VERIFIED"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.977327,
+     "pass": true
+    },
+    "CTL-GTM-PURCHASE-NO-CURRENCY": {
+     "expected": "VERIFIED",
+     "observed": [
+      "VERIFIED",
+      "VERIFIED",
+      "VERIFIED"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.980538,
+     "pass": true
+    },
+    "CTL-GTM-ADD-TO-CART": {
+     "expected": "REFUTED",
+     "observed": [
+      "REFUTED",
+      "REFUTED",
+      "REFUTED"
+     ],
+     "answer": "B",
+     "thresholded_probability": 0.994739,
+     "pass": true
+    }
+   },
+   "test_gated": {
+    "verdicts": 129,
+    "correct": 123,
+    "wilson_lower": 0.9022364923854131
+   },
+   "test_accuracy_by_variant": {
+    "near_miss": 0.045454545454545456,
+    "other_event": 0.8088235294117647,
+    "purchase": 1.0
+   },
+   "test_status_by_variant": {
+    "purchase": {
+     "VERIFIED": 74,
+     "INCONCLUSIVE": 16
+    },
+    "other_event": {
+     "REFUTED": 49,
+     "INCONCLUSIVE": 19
+    },
+    "near_miss": {
+     "VERIFIED": 6,
+     "INCONCLUSIVE": 16
+    }
+   },
+   "controls_pass": true
+  }
+ },
+ "chosen": {
+  "formulation": "choice5_events",
+  "measured_ece": 0.07237681465193543,
+  "assurance_eligible_before_replay": true,
+  "reasons": []
+ }
+}

@@ -1,0 +1,159 @@
+{
+  "kind": "rubric",
+  "schema_family": "system1",
+  "schema_version": "1",
+  "rubric_id": "RUB-S1-GTM-EVENT-IS-PURCHASE",
+  "rubric_version": "1.0.0",
+  "title": "dataLayer push is a GA4 purchase event (single condition, demonstration)",
+  "claim": {
+    "claim_type": "tracking_event_classification",
+    "statement": "The dataLayer push captured for the checkout-complete step is a GA4 `purchase` event (its `event` is exactly \"purchase\").",
+    "eligibility": "closed_option_conformance",
+    "spec_refs": [
+      "tracking-spec: purchase event"
+    ]
+  },
+  "assurance_eligible": true,
+  "backend": "laya",
+  "model": {
+    "provider": "huggingface",
+    "repo": "convaiinnovations/laya",
+    "checkpoint": "laya",
+    "revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+    "selection": "pinned",
+    "runtime": {
+      "package": "laya",
+      "package_version": "0.3.21",
+      "precision": "fp32",
+      "device_class": "cpu",
+      "eval_mode": true,
+      "fast_path": false,
+      "max_len": 512,
+      "head_max_len": 192
+    }
+  },
+  "question": {
+    "key": "event_is_purchase",
+    "type": "choice",
+    "instructions": "The state is one dataLayer push as JSON. Which GA4 event is it?",
+    "criteria": {
+      "A": "purchase",
+      "B": "add_to_cart",
+      "C": "begin_checkout",
+      "D": "view_item",
+      "E": "another event"
+    }
+  },
+  "question_digest": "51ebb9bab57c4684377225106a08aaa9df2f4b6bca4a0b7b7af7a941f3f47207",
+  "decision": {
+    "claim_holds_options": [
+      "A"
+    ],
+    "claim_fails_options": [
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "verify_threshold": 0.9,
+    "refute_threshold": 0.9,
+    "probability_basis": "calibrated_option_set_mass",
+    "tie_rule": "INCONCLUSIVE"
+  },
+  "calibration": {
+    "method": "temperature_scaled",
+    "temperature": 1.403501,
+    "calibration_set_digest": "3377bc4551fbf58dd3ce5201584a255b8131114f964352db4607abd9c0f6b9c6",
+    "calibration_set_size": 180,
+    "measured_ece": 0.0724,
+    "max_ece": 0.1
+  },
+  "input": {
+    "state_shape": "json_document",
+    "source": {
+      "kind": "captured_fixture",
+      "locator": "test/fixtures/datalayer/purchase-push.json"
+    },
+    "canonicalization": "rfc8785_jcs",
+    "token_limit": 320,
+    "tokenizer": "pinned_checkpoint",
+    "truncation": "never",
+    "over_limit": "ERROR"
+  },
+  "controls": [
+    {
+      "control_id": "CTL-GTM-PURCHASE-VALID",
+      "locator": "test/fixtures/datalayer/controls/purchase-valid.json",
+      "input_digest": "01e43114dc7a72eba277bb57e58dc5bca144cbc62f7f9f653341c704dc41f4a2",
+      "expected": "VERIFIED"
+    },
+    {
+      "control_id": "CTL-GTM-PURCHASE-NO-CURRENCY",
+      "locator": "test/fixtures/datalayer/controls/purchase-missing-currency.json",
+      "input_digest": "ea7875b02b28a69b3edab638708a0d39e2825273f01efa0f1d12b4ba9b90d842",
+      "expected": "VERIFIED"
+    },
+    {
+      "control_id": "CTL-GTM-ADD-TO-CART",
+      "locator": "test/fixtures/datalayer/controls/add-to-cart.json",
+      "input_digest": "ac8359930a47ddb06baee8cf8940b44679ba202f0e3668eada3cd04d241476ce",
+      "expected": "REFUTED"
+    }
+  ],
+  "replay": {
+    "min_runs": 2,
+    "probability_epsilon": 0.002,
+    "require_identical_answer": true,
+    "require_identical_status": true,
+    "freshness": "uncached_and_fresh_process"
+  },
+  "gateway": {
+    "worker_name": "jev-gateway",
+    "ai_gateway_id_env": "JEV_GATEWAY_AI_GATEWAY_ID",
+    "endpoint_env": "JEV_GATEWAY_ENDPOINT",
+    "auth_token_env": "JEV_GATEWAY_TOKEN",
+    "route": "/v1/systemone",
+    "cache": {
+      "mode": "enabled_with_bypass_run",
+      "ttl_seconds": 86400,
+      "key_binds": [
+        "backend",
+        "model_revision",
+        "checkpoint",
+        "rubric_digest",
+        "question_digest",
+        "input_digest",
+        "calibration"
+      ]
+    },
+    "logging": true
+  },
+  "operations": {
+    "allowed": [
+      "evaluate"
+    ],
+    "denied": [
+      "generate",
+      "propose",
+      "propose_claims",
+      "propose_options",
+      "suggest_options",
+      "rewrite",
+      "rewrite_claim",
+      "rewrite_options",
+      "explain",
+      "complete",
+      "chat",
+      "review"
+    ]
+  },
+  "notes": [
+    "Measured on the pinned checkpoint, CPU fp32, eval mode, one state per forward pass: formulation `choice5_events` chosen on the calibration split only (highest accuracy, then lowest NLL at the fitted temperature). Held-out accuracy 0.811 (n=180); ECE (15 bins) 0.097 raw logits, 0.075 at the checkpoint's shipped temperature, 0.053 at the fitted temperature 1.404; at verify 0.90 / refute 0.90, coverage 0.717 (VERIFIED 80, REFUTED 49, INCONCLUSIVE 51) with gated precision 0.953 (Wilson 95% lower bound 0.902). Calibration split: accuracy 0.806, ECE after fitting 0.072 (n=180). Dataset: test/fixtures/system1-calibration/single-condition/gtm-event-is-purchase/ (report: docs/calibration/system1-calibration-report.md, Hybrid section).",
+    "Formulations tried: noul: calibration accuracy 0.639, NLL 0.610 at T 6.613; held-out accuracy 0.617; choice2_neutral: calibration accuracy 0.644, NLL 0.568 at T 3.243; held-out accuracy 0.606; choice5_events: calibration accuracy 0.806, NLL 0.509 at T 1.404; held-out accuracy 0.811. Controls at the fitted T: CTL-GTM-PURCHASE-VALID VERIFIED->VERIFIED (p=0.977); CTL-GTM-PURCHASE-NO-CURRENCY VERIFIED->VERIFIED (p=0.981); CTL-GTM-ADD-TO-CART REFUTED->REFUTED (p=0.995). Replay: 5 runs per control (2 in fresh processes), max thresholded-probability delta 0, max logit delta 0; epsilon is 10x the larger of the measured delta and the delta the worst logit wobble seen on any checkpoint would cause at this temperature, rounded up.",
+    "Temperature semantics: `calibration.temperature` replaces the checkpoint's own temperature for this question's (type, option count) bucket, i.e. probabilities are softmax(option logits / T); a runner sets agent.temperature_by_options[temp_bucket] = T and passes no `lang`. `measured_ece` is the larger of the calibration-split and held-out ECE at the fitted temperature.",
+    "Held-out accuracy by variant: near_miss 0.05, other_event 0.81, purchase 1.00.",
+    "Demonstration of a single-condition question where Laya works. The selection guide routes this exact check to the `validator` backend (RUB-S1-VAL-GTM-PURCHASE-EVENT decides it, and the five other purchase conditions, exactly); do not bind a new claim to this rubric where the validator applies.",
+    "Held-out items include near-miss spellings (Purchase, PURCHASE, purchase_complete, order_completed, purchased, checkout_purchase) labeled as not purchase, because the condition is `event` exactly equal to \"purchase\". Held-out statuses by variant: near_miss INCONCLUSIVE 16, VERIFIED 6; other_event INCONCLUSIVE 19, REFUTED 49; purchase INCONCLUSIVE 16, VERIFIED 74. Every wrong gated verdict is a near-miss spelling VERIFIED as purchase; the model never REFUTES one. The bar is met on this mix (about one item in eight a near miss) and would not be on a population with more near misses.",
+    "Assurance-eligible: held-out gated precision 0.953 >= 0.95 with Wilson lower bound 0.902 >= 0.90, every control on its expected status in every replay run, measured ECE 0.072 <= max_ece 0.10."
+  ]
+}
