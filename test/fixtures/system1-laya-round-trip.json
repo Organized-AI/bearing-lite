@@ -1,5 +1,5 @@
 {
-  "description": "Laya System One round trip: spec planned from a frozen example rubric, backend outputs as schemas/system1.schema.json backend_output, and the receipts sealVerification emits for them. test/verification-bridge.test.mjs reseals the outputs and must reproduce these receipts; test/schema-validation.py validates outputs and receipts against their schemas. Rebuilt by tools/system1-calibration/build-round-trip.mjs. Run probabilities, gateway ids, and control observations are synthetic bridge inputs, not measurements: the bound rubric's measured calibration (it is not assurance-eligible) is in docs/calibration/system1-calibration-report.md.",
+  "description": "Laya System One round trip (diagnostic authority): spec planned from a frozen example rubric that is not assurance-eligible, backend outputs as schemas/system1.schema.json backend_output, and the receipts sealVerification emits for them. test/verification-bridge.test.mjs reseals the outputs and must reproduce these receipts; test/schema-validation.py validates outputs and receipts against their schemas. Rebuilt by tools/system1-calibration/build-round-trip.mjs. Run probabilities, gateway ids, and control observations are synthetic bridge inputs, not measurements: the bound rubric's measured calibration (it is not assurance-eligible) is in docs/calibration/system1-calibration-report.md.",
   "rubric_path": "skills/bearing-lite/references/system1-rubrics/laya-gtm-datalayer-event.rubric.json",
   "spec": {
     "backend": "laya",
@@ -48,16 +48,16 @@
       "candidate_revision": "b5cec79f04f6f6ea506a2ad89bf937aab143d876",
       "candidate_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     },
-    "stage": "assurance",
-    "authority": "assurance",
+    "stage": "implementation",
+    "authority": "diagnostic",
     "expected_result": "VERIFIED",
     "selected": true,
     "required": true
   },
   "produced_by": {
-    "role": "test_engineer.assurance",
-    "identity": "ate-s1",
-    "session": "sess-ate-s1"
+    "role": "implementer",
+    "identity": "impl-s1",
+    "session": "sess-impl-s1"
   },
   "request": {
     "schema_version": "1",
@@ -68,8 +68,8 @@
     "claim_id": "SEIT-S1-GTM-001",
     "claim_type": "tracking_event_conformance",
     "backend": "laya",
-    "stage": "assurance",
-    "authority": "assurance",
+    "stage": "implementation",
+    "authority": "diagnostic",
     "expected_result": "VERIFIED",
     "command_configuration": {
       "backend": "laya",
@@ -412,13 +412,13 @@
         }
       },
       "evidence_digest": "f79b42bd40cffd7a48ae6fe74165f9c29422cee02525104df7a06b597f8ff901",
-      "authority": "assurance",
+      "authority": "diagnostic",
       "produced_by": {
-        "role": "test_engineer.assurance",
-        "identity": "ate-s1",
-        "session": "sess-ate-s1"
+        "role": "implementer",
+        "identity": "impl-s1",
+        "session": "sess-impl-s1"
       },
-      "stage": "assurance",
+      "stage": "implementation",
       "evidence_tier": "observed",
       "backend_verdict": "VERIFIED"
     },
@@ -449,13 +449,13 @@
         }
       },
       "evidence_digest": "2be5a3f34c5503e62cde9996e7fe92479afe81679ef8fa4964ed46d629622448",
-      "authority": "assurance",
+      "authority": "diagnostic",
       "produced_by": {
-        "role": "test_engineer.assurance",
-        "identity": "ate-s1",
-        "session": "sess-ate-s1"
+        "role": "implementer",
+        "identity": "impl-s1",
+        "session": "sess-impl-s1"
       },
-      "stage": "assurance",
+      "stage": "implementation",
       "evidence_tier": "observed",
       "backend_verdict": "INCONCLUSIVE"
     },
@@ -486,13 +486,13 @@
         }
       },
       "evidence_digest": "53e7c776534e202576ba35c55915a4369877cb7e2734e936ae36d1d986308c50",
-      "authority": "assurance",
+      "authority": "diagnostic",
       "produced_by": {
-        "role": "test_engineer.assurance",
-        "identity": "ate-s1",
-        "session": "sess-ate-s1"
+        "role": "implementer",
+        "identity": "impl-s1",
+        "session": "sess-impl-s1"
       },
-      "stage": "assurance",
+      "stage": "implementation",
       "evidence_tier": "derived",
       "backend_verdict": "INCONCLUSIVE",
       "evidence_engine": "laya 0.3.21"

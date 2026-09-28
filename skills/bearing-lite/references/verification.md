@@ -103,7 +103,12 @@ rubric digest, model revision, checkpoint, gateway request and log ids, and
 every replay run. A verdict reconstructed rather than read (for example from a
 gateway log after a timeout) is marked `DERIVED` and seals INCONCLUSIVE.
 Rubrics, thresholds, and the gate slot are defined in
-`references/system1-rubrics.md`.
+`references/system1-rubrics.md`. An `assurance` plan for `jev` or `laya` must
+carry its frozen rubric: `planVerification` refuses it as `rubric_missing`,
+`rubric_digest_mismatch` (SHA-256 over `canonicalJson` of the rubric differs
+from the claim's `rubric_digest`), `rubric_backend_mismatch`, or
+`rubric_not_assurance_eligible`; a `diagnostic` plan may use a non-eligible
+rubric.
 
 These refusals are stated in engineering terms. An adopting project maps them
 to whatever assurance standard it follows.

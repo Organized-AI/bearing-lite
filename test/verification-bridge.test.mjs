@@ -486,25 +486,58 @@ describe("verification receipt bridge (#105)", () => {
 });
 
 /**
- * System One (Jev, Laya): a laya claim planned from a frozen example rubric,
- * sealed from schema-shaped backend output, and judged by the adapter.
- * test/fixtures/system1-laya-round-trip.json holds the outputs and the exact
- * receipts; test/schema-validation.py validates both against their schemas.
+ * System One (Jev, Laya): a laya claim planned from a frozen rubric, sealed
+ * from schema-shaped backend output, and judged by the adapter.
+ * test/fixtures/system1-laya-round-trip.json is a diagnostic run bound to the
+ * shipped GTM rubric, which is not assurance_eligible; it holds the outputs and
+ * the exact receipts, and test/schema-validation.py validates both. The
+ * assurance cases use SYNTHETIC_ELIGIBLE_RUBRIC below: an in-test copy with
+ * assurance_eligible flipped to true and a recomputed digest. It is not a
+ * calibrated rubric and is never written to disk.
  */
 describe("System One laya receipt round trip", () => {
   const { readFileSync } = require("node:fs");
   const S1 = JSON.parse(readFileSync(path.join(ROOT, "test/fixtures/system1-laya-round-trip.json"), "utf8"));
   const rubric = JSON.parse(readFileSync(path.join(ROOT, S1.rubric_path), "utf8"));
   const layaBackend = { name: "laya", enabled: true, available: true };
+  const rubricDigest = (r) => createHash("sha256").update(bridge.canonicalJson(r), "utf8").digest("hex");
 
-  function layaPlan(extra = {}) {
-    return bridge.planVerification({ ...S1.spec, ...extra });
+  const SYNTHETIC_ELIGIBLE_RUBRIC = {
+    ...structuredClone(rubric),
+    assurance_eligible: true,
+    notes: ["SYNTHETIC TEST COPY: assurance_eligible flipped to true in-test only; not calibrated.", ...rubric.notes],
+  };
+  const SYNTHETIC_DIGEST = rubricDigest(SYNTHETIC_ELIGIBLE_RUBRIC);
+  const ateS1 = { role: "test_engineer.assurance", identity: "ate-s1", session: "sess-ate-s1" };
+
+  /** The fixture's diagnostic plan, carrying the shipped (non-eligible) rubric. */
+  function diagnosticPlan(extra = {}) {
+    return bridge.planVerification({ ...S1.spec, rubric, ...extra });
   }
 
-  function roundTrip(outputKey) {
-    const plan = layaPlan();
+  /** An assurance plan bound to the synthetic eligible rubric. */
+  function assuranceSpec(extra = {}) {
+    return {
+      ...S1.spec,
+      stage: "assurance",
+      authority: "assurance",
+      claim: { ...S1.spec.claim, rubric_digest: SYNTHETIC_DIGEST },
+      rubric: SYNTHETIC_ELIGIBLE_RUBRIC,
+      ...extra,
+    };
+  }
+
+  /** Fixture outputs rebound to the synthetic rubric digest. */
+  function syntheticOutput(key) {
+    const out = structuredClone(S1.outputs[key]);
+    for (const result of out.results) result.evidence.rubric.rubric_digest = SYNTHETIC_DIGEST;
+    return out;
+  }
+
+  function assuranceTrip(outputKey) {
+    const plan = bridge.planVerification(assuranceSpec());
     assert.equal(plan.outcome, "READY", JSON.stringify(plan));
-    const seal = bridge.sealVerification({ plan, output: S1.outputs[outputKey], produced_by: S1.produced_by });
+    const seal = bridge.sealVerification({ plan, output: syntheticOutput(outputKey), produced_by: ateS1 });
     assert.equal(seal.outcome, "READY", JSON.stringify(seal));
     const verdict = adapter.evaluateVerification({
       request: plan.request,
@@ -517,28 +550,69 @@ describe("System One laya receipt round trip", () => {
     return { plan, seal, verdict };
   }
 
-  it("binds the claim to the frozen rubric by id, version, and digest", () => {
+  it("binds the fixture claim to the shipped rubric, which is not assurance-eligible", () => {
     assert.equal(rubric.backend, "laya");
+    assert.equal(rubric.assurance_eligible, false);
+    assert.equal(S1.spec.authority, "diagnostic");
     assert.equal(S1.spec.claim.rubric_id, rubric.rubric_id);
     assert.equal(S1.spec.claim.rubric_version, rubric.rubric_version);
-    assert.equal(
-      S1.spec.claim.rubric_digest,
-      createHash("sha256").update(bridge.canonicalJson(rubric), "utf8").digest("hex"),
-    );
+    assert.equal(S1.spec.claim.rubric_digest, rubricDigest(rubric));
     assert.deepEqual(S1.spec.backend_operations, rubric.operations);
-    assert.deepEqual(layaPlan().request, S1.request);
+    assert.deepEqual(diagnosticPlan().request, S1.request);
   });
 
   it("reproduces the fixture receipts exactly, so the schema-validated receipts are real seals", () => {
+    const plan = diagnosticPlan();
+    assert.equal(plan.outcome, "READY", JSON.stringify(plan));
     for (const key of Object.keys(S1.outputs)) {
-      const { seal } = roundTrip(key);
+      const seal = bridge.sealVerification({ plan, output: S1.outputs[key], produced_by: S1.produced_by });
       assert.deepEqual(seal.receipt, S1.receipts[key], key);
     }
   });
 
-  it("VERIFIED laya receipt passes the assurance gate and is gate_eligible", () => {
-    const { seal, verdict } = roundTrip("verified");
+  it("diagnostic plan on a non-eligible rubric is allowed and never gate-eligible", () => {
+    const plan = diagnosticPlan();
+    assert.equal(plan.outcome, "READY");
+    // Diagnostic without the rubric object is also allowed.
+    assert.equal(bridge.planVerification(S1.spec).outcome, "READY");
+    const verdict = adapter.evaluateVerification({
+      request: plan.request,
+      receipt: S1.receipts.verified,
+      candidate: S1.spec.candidate,
+      backend: layaBackend,
+      author: ateS1,
+      gate: "assurance",
+    });
+    assert.equal(verdict.outcome, "REJECT");
+    assert.equal(verdict.reason, "diagnostic_cannot_satisfy_assurance_gate");
+    assert.equal(verdict.gate_eligible, false);
+  });
+
+  it("assurance plan on the shipped non-eligible rubric is rubric_not_assurance_eligible", () => {
+    const plan = bridge.planVerification({ ...S1.spec, stage: "assurance", authority: "assurance", rubric });
+    assert.equal(plan.outcome, "REJECT");
+    assert.equal(plan.reason, "rubric_not_assurance_eligible");
+  });
+
+  it("assurance plan without the rubric, or with a rubric that does not hash to the claim, is refused", () => {
+    const missing = bridge.planVerification(assuranceSpec({ rubric: undefined }));
+    assert.deepEqual([missing.outcome, missing.reason], ["REJECT", "rubric_missing"]);
+    const stale = bridge.planVerification(assuranceSpec({ claim: S1.spec.claim }));
+    assert.deepEqual([stale.outcome, stale.reason], ["REJECT", "rubric_digest_mismatch"]);
+    const edited = bridge.planVerification(assuranceSpec({
+      rubric: { ...SYNTHETIC_ELIGIBLE_RUBRIC, decision: { ...SYNTHETIC_ELIGIBLE_RUBRIC.decision, verify_threshold: 0.5 } },
+    }));
+    assert.deepEqual([edited.outcome, edited.reason], ["REJECT", "rubric_digest_mismatch"]);
+    const diagMismatch = diagnosticPlan({ rubric: SYNTHETIC_ELIGIBLE_RUBRIC });
+    assert.deepEqual([diagMismatch.outcome, diagMismatch.reason], ["REJECT", "rubric_digest_mismatch"]);
+    const jevOnLaya = bridge.planVerification(assuranceSpec({ backend: "jev", claim: { ...S1.spec.claim, backend: "jev", rubric_digest: SYNTHETIC_DIGEST } }));
+    assert.deepEqual([jevOnLaya.outcome, jevOnLaya.reason], ["REJECT", "rubric_backend_mismatch"]);
+  });
+
+  it("assurance plan on an eligible rubric is READY; VERIFIED passes the gate and is gate_eligible", () => {
+    const { seal, verdict } = assuranceTrip("verified");
     assert.equal(seal.receipt.backend, "laya");
+    assert.equal(seal.receipt.authority, "assurance");
     assert.equal(seal.receipt.evidence_tier, "observed");
     assert.equal(verdict.outcome, "PASS", JSON.stringify(verdict));
     assert.equal(verdict.reason, "independent_assurance_verified");
@@ -546,7 +620,7 @@ describe("System One laya receipt round trip", () => {
   });
 
   it("INCONCLUSIVE replay_probability_divergence is not gate_eligible", () => {
-    const { seal, verdict } = roundTrip("replay_divergence");
+    const { seal, verdict } = assuranceTrip("replay_divergence");
     assert.equal(seal.receipt.status, "INCONCLUSIVE");
     assert.equal(verdict.outcome, "INCONCLUSIVE");
     assert.equal(verdict.reason, "inconclusive_cannot_satisfy_gate");
@@ -554,16 +628,17 @@ describe("System One laya receipt round trip", () => {
   });
 
   it("a DERIVED laya verdict seals INCONCLUSIVE with evidence_tier derived", () => {
-    const { seal, verdict } = roundTrip("derived");
+    const { seal, verdict } = assuranceTrip("derived");
     assert.equal(seal.receipt.status, "INCONCLUSIVE");
     assert.equal(seal.receipt.evidence_tier, "derived");
     assert.equal(seal.receipt.evidence_engine, "laya 0.3.21");
     assert.equal(verdict.gate_eligible, false);
     // Even a runner that reports VERIFIED beside a DERIVED strength cannot close a gate.
-    const forged = structuredClone(S1.outputs.derived);
+    const forged = syntheticOutput("derived");
     forged.results[0].verdict = "VERIFIED";
     delete forged.results[0].reason;
-    const resealed = bridge.sealVerification({ plan: layaPlan(), output: forged, produced_by: S1.produced_by });
+    const plan = bridge.planVerification(assuranceSpec());
+    const resealed = bridge.sealVerification({ plan, output: forged, produced_by: ateS1 });
     assert.equal(resealed.receipt.status, "INCONCLUSIVE");
     assert.equal(resealed.receipt.backend_verdict, "VERIFIED");
     assert.equal(resealed.receipt.evidence_tier, "derived");
@@ -572,24 +647,26 @@ describe("System One laya receipt round trip", () => {
   it("refuses a generative operation drawn from the rubric's denied list", () => {
     for (const operation of ["propose_claims", "propose_options", "rewrite_claim", "review"]) {
       assert.ok(rubric.operations.denied.includes(operation), operation);
-      const plan = layaPlan({ backend_operation: operation });
+      const plan = bridge.planVerification(assuranceSpec({ backend_operation: operation }));
       assert.equal(plan.outcome, "REJECT", operation);
       assert.equal(plan.reason, "generative_backend_operation_denied", operation);
     }
   });
 
   it("a jev receipt against a laya request is claim_or_backend_mismatch: no silent fallback", () => {
-    const laya = layaPlan();
-    const jev = layaPlan({
+    const laya = bridge.planVerification(assuranceSpec());
+    const jevRubric = { ...SYNTHETIC_ELIGIBLE_RUBRIC, backend: "jev" };
+    const jev = bridge.planVerification(assuranceSpec({
       backend: "jev",
-      claim: { ...S1.spec.claim, backend: "jev" },
-    });
+      rubric: jevRubric,
+      claim: { ...S1.spec.claim, backend: "jev", rubric_digest: rubricDigest(jevRubric) },
+    }));
     assert.equal(jev.outcome, "READY", JSON.stringify(jev));
-    const jevOutput = structuredClone(S1.outputs.verified);
+    const jevOutput = syntheticOutput("verified");
     jevOutput.backend = "jev";
     jevOutput.backend_version = "jev 1.13.0";
     jevOutput.results[0].evidence.engine = "jev";
-    const seal = bridge.sealVerification({ plan: jev, output: jevOutput, produced_by: S1.produced_by });
+    const seal = bridge.sealVerification({ plan: jev, output: jevOutput, produced_by: ateS1 });
     assert.equal(seal.receipt.backend, "jev");
     const verdict = adapter.evaluateVerification({
       request: laya.request,

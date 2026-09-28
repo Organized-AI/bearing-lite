@@ -11,6 +11,11 @@
 // rubric file and re-runs planVerification and sealVerification. Run
 // probabilities, gateway ids, and control observations stay synthetic: the
 // fixture exercises the bridge, it is not a measurement.
+//
+// The shipped rubric is not assurance_eligible, and planVerification refuses an
+// assurance plan on it (rubric_not_assurance_eligible). The fixture is therefore
+// a diagnostic run by an implementer. The assurance cases in
+// test/verification-bridge.test.mjs use an in-test synthetic eligible copy.
 import { createRequire } from "node:module";
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
@@ -33,10 +38,13 @@ const holds = rubric.decision.claim_holds_options[0];
 const fails = rubric.decision.claim_fails_options[0];
 
 S1.description =
-  "Laya System One round trip: spec planned from a frozen example rubric, backend outputs as schemas/system1.schema.json backend_output, and the receipts sealVerification emits for them. test/verification-bridge.test.mjs reseals the outputs and must reproduce these receipts; test/schema-validation.py validates outputs and receipts against their schemas. " +
+  "Laya System One round trip (diagnostic authority): spec planned from a frozen example rubric that is not assurance-eligible, backend outputs as schemas/system1.schema.json backend_output, and the receipts sealVerification emits for them. test/verification-bridge.test.mjs reseals the outputs and must reproduce these receipts; test/schema-validation.py validates outputs and receipts against their schemas. " +
   "Rebuilt by tools/system1-calibration/build-round-trip.mjs. Run probabilities, gateway ids, and control observations are synthetic bridge inputs, not measurements: the bound rubric's measured calibration (it is not assurance-eligible) is in docs/calibration/system1-calibration-report.md.";
 S1.spec.claim = { ...S1.spec.claim, rubric_id: rubric.rubric_id, rubric_version: rubric.rubric_version, rubric_digest: rubricDigest };
 S1.spec.backend_operations = rubric.operations;
+S1.spec.stage = "implementation";
+S1.spec.authority = "diagnostic";
+S1.produced_by = { role: "implementer", identity: "impl-s1", session: "sess-impl-s1" };
 
 for (const output of Object.values(S1.outputs)) {
   for (const result of output.results) {
@@ -56,7 +64,7 @@ for (const output of Object.values(S1.outputs)) {
   }
 }
 
-const plan = bridge.planVerification(S1.spec);
+const plan = bridge.planVerification({ ...S1.spec, rubric });
 if (plan.outcome !== "READY") throw new Error("plan: " + JSON.stringify(plan));
 S1.request = plan.request;
 for (const key of Object.keys(S1.outputs)) {

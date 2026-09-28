@@ -46,7 +46,14 @@ implementation departs from it and why.
   exact receipts). It covers assurance PASS on VERIFIED, INCONCLUSIVE
   `replay_probability_divergence` not gate-eligible, DERIVED sealing
   INCONCLUSIVE, generative operations refused, and a `jev` receipt against a
-  `laya` request rejected. `test/verification.test.mjs` renames the download
+  `laya` request rejected. After calibration left every shipped rubric
+  `assurance_eligible: false`, `planVerification` refuses a `jev`/`laya`
+  assurance plan without its rubric (`rubric_missing`), whose rubric does not
+  hash to `rubric_digest` (`rubric_digest_mismatch`), whose rubric pins another
+  backend (`rubric_backend_mismatch`), or whose rubric is not eligible
+  (`rubric_not_assurance_eligible`). The fixture is therefore a diagnostic run,
+  and the assurance cases use an in-test synthetic eligible copy of the GTM
+  rubric. `test/verification.test.mjs` renames the download
   case and runs it for `reverify`, `jev`, and `laya`;
   `test/required-semantics.test.mjs` adds the `jev`/`laya` selected-versus-
   required split. `test/gate-chain.test.mjs` adds the slot, legacy-slot, and

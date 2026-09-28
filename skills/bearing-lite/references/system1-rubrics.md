@@ -174,6 +174,11 @@ policy.
   are unchanged. Implementer, Light Implementer, and Integration Engineer runs are
   diagnostic. Only an independent Test Engineer assurance session, rerunning the
   frozen rubric on the exact stable candidate, produces assurance receipts.
+- Only a rubric with `assurance_eligible: true` may back an assurance request:
+  `planVerification` requires the rubric object on a `jev`/`laya` assurance
+  plan, checks its digest against the claim's `rubric_digest`, and refuses a
+  non-eligible rubric as `rubric_not_assurance_eligible` before anything runs.
+  Diagnostic plans may use it.
 - Any change to backend, model revision, checkpoint, question, options,
   thresholds, calibration, controls, input policy, replay, or cache policy is a
   new rubric version and requires a plan amendment before an assurance packet may

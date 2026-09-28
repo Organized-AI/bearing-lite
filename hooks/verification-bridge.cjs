@@ -27,6 +27,9 @@
  *   - An analysis-derived verdict is sealed as INCONCLUSIVE, so a heuristic
  *     answer cannot close a gate. The raw verdict stays visible in the receipt.
  *   - A malformed claim is a typed rejection, never a quiet unproven receipt.
+ *   - A System One (`jev`, `laya`) assurance plan carries its frozen rubric;
+ *     the rubric must hash to the claim's rubric_digest and be
+ *     assurance_eligible, or the plan is refused before anything runs.
  */
 
 const crypto = require("node:crypto");
@@ -43,6 +46,8 @@ const EXPECTED = Object.freeze(["VERIFIED", "REFUTED"]);
 const STATUSES = Object.freeze(["VERIFIED", "REFUTED", "INCONCLUSIVE", "ERROR"]);
 const CANDIDATE_REQUIRED = Object.freeze(["candidate_ref", "candidate_revision"]);
 const SHA256 = /^[0-9a-f]{64}$/;
+/** System One backends: an assurance claim must name a frozen, eligible rubric. */
+const SYSTEM1_BACKENDS = Object.freeze(["jev", "laya"]);
 
 /**
  * Slots a caller template may use. Each names a value the bridge substitutes;
@@ -120,7 +125,7 @@ function candidateFields(candidate) {
  *   claim_id?: string, claim_type?: string, claim?: object, target?: string,
  *   candidate?: object, stage?: string, authority?: string,
  *   expected_result?: string, selected?: boolean, required?: boolean,
- *   args?: string[]
+ *   args?: string[], rubric?: object
  * }} [spec]
  * A caller-supplied `argv` is never read: the runnable command is always
  * assembled from the validated operation, target, claim, and template.
@@ -175,6 +180,26 @@ function planVerification(spec) {
     return fail("NEEDS_MORE_EVIDENCE", "claim_unbound");
   }
   if (!nonempty(spec.target)) return fail("NEEDS_MORE_EVIDENCE", "target_unbound");
+
+  // The claim binding names its rubric only by digest, and the adapter never
+  // sees the rubric, so eligibility is enforced here. rubric_digest is SHA-256
+  // over canonicalJson of the whole rubric object. Diagnostic runs may use a
+  // non-eligible rubric; a supplied rubric must still match the digest.
+  if (SYSTEM1_BACKENDS.includes(spec.backend)) {
+    const rubric = spec.rubric;
+    if (spec.authority === "assurance" && !isPlainObject(rubric)) {
+      return fail("REJECT", "rubric_missing");
+    }
+    if (rubric !== undefined) {
+      if (!isPlainObject(rubric) || sha256Hex(canonicalJson(rubric)) !== spec.claim.rubric_digest) {
+        return fail("REJECT", "rubric_digest_mismatch");
+      }
+      if (rubric.backend !== spec.backend) return fail("REJECT", "rubric_backend_mismatch");
+      if (spec.authority === "assurance" && rubric.assurance_eligible !== true) {
+        return fail("REJECT", "rubric_not_assurance_eligible");
+      }
+    }
+  }
 
   const candidate = spec.candidate;
   if (!isPlainObject(candidate)) return fail("NEEDS_MORE_EVIDENCE", "candidate_unbound");

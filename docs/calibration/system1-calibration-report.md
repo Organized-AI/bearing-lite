@@ -453,11 +453,11 @@ does move fp32 logits on this stack.
   held-out figure is still mildly optimistic.
 - **The round-trip fixture is synthetic.**
   `test/fixtures/system1-laya-round-trip.json` still carries a synthetic
-  VERIFIED run at p = 0.9731. The bridge and adapter tests pass it through the
-  assurance gate although the bound rubric is no longer
-  `assurance_eligible`. `hooks/verification.cjs` does not read the rubric's
-  `assurance_eligible`. That check belongs in the runner or the plan
-  integrator. It is not enforced today.
+  VERIFIED run at p = 0.9731. It is now a diagnostic run: `planVerification`
+  refuses an assurance plan on a rubric that is not `assurance_eligible`
+  (`rubric_not_assurance_eligible`), so the assurance-gate tests use an in-test
+  synthetic copy of the GTM rubric with the flag flipped and a recomputed
+  digest.
 - **Jev is unmeasured.** No TypeSafe Jev credentials were available. The Jev
   rubric keeps its placeholder calibration and has no control fixtures. It is
   now marked `UNMEASURED` and `assurance_eligible: false` at version 1.0.1.
