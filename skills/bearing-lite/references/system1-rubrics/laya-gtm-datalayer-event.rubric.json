@@ -1,0 +1,147 @@
+{
+  "kind": "rubric",
+  "schema_family": "system1",
+  "schema_version": "1",
+  "rubric_id": "RUB-S1-GTM-DATALAYER-PURCHASE",
+  "rubric_version": "1.0.0",
+  "title": "GTM dataLayer purchase event conforms to the tracking spec",
+  "claim": {
+    "claim_type": "tracking_event_conformance",
+    "statement": "The dataLayer push captured for the checkout-complete step is a GA4 `purchase` event that carries transaction_id, value, currency, and a non-empty items array, as the tracking spec requires.",
+    "eligibility": "closed_option_conformance",
+    "spec_refs": [
+      "tracking-spec: purchase event"
+    ]
+  },
+  "assurance_eligible": true,
+  "backend": "laya",
+  "model": {
+    "provider": "huggingface",
+    "repo": "convaiinnovations/laya",
+    "checkpoint": "laya",
+    "revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+    "selection": "pinned",
+    "runtime": {
+      "package": "laya",
+      "package_version": "0.3.21",
+      "precision": "fp32",
+      "device_class": "cpu",
+      "eval_mode": true,
+      "fast_path": false,
+      "max_len": 512,
+      "head_max_len": 192
+    }
+  },
+  "question": {
+    "key": "purchase_event_conforms",
+    "type": "noul",
+    "instructions": "The state is one dataLayer push as JSON. Rule: it is a GA4 purchase event only if `event` equals \"purchase\" and `ecommerce` contains transaction_id, value, currency (a 3-letter ISO 4217 code), and an items array with at least one item that has item_id or item_name. Does this push satisfy every part of the rule?"
+  },
+  "question_digest": "d67cbccffc2ec6eaece32e6aef5adcd5b656f757f73730b8ffab491aed395a96",
+  "decision": {
+    "claim_holds_options": [
+      "yes"
+    ],
+    "claim_fails_options": [
+      "no"
+    ],
+    "verify_threshold": 0.9,
+    "refute_threshold": 0.9,
+    "probability_basis": "calibrated_option_set_mass",
+    "tie_rule": "INCONCLUSIVE"
+  },
+  "calibration": {
+    "method": "temperature_scaled",
+    "temperature": 1,
+    "calibration_set_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "calibration_set_size": 200,
+    "measured_ece": 0.081,
+    "max_ece": 0.1
+  },
+  "input": {
+    "state_shape": "json_document",
+    "source": {
+      "kind": "captured_fixture",
+      "locator": "test/fixtures/datalayer/checkout-complete.json",
+      "extractor": "json_pointer:/0"
+    },
+    "canonicalization": "rfc8785_jcs",
+    "token_limit": 320,
+    "tokenizer": "pinned_checkpoint",
+    "truncation": "never",
+    "over_limit": "ERROR"
+  },
+  "controls": [
+    {
+      "control_id": "CTL-GTM-PURCHASE-VALID",
+      "locator": "test/fixtures/datalayer/controls/purchase-valid.json",
+      "input_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "expected": "VERIFIED"
+    },
+    {
+      "control_id": "CTL-GTM-PURCHASE-NO-CURRENCY",
+      "locator": "test/fixtures/datalayer/controls/purchase-missing-currency.json",
+      "input_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "expected": "REFUTED"
+    },
+    {
+      "control_id": "CTL-GTM-ADD-TO-CART",
+      "locator": "test/fixtures/datalayer/controls/add-to-cart.json",
+      "input_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "expected": "REFUTED"
+    }
+  ],
+  "replay": {
+    "min_runs": 2,
+    "probability_epsilon": 0.000001,
+    "require_identical_answer": true,
+    "require_identical_status": true,
+    "freshness": "uncached_and_fresh_process"
+  },
+  "gateway": {
+    "worker_name": "jev-gateway",
+    "ai_gateway_id_env": "JEV_GATEWAY_AI_GATEWAY_ID",
+    "endpoint_env": "JEV_GATEWAY_ENDPOINT",
+    "auth_token_env": "JEV_GATEWAY_TOKEN",
+    "route": "/v1/systemone",
+    "cache": {
+      "mode": "enabled_with_bypass_run",
+      "ttl_seconds": 86400,
+      "key_binds": [
+        "backend",
+        "model_revision",
+        "checkpoint",
+        "rubric_digest",
+        "question_digest",
+        "input_digest",
+        "calibration"
+      ]
+    },
+    "logging": true
+  },
+  "operations": {
+    "allowed": [
+      "evaluate"
+    ],
+    "denied": [
+      "generate",
+      "propose",
+      "propose_claims",
+      "propose_options",
+      "suggest_options",
+      "rewrite",
+      "rewrite_claim",
+      "rewrite_options",
+      "explain",
+      "complete",
+      "chat",
+      "review"
+    ]
+  },
+  "notes": [
+    "Placeholder digests (all zeros) mark inputs that do not exist yet: the calibration set and the control fixtures. Replace them with real SHA-256 digests and a measured ECE before this rubric is frozen into a plan; a rubric with a placeholder digest must not back an assurance request.",
+    "measured_ece 0.081 is the published post-temperature figure for the `laya` checkpoint, not a measurement on this rubric's calibration set; temperature 1.0 is a placeholder until fitted.",
+    "noul on the English checkpoint can follow its false/true labels instead of the state (laya issue #156). The REFUTED controls exist to catch that; if they fail, re-author as a two-option choice with neutral keys (a version bump and plan amendment).",
+    "Field presence alone is mechanically checkable with a JSON parser; prefer a unit test for that part and keep this rubric for spec conformance a parser cannot express cheaply."
+  ]
+}

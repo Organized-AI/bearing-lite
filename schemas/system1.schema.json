@@ -1,0 +1,969 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/alphazede/bearing-lite/schemas/system1.schema.json",
+  "title": "Bearing Lite System One deterministic-execution backends (jev, laya)",
+  "description": "One schema family (\"system1\") for two distinct verification backend identities, `jev` and `laya`. A System One decision model scores fixed, typed options for a fixed input; it never generates text. Bearing uses it only for deterministic execution: a frozen, versioned rubric pins exactly one backend, one immutable model revision, one typed question, fixed thresholds, a replay protocol, and a gateway cache policy, so a verdict is mechanically derived and reproducible. Three document shapes: (a) `rubric` - the frozen rubric definition, discriminated on `backend`; (b) `command_configuration` - the object hooks/verification-bridge.cjs planVerification stores in a request and receipt for this backend; (c) `backend_output` - the run output handed to sealVerification, whose SHA-256 over canonical JSON becomes the receipt `evidence_digest`. Schema validates structure only; hooks/verification.cjs still enforces diagnostic-versus-assurance authority, independence, and gate eligibility. No valid document carries a credential, key, or account id: secrets are referenced only by environment-variable name.",
+  "oneOf": [
+    { "$ref": "#/$defs/rubric" },
+    { "$ref": "#/$defs/command_configuration" },
+    { "$ref": "#/$defs/backend_output" }
+  ],
+  "$defs": {
+    "nonempty": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "git_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "Immutable Hugging Face commit sha (40 hex). A branch or tag name such as `main` is mutable and invalid."
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Exact version. Ranges, `latest`, and prerelease tags are invalid because they are not reproducible."
+    },
+    "identifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+    },
+    "env_var_name": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]{1,63}$",
+      "description": "Name of an environment variable that holds a secret or deployment-specific value. Only the NAME is recorded; the value never appears in a rubric, request, receipt, or output."
+    },
+    "backend": {
+      "type": "string",
+      "enum": ["jev", "laya"],
+      "description": "Distinct backend identity. `jev` and `laya` share the system1 schema family but are never interchangeable: switching backend is a different binding and a different receipt, and requires a plan amendment. A generic name such as `system1` must not stand in for either."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["VERIFIED", "REFUTED", "INCONCLUSIVE", "ERROR"]
+    },
+    "probability": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "verdict_operation": {
+      "type": "string",
+      "enum": ["evaluate", "check", "score"],
+      "description": "Verdict-only backend operations. Each scores the rubric's fixed options for the fixed input and returns an answer plus probability; none proposes, generates, or rewrites a claim or an option."
+    },
+    "generative_operation": {
+      "type": "string",
+      "enum": [
+        "generate",
+        "propose",
+        "propose_claims",
+        "propose_options",
+        "suggest_options",
+        "rewrite",
+        "rewrite_claim",
+        "rewrite_options",
+        "explain",
+        "complete",
+        "chat",
+        "review"
+      ],
+      "description": "Operations that would propose, generate, or rewrite claims, options, or code, or perform open-ended judgment. Listed in `denied` so planVerification refuses them as `generative_backend_operation_denied` rather than `backend_operation_unsupported`."
+    },
+    "backend_operations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed", "denied"],
+      "description": "Operation policy copied verbatim into the planVerification spec `backend_operations`. `allowed` is verdict-only; `denied` must name at least the core generative operations.",
+      "properties": {
+        "allowed": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/verdict_operation" }
+        },
+        "denied": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/generative_operation" },
+          "allOf": [
+            { "contains": { "const": "generate" } },
+            { "contains": { "const": "propose_claims" } },
+            { "contains": { "const": "propose_options" } },
+            { "contains": { "const": "rewrite" } },
+            { "contains": { "const": "review" } }
+          ]
+        }
+      }
+    },
+    "laya_checkpoint": {
+      "type": "string",
+      "enum": ["laya", "laya-multilingual", "laya-typed-decisions"],
+      "description": "`laya` = ModernBERT-large, 421M, 512-token context (English). `laya-multilingual` = mmBERT-base, 322M, 1024-token default context (encoder reads up to 8192 with max_len). `laya-typed-decisions` = ModernBERT-large fine-tune, 421M, 1024-token context. All three live in the `convaiinnovations/laya` repository (root and subfolders)."
+    },
+    "question_type": {
+      "type": "string",
+      "enum": ["choice", "score", "noul"],
+      "description": "`choice` = one of named options; `score` = ordinal level from an ordered list; `noul` = binary yes/no (the backend returns the probability of yes)."
+    },
+
+    "laya_model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "repo", "checkpoint", "revision", "selection", "runtime"],
+      "description": "Open-weights Laya pin. Weights are fetched only by immutable commit; a Router may be used only when `selection` allows it.",
+      "properties": {
+        "provider": { "const": "huggingface" },
+        "repo": { "const": "convaiinnovations/laya" },
+        "checkpoint": { "$ref": "#/$defs/laya_checkpoint" },
+        "revision": { "$ref": "#/$defs/git_sha" },
+        "selection": {
+          "type": "string",
+          "enum": ["pinned", "router_auto"],
+          "description": "`pinned` calls the named checkpoint directly (Router `model=` override or single-model load). `router_auto` lets the Laya Router choose by detected language/script; because that choice depends on the input, it is diagnostic-only and invalid on an assurance-eligible rubric. When the served routing metadata names a checkpoint other than `checkpoint`, the run is ERROR `checkpoint_mismatch`."
+        },
+        "runtime": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["package", "package_version", "precision", "device_class", "eval_mode", "fast_path", "max_len", "head_max_len"],
+          "properties": {
+            "package": { "const": "laya" },
+            "package_version": { "$ref": "#/$defs/semver" },
+            "precision": { "type": "string", "enum": ["fp32", "fp16", "bf16"] },
+            "device_class": { "type": "string", "enum": ["cpu", "cuda", "mps"] },
+            "eval_mode": {
+              "const": true,
+              "description": "Model runs in eval mode (dropout off). Training-mode inference is never valid."
+            },
+            "fast_path": {
+              "type": "boolean",
+              "description": "Whether the optional TileLang GPU fast path is enabled. Recorded because it changes kernels and therefore bit-level results; replay epsilon absorbs residual GPU nondeterminism only."
+            },
+            "max_len": {
+              "type": "integer",
+              "minimum": 128,
+              "maximum": 8192,
+              "description": "Total sequence budget passed to the runtime. Must not exceed the checkpoint limit (512 for `laya`, 1024 for `laya-typed-decisions`, 8192 for `laya-multilingual`)."
+            },
+            "head_max_len": {
+              "type": "integer",
+              "minimum": 64,
+              "maximum": 1024,
+              "description": "Option-prompt budget. State budget is max_len - head_max_len."
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "checkpoint": { "const": "laya" } } },
+          "then": { "properties": { "runtime": { "properties": { "max_len": { "maximum": 512 } } } } }
+        },
+        {
+          "if": { "properties": { "checkpoint": { "const": "laya-typed-decisions" } } },
+          "then": { "properties": { "runtime": { "properties": { "max_len": { "maximum": 1024 } } } } }
+        }
+      ]
+    },
+    "jev_model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "model_id", "model_version", "client"],
+      "description": "Hosted TypeSafe Jev pin. The model version is the immutable revision; a response reporting any other version is ERROR `model_revision_mismatch`.",
+      "properties": {
+        "provider": { "const": "typesafe" },
+        "model_id": { "const": "jev" },
+        "model_version": { "$ref": "#/$defs/semver" },
+        "client": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["package", "package_version", "function"],
+          "properties": {
+            "package": { "const": "ai" },
+            "package_version": { "$ref": "#/$defs/semver" },
+            "function": {
+              "const": "experimental_evaluate",
+              "description": "Vercel AI SDK evaluation entry point. Text-generation entry points are never used."
+            }
+          }
+        }
+      }
+    },
+
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "type", "instructions"],
+      "description": "The single typed question, exactly as sent in the `/v1/systemone` `questions` map (Jev and laya-serve share this shape). `question_digest` in the rubric is SHA-256 over canonical JSON of this object.",
+      "properties": {
+        "key": { "$ref": "#/$defs/identifier" },
+        "type": { "$ref": "#/$defs/question_type" },
+        "instructions": { "$ref": "#/$defs/nonempty" },
+        "criteria": {
+          "description": "`choice`: object mapping option key to a description. `score`: ordered array of level descriptions (index = level). `noul`: absent.",
+          "oneOf": [
+            {
+              "type": "object",
+              "minProperties": 2,
+              "maxProperties": 20,
+              "propertyNames": { "$ref": "#/$defs/identifier" },
+              "additionalProperties": { "$ref": "#/$defs/nonempty" }
+            },
+            {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 10,
+              "items": { "$ref": "#/$defs/nonempty" }
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "noul" } } },
+          "then": { "not": { "required": ["criteria"] } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "choice" } } },
+          "then": { "required": ["criteria"], "properties": { "criteria": { "type": "object" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "score" } } },
+          "then": { "required": ["criteria"], "properties": { "criteria": { "type": "array" } } }
+        }
+      ]
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim_holds_options", "claim_fails_options", "verify_threshold", "refute_threshold", "probability_basis", "tie_rule"],
+      "description": "Frozen mapping from (hard answer, calibrated probability) to status. Per run: VERIFIED iff the hard answer is in `claim_holds_options` AND the calibrated probability mass of `claim_holds_options` >= `verify_threshold`; REFUTED iff the hard answer is in `claim_fails_options` AND the mass of `claim_fails_options` >= `refute_threshold`; otherwise INCONCLUSIVE. The two option sets are disjoint; an option in neither set (for example an explicit `unclear`) always maps to INCONCLUSIVE. Thresholds are frozen in the plan and never chosen at run time.",
+      "properties": {
+        "claim_holds_options": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonempty" },
+          "description": "Option keys (choice), level indexes as decimal strings (score), or `yes`/`no` (noul) whose selection means the claim holds."
+        },
+        "claim_fails_options": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonempty" }
+        },
+        "verify_threshold": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 0.999
+        },
+        "refute_threshold": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 0.999
+        },
+        "probability_basis": {
+          "const": "calibrated_option_set_mass",
+          "description": "Thresholds compare against the calibrated probability summed over the relevant option set, never the raw logit, the `act_probability` head, or an uncalibrated softmax."
+        },
+        "tie_rule": {
+          "const": "INCONCLUSIVE",
+          "description": "An exact tie for the top option (or noul p(yes) == 0.5) is INCONCLUSIVE `answer_tie`; there is no lexical or first-listed tie-break."
+        }
+      }
+    },
+    "calibration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "calibration_set_digest", "calibration_set_size", "measured_ece", "max_ece"],
+      "description": "How the probability compared against the thresholds was calibrated, and on what frozen data. Recalibrating changes the rubric version.",
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["temperature_scaled", "provider_as_returned"],
+          "description": "`temperature_scaled`: one frozen temperature per (question type, option count), fitted on the named calibration set. `provider_as_returned`: probabilities used as the hosted provider returns them (Jev only)."
+        },
+        "temperature": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 20
+        },
+        "calibration_set_digest": { "$ref": "#/$defs/sha256" },
+        "calibration_set_size": { "type": "integer", "minimum": 50 },
+        "measured_ece": { "type": "number", "minimum": 0, "maximum": 1 },
+        "max_ece": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.15,
+          "description": "Ceiling on measured ECE for this rubric's calibration set. A rubric whose measured_ece exceeds it must not be frozen."
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "method": { "const": "temperature_scaled" } } },
+          "then": { "required": ["temperature"] }
+        },
+        {
+          "if": { "properties": { "method": { "const": "provider_as_returned" } } },
+          "then": { "not": { "required": ["temperature"] } }
+        }
+      ]
+    },
+    "input_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state_shape", "source", "canonicalization", "token_limit", "tokenizer", "truncation", "over_limit"],
+      "description": "What the model sees and how it is made byte-stable. The canonicalized input is SHA-256 digested; that digest is bound into the claim and the evidence.",
+      "properties": {
+        "state_shape": {
+          "type": "string",
+          "enum": ["text", "json_document", "keyed_text"],
+          "description": "`text` = a single string state; `json_document` = a JSON object state; `keyed_text` = an object of named text fields (for example {\"document\": ...})."
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "locator"],
+          "properties": {
+            "kind": { "type": "string", "enum": ["repo_file", "repo_file_excerpt", "build_artifact", "captured_fixture"] },
+            "locator": {
+              "$ref": "#/$defs/nonempty",
+              "description": "Repository-relative path, glob, or extractor id resolved against the candidate. Never an absolute host path or URL carrying credentials."
+            },
+            "extractor": {
+              "$ref": "#/$defs/nonempty",
+              "description": "Deterministic extraction step (for example a JSON pointer or a named parser) applied before canonicalization."
+            }
+          }
+        },
+        "canonicalization": {
+          "type": "string",
+          "enum": ["rfc8785_jcs", "utf8_nfc_lf_trim_trailing", "toml_to_rfc8785_jcs", "jsonc_to_rfc8785_jcs"],
+          "description": "Byte-stable normalization applied before digesting and sending. The exact bytes sent are the bytes digested."
+        },
+        "token_limit": {
+          "type": "integer",
+          "minimum": 32,
+          "maximum": 8192,
+          "description": "Maximum state tokens as counted by the pinned checkpoint's tokenizer. Must not exceed the model's max_len - head_max_len."
+        },
+        "tokenizer": {
+          "type": "string",
+          "enum": ["pinned_checkpoint", "utf8_byte_upper_bound"],
+          "description": "How the limit is checked BEFORE the request is sent. `pinned_checkpoint`: count with the tokenizer files of the pinned Laya revision. `utf8_byte_upper_bound`: treat the UTF-8 byte length as the token count, a conservative bound for a hosted model whose tokenizer is not available client-side (Jev)."
+        },
+        "truncation": {
+          "const": "never",
+          "description": "Silent truncation is never allowed; the runtime's own truncation must be disabled or detected."
+        },
+        "over_limit": {
+          "const": "ERROR",
+          "description": "An input over token_limit seals ERROR `input_over_context_limit`. ERROR (not INCONCLUSIVE) because the rubric could not be executed as frozen; either way it can never become PASS."
+        }
+      }
+    },
+    "control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["control_id", "locator", "input_digest", "expected"],
+      "description": "Known-answer control executed with the same rubric in the same session before the claim. A control that does not map to its expected status makes the claim INCONCLUSIVE `control_failed`. Guards against label-following (for example the documented noul bias on the English checkpoint) and against a silently changed serving stack.",
+      "properties": {
+        "control_id": { "$ref": "#/$defs/identifier" },
+        "locator": { "$ref": "#/$defs/nonempty" },
+        "input_digest": { "$ref": "#/$defs/sha256" },
+        "expected": { "type": "string", "enum": ["VERIFIED", "REFUTED"] }
+      }
+    },
+    "replay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["min_runs", "probability_epsilon", "require_identical_answer", "require_identical_status", "freshness"],
+      "description": "Determinism check. Every run maps independently through `decision`; the claim status is the common status only when every run has the identical hard answer, the identical status, and pairwise probability deltas <= probability_epsilon. Any divergence is INCONCLUSIVE with a typed replay reason.",
+      "properties": {
+        "min_runs": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "probability_epsilon": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.02,
+          "description": "Maximum absolute difference in the thresholded probability between any two runs. Exists for GPU kernel nondeterminism; pinned CPU fp32 Laya should use a value at or near 1e-6."
+        },
+        "require_identical_answer": { "const": true },
+        "require_identical_status": { "const": true },
+        "freshness": {
+          "type": "string",
+          "enum": ["one_uncached_run", "one_fresh_process_run", "uncached_and_fresh_process"],
+          "description": "At least one run must bypass the AI Gateway cache (`cf-aig-skip-cache`), and/or run on a freshly started model process. A replay set where every run was a cache hit proves nothing about the model and is INCONCLUSIVE `replay_freshness_unmet`."
+        }
+      }
+    },
+    "gateway": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["worker_name", "ai_gateway_id_env", "endpoint_env", "route", "cache", "logging"],
+      "description": "Serving path. Both backends are reached through the `jev-gateway` Cloudflare Worker, which forwards every call through Cloudflare AI Gateway (Jev as the upstream provider; laya-serve as a custom provider). Only env-var NAMES appear here.",
+      "properties": {
+        "worker_name": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,62}$"
+        },
+        "ai_gateway_id_env": { "$ref": "#/$defs/env_var_name" },
+        "endpoint_env": { "$ref": "#/$defs/env_var_name" },
+        "auth_token_env": { "$ref": "#/$defs/env_var_name" },
+        "route": {
+          "const": "/v1/systemone",
+          "description": "Jev-compatible decision route (laya-serve exposes the same request/response shape)."
+        },
+        "cache": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "ttl_seconds", "key_binds"],
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": ["enabled_with_bypass_run", "bypass_all"],
+              "description": "`enabled_with_bypass_run`: cache is on, but the replay's freshness run sets the skip-cache header. `bypass_all`: no run is served from cache."
+            },
+            "ttl_seconds": { "type": "integer", "minimum": 0, "maximum": 604800 },
+            "key_binds": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": ["backend", "model_revision", "checkpoint", "rubric_digest", "question_digest", "input_digest", "calibration"]
+              },
+              "allOf": [
+                { "contains": { "const": "model_revision" } },
+                { "contains": { "const": "rubric_digest" } },
+                { "contains": { "const": "input_digest" } }
+              ],
+              "description": "Values folded into the gateway cache key (for example via `cf-aig-cache-key`) so a cached answer can never be served for a different model revision, rubric, or input."
+            }
+          }
+        },
+        "logging": {
+          "const": true,
+          "description": "AI Gateway logging stays on so every run has a request id and log id recorded in the evidence."
+        }
+      }
+    },
+
+    "rubric_common": {
+      "type": "object",
+      "required": [
+        "kind",
+        "schema_family",
+        "schema_version",
+        "rubric_id",
+        "rubric_version",
+        "title",
+        "claim",
+        "assurance_eligible",
+        "backend",
+        "model",
+        "question",
+        "question_digest",
+        "decision",
+        "calibration",
+        "input",
+        "controls",
+        "replay",
+        "gateway",
+        "operations"
+      ],
+      "properties": {
+        "kind": { "const": "rubric" },
+        "schema_family": { "const": "system1" },
+        "schema_version": { "type": "string", "const": "1" },
+        "rubric_id": {
+          "type": "string",
+          "pattern": "^RUB-S1-[A-Z0-9][A-Z0-9-]*$"
+        },
+        "rubric_version": { "$ref": "#/$defs/semver" },
+        "title": { "$ref": "#/$defs/nonempty" },
+        "claim": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["claim_type", "statement", "eligibility"],
+          "properties": {
+            "claim_type": { "$ref": "#/$defs/identifier" },
+            "statement": {
+              "$ref": "#/$defs/nonempty",
+              "description": "The fixed claim, written by the Planning Test Engineer. Never produced or reworded by a backend."
+            },
+            "eligibility": {
+              "type": "string",
+              "enum": ["closed_option_conformance", "closed_option_classification"],
+              "description": "`closed_option_conformance`: does this fixed input satisfy this fixed, written rule (yes/no or pass/fail options). `closed_option_classification`: which of these fixed categories does the input fall in, where some categories mean holds and others fails."
+            },
+            "spec_refs": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/nonempty" },
+              "description": "Requirement, design, or published-standard references the rule text derives from."
+            }
+          }
+        },
+        "assurance_eligible": {
+          "type": "boolean",
+          "description": "True when this rubric may back an `assurance` request. Assurance-eligible rubrics must pin the checkpoint, replay at least twice with a freshness run, and use calibrated probabilities."
+        },
+        "backend": { "$ref": "#/$defs/backend" },
+        "question": { "$ref": "#/$defs/question" },
+        "question_digest": {
+          "$ref": "#/$defs/sha256",
+          "description": "SHA-256 over canonical JSON (sorted keys, no whitespace; the bridge's canonicalJson) of `question`. A served question whose digest differs is ERROR `question_digest_mismatch`."
+        },
+        "decision": { "$ref": "#/$defs/decision" },
+        "calibration": { "$ref": "#/$defs/calibration" },
+        "input": { "$ref": "#/$defs/input_policy" },
+        "controls": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/control" },
+          "allOf": [
+            { "contains": { "properties": { "expected": { "const": "VERIFIED" } } } },
+            { "contains": { "properties": { "expected": { "const": "REFUTED" } } } }
+          ]
+        },
+        "replay": { "$ref": "#/$defs/replay" },
+        "gateway": { "$ref": "#/$defs/gateway" },
+        "operations": { "$ref": "#/$defs/backend_operations" },
+        "notes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonempty" }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "assurance_eligible": { "const": true } } },
+          "then": {
+            "properties": {
+              "replay": { "properties": { "min_runs": { "minimum": 2 } } },
+              "calibration": { "properties": { "measured_ece": { "maximum": 0.15 } } },
+              "decision": {
+                "properties": {
+                  "verify_threshold": { "minimum": 0.8 },
+                  "refute_threshold": { "minimum": 0.8 }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "question": { "properties": { "type": { "const": "noul" } } } } },
+          "then": {
+            "properties": {
+              "decision": {
+                "properties": {
+                  "claim_holds_options": { "items": { "enum": ["yes", "no"] }, "maxItems": 1 },
+                  "claim_fails_options": { "items": { "enum": ["yes", "no"] }, "maxItems": 1 }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "question": { "properties": { "type": { "const": "score" } } } } },
+          "then": {
+            "properties": {
+              "decision": {
+                "properties": {
+                  "claim_holds_options": { "items": { "pattern": "^[0-9]$" } },
+                  "claim_fails_options": { "items": { "pattern": "^[0-9]$" } }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "laya_rubric": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "allOf": [{ "$ref": "#/$defs/rubric_common" }],
+      "properties": {
+        "backend": { "const": "laya" },
+        "model": { "$ref": "#/$defs/laya_model" },
+        "calibration": {
+          "properties": { "method": { "const": "temperature_scaled" } },
+          "description": "Laya checkpoints ship over-confident; a frozen temperature fitted on the rubric's calibration set is required."
+        }
+      },
+      "if": { "properties": { "assurance_eligible": { "const": true } } },
+      "then": {
+        "properties": {
+          "model": { "properties": { "selection": { "const": "pinned" } } }
+        }
+      }
+    },
+    "jev_rubric": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "allOf": [{ "$ref": "#/$defs/rubric_common" }],
+      "properties": {
+        "backend": { "const": "jev" },
+        "model": { "$ref": "#/$defs/jev_model" },
+        "input": {
+          "properties": { "tokenizer": { "const": "utf8_byte_upper_bound" } },
+          "description": "Jev's tokenizer is not available client-side, so the limit is enforced on UTF-8 bytes before sending."
+        }
+      }
+    },
+    "rubric": {
+      "description": "(a) Frozen rubric. Pins exactly one backend; discriminated on `backend`. The rubric's own digest (SHA-256 over canonical JSON of the whole rubric document) is its identity inside claims and evidence; any edit is a new rubric_version and a plan amendment.",
+      "type": "object",
+      "required": ["kind", "backend"],
+      "properties": {
+        "kind": { "const": "rubric" }
+      },
+      "oneOf": [
+        { "$ref": "#/$defs/laya_rubric" },
+        { "$ref": "#/$defs/jev_rubric" }
+      ]
+    },
+
+    "claim_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "backend", "rubric_id", "rubric_version", "rubric_digest", "input_digest"],
+      "description": "The planVerification `claim` object for a system1 request. Its canonical JSON is stored as `command_configuration.claim`. It binds the frozen rubric by id, version, and digest, and the exact canonicalized input by digest; it carries no free text a backend could reinterpret.",
+      "properties": {
+        "kind": { "const": "system1_decision" },
+        "backend": { "$ref": "#/$defs/backend" },
+        "rubric_id": { "type": "string", "pattern": "^RUB-S1-[A-Z0-9][A-Z0-9-]*$" },
+        "rubric_version": { "$ref": "#/$defs/semver" },
+        "rubric_digest": { "$ref": "#/$defs/sha256" },
+        "input_digest": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "command_configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["backend", "operation", "target", "claim", "args", "invocation"],
+      "description": "(b) Exactly the object planVerification builds and stores in both request and receipt (they must be deeply equal). `claim` is canonical JSON (sorted keys) of a `claim_binding`. `args` is empty: every run parameter (thresholds, replay, cache policy, checkpoint) is pinned by the rubric digest, so command-line overrides are not permitted.",
+      "properties": {
+        "backend": { "$ref": "#/$defs/backend" },
+        "operation": { "$ref": "#/$defs/verdict_operation" },
+        "target": {
+          "$ref": "#/$defs/nonempty",
+          "description": "Repository-relative locator of the input under test, resolved per the rubric's input.source."
+        },
+        "claim": {
+          "type": "string",
+          "contentMediaType": "application/json",
+          "contentSchema": { "$ref": "#/$defs/claim_binding" },
+          "pattern": "^\\{\"backend\":\"(jev|laya)\",\"input_digest\":\"[0-9a-f]{64}\",\"kind\":\"system1_decision\",\"rubric_digest\":\"[0-9a-f]{64}\",\"rubric_id\":\"RUB-S1-[A-Z0-9][A-Z0-9-]*\",\"rubric_version\":\"[0-9]+\\.[0-9]+\\.[0-9]+\"\\}$"
+        },
+        "args": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "invocation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["executable", "argv_template"],
+          "properties": {
+            "executable": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[^{}\\s]+$",
+              "description": "The caller's verdict-only runner (for example a small client that posts to jev-gateway). Never a generation CLI."
+            },
+            "argv_template": {
+              "type": "array",
+              "minItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(\\{operation\\}|\\{target\\}|\\{claim\\}|\\{args\\}|[^{}]+)$"
+              },
+              "allOf": [
+                { "contains": { "const": "{operation}" }, "minContains": 1, "maxContains": 1 },
+                { "contains": { "const": "{target}" }, "minContains": 1, "maxContains": 1 },
+                { "contains": { "const": "{claim}" }, "minContains": 1, "maxContains": 1 },
+                { "contains": { "const": "{args}" }, "minContains": 0, "maxContains": 1 }
+              ]
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "backend": { "const": "laya" } } },
+          "then": { "properties": { "claim": { "pattern": "^\\{\"backend\":\"laya\"," } } }
+        },
+        {
+          "if": { "properties": { "backend": { "const": "jev" } } },
+          "then": { "properties": { "claim": { "pattern": "^\\{\"backend\":\"jev\"," } } }
+        }
+      ]
+    },
+
+    "inconclusive_reason": {
+      "type": "string",
+      "enum": [
+        "below_verify_threshold",
+        "below_refute_threshold",
+        "answer_not_decisive",
+        "answer_tie",
+        "replay_answer_divergence",
+        "replay_status_divergence",
+        "replay_probability_divergence",
+        "replay_freshness_unmet",
+        "replay_runs_insufficient",
+        "control_failed",
+        "verdict_recovered_not_read"
+      ]
+    },
+    "error_reason": {
+      "type": "string",
+      "enum": [
+        "backend_unavailable",
+        "gateway_error",
+        "gateway_timeout",
+        "backend_response_invalid",
+        "input_over_context_limit",
+        "input_unresolvable",
+        "input_canonicalization_failed",
+        "input_digest_mismatch",
+        "model_revision_mismatch",
+        "checkpoint_mismatch",
+        "rubric_digest_mismatch",
+        "question_digest_mismatch",
+        "calibration_unavailable"
+      ]
+    },
+    "run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_index", "answer", "option_probabilities", "thresholded_probability", "run_status", "cache", "fresh_process", "gateway_request_id", "gateway_log_id", "served_model_revision"],
+      "properties": {
+        "run_index": { "type": "integer", "minimum": 1 },
+        "answer": {
+          "$ref": "#/$defs/nonempty",
+          "description": "Hard answer: the argmax option key (choice), level index as a decimal string (score), or `yes`/`no` (noul)."
+        },
+        "option_probabilities": {
+          "type": "object",
+          "minProperties": 2,
+          "additionalProperties": { "$ref": "#/$defs/probability" },
+          "description": "Calibrated probability per option as used for mapping (noul: {\"yes\": p, \"no\": 1-p})."
+        },
+        "raw_probabilities": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/probability" },
+          "description": "Uncalibrated probabilities as served, kept for audit."
+        },
+        "thresholded_probability": {
+          "$ref": "#/$defs/probability",
+          "description": "Calibrated mass of the option set containing `answer` (holds or fails set); 0 when the answer is in neither."
+        },
+        "run_status": { "$ref": "#/$defs/status" },
+        "cache": { "type": "string", "enum": ["HIT", "MISS", "BYPASS"] },
+        "fresh_process": { "type": "boolean" },
+        "gateway_request_id": { "$ref": "#/$defs/nonempty" },
+        "gateway_log_id": { "$ref": "#/$defs/nonempty" },
+        "served_model_revision": {
+          "$ref": "#/$defs/nonempty",
+          "description": "Revision the server reported (Laya commit sha or Jev model version)."
+        },
+        "served_checkpoint": {
+          "$ref": "#/$defs/laya_checkpoint",
+          "description": "Laya only: checkpoint named in the served routing metadata."
+        }
+      }
+    },
+    "system1_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strength", "engine", "engine_version", "rubric", "model", "question_type", "input", "controls", "runs", "replay", "decision"],
+      "properties": {
+        "strength": {
+          "type": "string",
+          "pattern": "^(observed|DERIVED\\b.*)$",
+          "description": "`observed` when every run's answer and probability were read from live responses. `DERIVED ...` when any verdict was recovered (for example reconstructed from an AI Gateway log after a client timeout); sealVerification then seals INCONCLUSIVE with evidence_tier `derived`."
+        },
+        "engine": { "$ref": "#/$defs/backend" },
+        "engine_version": { "$ref": "#/$defs/nonempty" },
+        "rubric": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["rubric_id", "rubric_version", "rubric_digest", "question_digest"],
+          "properties": {
+            "rubric_id": { "type": "string", "pattern": "^RUB-S1-[A-Z0-9][A-Z0-9-]*$" },
+            "rubric_version": { "$ref": "#/$defs/semver" },
+            "rubric_digest": { "$ref": "#/$defs/sha256" },
+            "question_digest": { "$ref": "#/$defs/sha256" }
+          }
+        },
+        "model": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["model_id", "revision"],
+          "properties": {
+            "model_id": { "$ref": "#/$defs/nonempty" },
+            "revision": { "$ref": "#/$defs/nonempty" },
+            "checkpoint": { "$ref": "#/$defs/laya_checkpoint" },
+            "selection": { "type": "string", "enum": ["pinned", "router_auto"] },
+            "calibration_temperature": { "type": "number", "exclusiveMinimum": 0 }
+          }
+        },
+        "question_type": { "$ref": "#/$defs/question_type" },
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["target", "canonicalization", "input_digest", "token_count", "token_limit", "truncated"],
+          "properties": {
+            "target": { "$ref": "#/$defs/nonempty" },
+            "canonicalization": { "$ref": "#/$defs/nonempty" },
+            "input_digest": { "$ref": "#/$defs/sha256" },
+            "token_count": { "type": "integer", "minimum": 0 },
+            "token_limit": { "type": "integer", "minimum": 1 },
+            "truncated": { "const": false }
+          }
+        },
+        "controls": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["control_id", "expected", "observed"],
+            "properties": {
+              "control_id": { "$ref": "#/$defs/identifier" },
+              "expected": { "type": "string", "enum": ["VERIFIED", "REFUTED"] },
+              "observed": { "$ref": "#/$defs/status" }
+            }
+          }
+        },
+        "runs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/run" }
+        },
+        "replay": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["runs", "identical_answer", "identical_status", "max_probability_delta", "probability_epsilon", "freshness_met"],
+          "properties": {
+            "runs": { "type": "integer", "minimum": 0 },
+            "identical_answer": { "type": "boolean" },
+            "identical_status": { "type": "boolean" },
+            "max_probability_delta": { "type": "number", "minimum": 0, "maximum": 1 },
+            "probability_epsilon": { "type": "number", "minimum": 0, "maximum": 1 },
+            "freshness_met": { "type": "boolean" }
+          }
+        },
+        "decision": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["answer", "thresholded_probability", "verify_threshold", "refute_threshold", "mapped_status"],
+          "properties": {
+            "answer": { "type": ["string", "null"] },
+            "thresholded_probability": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+            "verify_threshold": { "type": "number" },
+            "refute_threshold": { "type": "number" },
+            "mapped_status": { "$ref": "#/$defs/status" }
+          }
+        }
+      }
+    },
+    "system1_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim_id", "kind", "verdict", "detail", "evidence"],
+      "description": "The single claim result. sealVerification reads `verdict` as the status. `detail` must never contain the phrase `malformed claim` unless the claim binding itself could not be parsed (that is a typed rejection, not a receipt).",
+      "properties": {
+        "claim_id": { "$ref": "#/$defs/nonempty" },
+        "kind": { "const": "system1_decision" },
+        "verdict": { "$ref": "#/$defs/status" },
+        "reason": {
+          "description": "Typed reason; required for INCONCLUSIVE and ERROR, absent for VERIFIED and REFUTED.",
+          "anyOf": [
+            { "$ref": "#/$defs/inconclusive_reason" },
+            { "$ref": "#/$defs/error_reason" }
+          ]
+        },
+        "detail": { "type": "string" },
+        "evidence": { "$ref": "#/$defs/system1_evidence" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "verdict": { "enum": ["VERIFIED", "REFUTED"] } } },
+          "then": {
+            "not": { "required": ["reason"] },
+            "properties": {
+              "evidence": {
+                "properties": {
+                  "strength": { "const": "observed" },
+                  "runs": { "minItems": 1 },
+                  "replay": {
+                    "properties": {
+                      "identical_answer": { "const": true },
+                      "identical_status": { "const": true }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "verdict": { "const": "INCONCLUSIVE" } } },
+          "then": {
+            "required": ["reason"],
+            "properties": { "reason": { "$ref": "#/$defs/inconclusive_reason" } }
+          }
+        },
+        {
+          "if": { "properties": { "verdict": { "const": "ERROR" } } },
+          "then": {
+            "required": ["reason"],
+            "properties": { "reason": { "$ref": "#/$defs/error_reason" } }
+          }
+        }
+      ]
+    },
+    "backend_output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_family", "schema_version", "backend", "backend_version", "results"],
+      "description": "(c) What the caller's runner returns and hands to sealVerification. `backend_version` is read from the run and names backend, runtime, and model revision (for example `laya 0.3.20 convaiinnovations/laya@<sha> laya-typed-decisions` or `jev 1.13.0`). `results` holds exactly one claim result. The whole object is digested (SHA-256, canonical JSON) into the receipt `evidence_digest`, so every gateway id and replay value is bound.",
+      "properties": {
+        "schema_family": { "const": "system1" },
+        "schema_version": { "type": "string", "const": "1" },
+        "backend": { "$ref": "#/$defs/backend" },
+        "backend_version": {
+          "type": "string",
+          "pattern": "^(jev|laya) \\S+.*$"
+        },
+        "results": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": { "$ref": "#/$defs/system1_result" }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "backend": { "const": "laya" } } },
+          "then": {
+            "properties": {
+              "backend_version": { "pattern": "^laya " },
+              "results": { "items": { "properties": { "evidence": { "properties": { "engine": { "const": "laya" } } } } } }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "backend": { "const": "jev" } } },
+          "then": {
+            "properties": {
+              "backend_version": { "pattern": "^jev " },
+              "results": { "items": { "properties": { "evidence": { "properties": { "engine": { "const": "jev" } } } } } }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

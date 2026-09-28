@@ -353,8 +353,121 @@
                   "type": "boolean"
                 }
               }
+            },
+            "jev": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "enabled"
+              ],
+              "description": "TypeSafe Jev hosted decision model, served through jev-gateway. Backend identity stays `jev`.",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "User configuration only. Availability or enablement never selects this backend for a task; the Planning Test Engineer selects it per eligible SEIT claim."
+                },
+                "required": {
+                  "type": "boolean",
+                  "description": "When true, an activated-but-unavailable backend halts instead of proceeding with a note. Omitted is false; no migration."
+                },
+                "gateway": {
+                  "$ref": "#/$defs/system1Gateway"
+                }
+              }
+            },
+            "laya": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "enabled"
+              ],
+              "description": "Laya open-weights System One decision model (convaiinnovations/laya), self-hosted behind jev-gateway. Backend identity stays `laya`.",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "User configuration only. Availability or enablement never selects this backend for a task; the Planning Test Engineer selects it per eligible SEIT claim."
+                },
+                "required": {
+                  "type": "boolean",
+                  "description": "When true, an activated-but-unavailable backend halts instead of proceeding with a note. Omitted is false; no migration."
+                },
+                "gateway": {
+                  "$ref": "#/$defs/system1Gateway"
+                },
+                "default_checkpoint": {
+                  "type": "string",
+                  "enum": [
+                    "laya",
+                    "laya-multilingual",
+                    "laya-typed-decisions"
+                  ],
+                  "description": "Default checkpoint offered when authoring a rubric. A rubric always pins its own checkpoint and revision; this default never overrides a rubric."
+                }
+              }
             }
-          }
+          },
+          "description": "Optional deterministic-verification backends. `jev` and `laya` are the System One decision-model backends (schemas/system1.schema.json) and are exclusive with `reverify`: `reverify.enabled: true` is invalid while `jev.enabled` or `laya.enabled` is true. `jev` and `laya` may both be enabled; each rubric still pins exactly one.",
+          "allOf": [
+            {
+              "if": {
+                "required": [
+                  "reverify"
+                ],
+                "properties": {
+                  "reverify": {
+                    "required": [
+                      "enabled"
+                    ],
+                    "properties": {
+                      "enabled": {
+                        "const": true
+                      }
+                    }
+                  }
+                }
+              },
+              "then": {
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "jev"
+                      ],
+                      "properties": {
+                        "jev": {
+                          "required": [
+                            "enabled"
+                          ],
+                          "properties": {
+                            "enabled": {
+                              "const": true
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "required": [
+                        "laya"
+                      ],
+                      "properties": {
+                        "laya": {
+                          "required": [
+                            "enabled"
+                          ],
+                          "properties": {
+                            "enabled": {
+                              "const": true
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
         },
         "review": {
           "type": "object",
@@ -380,6 +493,33 @@
               "description": "Deterministic file selection and rule resolution for the Reviewer. It finds no defects and produces no verdict. enabled and required are independent: required has force when both are true."
             }
           }
+        }
+      }
+    },
+    "envVarName": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]{1,63}$",
+      "description": "Environment-variable NAME only. The value (account id, gateway id, endpoint, token) never appears in profiles.json."
+    },
+    "system1Gateway": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "worker_name",
+        "ai_gateway_id_env",
+        "endpoint_env"
+      ],
+      "description": "Serving path through the jev-gateway Cloudflare Worker and Cloudflare AI Gateway. Records env-var names only; never credentials, keys, or account ids.",
+      "properties": {
+        "worker_name": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,62}$"
+        },
+        "ai_gateway_id_env": {
+          "$ref": "#/$defs/envVarName"
+        },
+        "endpoint_env": {
+          "$ref": "#/$defs/envVarName"
         }
       }
     }

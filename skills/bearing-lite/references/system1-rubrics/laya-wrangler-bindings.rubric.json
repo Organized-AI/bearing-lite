@@ -1,0 +1,147 @@
+{
+  "kind": "rubric",
+  "schema_family": "system1",
+  "schema_version": "1",
+  "rubric_id": "RUB-S1-WRANGLER-REQUIRED-BINDINGS",
+  "rubric_version": "1.0.0",
+  "title": "Wrangler config binds the required D1, KV, and R2 resources",
+  "claim": {
+    "claim_type": "deployment_config_conformance",
+    "statement": "The Worker's wrangler configuration binds a D1 database as DB, a KV namespace as CACHE, and an R2 bucket as ASSETS, each with a non-empty resource identifier, as the design's resource table requires.",
+    "eligibility": "closed_option_conformance",
+    "spec_refs": [
+      "design: Worker resource bindings"
+    ]
+  },
+  "assurance_eligible": true,
+  "backend": "laya",
+  "model": {
+    "provider": "huggingface",
+    "repo": "convaiinnovations/laya",
+    "checkpoint": "laya",
+    "revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+    "selection": "pinned",
+    "runtime": {
+      "package": "laya",
+      "package_version": "0.3.21",
+      "precision": "fp32",
+      "device_class": "cpu",
+      "eval_mode": true,
+      "fast_path": false,
+      "max_len": 512,
+      "head_max_len": 192
+    }
+  },
+  "question": {
+    "key": "required_bindings_present",
+    "type": "noul",
+    "instructions": "The state is the bindings section of a Cloudflare wrangler configuration as JSON. Rule: d1_databases has an entry with binding \"DB\" and a non-empty database_id; kv_namespaces has an entry with binding \"CACHE\" and a non-empty id; r2_buckets has an entry with binding \"ASSETS\" and a non-empty bucket_name. Does the configuration satisfy all three parts of the rule?"
+  },
+  "question_digest": "3ee9ba6bc7515959c6e300bc392cd4c9274e90bce3abb64d298fa7f376ed5583",
+  "decision": {
+    "claim_holds_options": [
+      "yes"
+    ],
+    "claim_fails_options": [
+      "no"
+    ],
+    "verify_threshold": 0.9,
+    "refute_threshold": 0.9,
+    "probability_basis": "calibrated_option_set_mass",
+    "tie_rule": "INCONCLUSIVE"
+  },
+  "calibration": {
+    "method": "temperature_scaled",
+    "temperature": 1,
+    "calibration_set_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "calibration_set_size": 200,
+    "measured_ece": 0.081,
+    "max_ece": 0.1
+  },
+  "input": {
+    "state_shape": "json_document",
+    "source": {
+      "kind": "repo_file_excerpt",
+      "locator": "wrangler.jsonc",
+      "extractor": "keys:d1_databases,kv_namespaces,r2_buckets"
+    },
+    "canonicalization": "jsonc_to_rfc8785_jcs",
+    "token_limit": 320,
+    "tokenizer": "pinned_checkpoint",
+    "truncation": "never",
+    "over_limit": "ERROR"
+  },
+  "controls": [
+    {
+      "control_id": "CTL-WRANGLER-ALL-BOUND",
+      "locator": "test/fixtures/wrangler/controls/all-bound.jsonc",
+      "input_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "expected": "VERIFIED"
+    },
+    {
+      "control_id": "CTL-WRANGLER-NO-R2",
+      "locator": "test/fixtures/wrangler/controls/missing-r2.jsonc",
+      "input_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "expected": "REFUTED"
+    },
+    {
+      "control_id": "CTL-WRANGLER-WRONG-KV-NAME",
+      "locator": "test/fixtures/wrangler/controls/kv-bound-as-kv.jsonc",
+      "input_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "expected": "REFUTED"
+    }
+  ],
+  "replay": {
+    "min_runs": 2,
+    "probability_epsilon": 0.000001,
+    "require_identical_answer": true,
+    "require_identical_status": true,
+    "freshness": "uncached_and_fresh_process"
+  },
+  "gateway": {
+    "worker_name": "jev-gateway",
+    "ai_gateway_id_env": "JEV_GATEWAY_AI_GATEWAY_ID",
+    "endpoint_env": "JEV_GATEWAY_ENDPOINT",
+    "auth_token_env": "JEV_GATEWAY_TOKEN",
+    "route": "/v1/systemone",
+    "cache": {
+      "mode": "enabled_with_bypass_run",
+      "ttl_seconds": 86400,
+      "key_binds": [
+        "backend",
+        "model_revision",
+        "checkpoint",
+        "rubric_digest",
+        "question_digest",
+        "input_digest",
+        "calibration"
+      ]
+    },
+    "logging": true
+  },
+  "operations": {
+    "allowed": [
+      "evaluate"
+    ],
+    "denied": [
+      "generate",
+      "propose",
+      "propose_claims",
+      "propose_options",
+      "suggest_options",
+      "rewrite",
+      "rewrite_claim",
+      "rewrite_options",
+      "explain",
+      "complete",
+      "chat",
+      "review"
+    ]
+  },
+  "notes": [
+    "Placeholder digests (all zeros) mark inputs that do not exist yet: the calibration set and the control fixtures. Replace them with real SHA-256 digests and a measured ECE before this rubric is frozen into a plan; a rubric with a placeholder digest must not back an assurance request.",
+    "The extractor keeps only the three binding arrays so the state fits the 320-token state budget of the 512-context checkpoint; a config whose bindings exceed it is ERROR `input_over_context_limit`, never truncated.",
+    "Honest limit: exact binding names are decidable by a JSON parser, and a parser test is stronger evidence than any model. Use this rubric only where the plan states binding requirements in prose that a fixed parser does not encode; otherwise the Planning Test Engineer should select a test, not a System One backend.",
+    "noul label-following risk on the English checkpoint (laya issue #156) is covered by the REFUTED controls."
+  ]
+}

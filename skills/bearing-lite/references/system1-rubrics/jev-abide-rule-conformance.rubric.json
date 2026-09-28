@@ -1,0 +1,141 @@
+{
+  "kind": "rubric",
+  "schema_family": "system1",
+  "schema_version": "1",
+  "rubric_id": "RUB-S1-ABIDE-NO-SECRETS-IN-WRANGLER",
+  "rubric_version": "1.0.0",
+  "title": "Code edit obeys project rule: no secret values in wrangler vars",
+  "claim": {
+    "claim_type": "project_rule_conformance",
+    "statement": "The candidate's edit to wrangler configuration adds no secret value (API key, token, password, or private key) under `vars`; secrets are referenced only through Worker secrets, per the project rule used by abide.",
+    "eligibility": "closed_option_conformance",
+    "spec_refs": [
+      "abide rule: no-secrets-in-wrangler-vars"
+    ]
+  },
+  "assurance_eligible": true,
+  "backend": "jev",
+  "model": {
+    "provider": "typesafe",
+    "model_id": "jev",
+    "model_version": "1.13.0",
+    "client": {
+      "package": "ai",
+      "package_version": "7.0.118",
+      "function": "experimental_evaluate"
+    }
+  },
+  "question": {
+    "key": "edit_obeys_rule",
+    "type": "choice",
+    "instructions": "The state is one unified diff hunk from a code edit plus its file path. Project rule: a wrangler configuration must never place a secret value (API key, token, password, private key, or credential string) under `vars`; secrets are declared as Worker secrets and referenced by name only. Which option describes the added lines of this edit?",
+    "criteria": {
+      "A": "the added lines comply with the rule",
+      "B": "the added lines put a secret value under vars, violating the rule",
+      "C": "the edit does not touch wrangler vars, so the rule does not apply"
+    }
+  },
+  "question_digest": "0a208c4b8e89374aabf965c17c2e91c5a6d7edd791dc3a514ec1a27b2628e03b",
+  "decision": {
+    "claim_holds_options": [
+      "A"
+    ],
+    "claim_fails_options": [
+      "B"
+    ],
+    "verify_threshold": 0.9,
+    "refute_threshold": 0.85,
+    "probability_basis": "calibrated_option_set_mass",
+    "tie_rule": "INCONCLUSIVE"
+  },
+  "calibration": {
+    "method": "temperature_scaled",
+    "temperature": 1,
+    "calibration_set_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "calibration_set_size": 200,
+    "measured_ece": 0.144,
+    "max_ece": 0.15
+  },
+  "input": {
+    "state_shape": "keyed_text",
+    "source": {
+      "kind": "repo_file_excerpt",
+      "locator": "git diff <baseline>..<candidate> -- wrangler.jsonc wrangler.toml",
+      "extractor": "one claim per hunk: {path, diff}"
+    },
+    "canonicalization": "utf8_nfc_lf_trim_trailing",
+    "token_limit": 4000,
+    "tokenizer": "utf8_byte_upper_bound",
+    "truncation": "never",
+    "over_limit": "ERROR"
+  },
+  "controls": [
+    {
+      "control_id": "CTL-ABIDE-VARS-PUBLIC-URL",
+      "locator": "test/fixtures/abide/controls/vars-public-url.diff",
+      "input_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "expected": "VERIFIED"
+    },
+    {
+      "control_id": "CTL-ABIDE-VARS-API-KEY",
+      "locator": "test/fixtures/abide/controls/vars-api-key.diff",
+      "input_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "expected": "REFUTED"
+    }
+  ],
+  "replay": {
+    "min_runs": 2,
+    "probability_epsilon": 0.01,
+    "require_identical_answer": true,
+    "require_identical_status": true,
+    "freshness": "one_uncached_run"
+  },
+  "gateway": {
+    "worker_name": "jev-gateway",
+    "ai_gateway_id_env": "JEV_GATEWAY_AI_GATEWAY_ID",
+    "endpoint_env": "JEV_GATEWAY_ENDPOINT",
+    "auth_token_env": "JEV_GATEWAY_TOKEN",
+    "route": "/v1/systemone",
+    "cache": {
+      "mode": "enabled_with_bypass_run",
+      "ttl_seconds": 86400,
+      "key_binds": [
+        "backend",
+        "model_revision",
+        "checkpoint",
+        "rubric_digest",
+        "question_digest",
+        "input_digest",
+        "calibration"
+      ]
+    },
+    "logging": true
+  },
+  "operations": {
+    "allowed": [
+      "evaluate"
+    ],
+    "denied": [
+      "generate",
+      "propose",
+      "propose_claims",
+      "propose_options",
+      "suggest_options",
+      "rewrite",
+      "rewrite_claim",
+      "rewrite_options",
+      "explain",
+      "complete",
+      "chat",
+      "review"
+    ]
+  },
+  "notes": [
+    "Placeholder digests (all zeros) mark inputs that do not exist yet: the calibration set and the control fixtures. Replace them with real SHA-256 digests and a measured ECE before this rubric is frozen into a plan; a rubric with a placeholder digest must not back an assurance request.",
+    "Jev is hosted and closed: the pinned model_version is the only revision handle, fresh-process replay is not available, and a served version other than 1.13.0 is ERROR `model_revision_mismatch`. That is why epsilon is wider (0.01) than for pinned CPU Laya.",
+    "Published third-party Jev ECE figures (as returned) range from 0.144 (typed-decisions) to 0.246; measured_ece 0.144 is that published figure, not a measurement on this rubric. Fit the temperature on this rubric's calibration set and record the measured ECE before freezing.",
+    "Neutral option keys (A/B/C) with the verdict in the description avoid label-following on yes/no wording.",
+    "The input budget uses UTF-8 bytes as a conservative token bound because Jev's tokenizer is not available client-side; 4000 is a chosen budget, not Jev's documented context limit.",
+    "This is a rule-conformance verdict on a fixed diff, not code review: Jev never proposes a fix, rewrites the diff, or judges code quality."
+  ]
+}
