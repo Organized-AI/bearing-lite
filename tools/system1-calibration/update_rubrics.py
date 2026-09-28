@@ -2,6 +2,9 @@
 
     python tools/system1-calibration/update_rubrics.py
 
+Each is also marked SUPERSEDED (patch version) by the hybrid design: the checks
+moved to validator rubrics and single-condition Laya rubrics.
+
 Reads results.json and replay.json per rubric. Never edits thresholds or
 max_ece. Sets assurance_eligible from the measured bar (held-out calibrated
 ECE <= max_ece, every control on its expected status, held-out precision of
@@ -26,6 +29,28 @@ BASELINE = "2f8a83d"  # commit holding the placeholder rubrics
 PLACEHOLDER_PREFIXES = ("Placeholder digests", "measured_ece ", "noul on the English checkpoint",
                         "noul label-following risk", "Measured on ", "Temperature semantics", "Not assurance-eligible",
                         "Option C is deliberately")
+
+
+# The multi-condition Laya rubrics stay measured and non-eligible; their checks moved to other rubrics
+# (docs/calibration/system1-calibration-report.md, Hybrid section). Superseding is a note, so a patch version.
+SUPERSEDED = {
+    "gtm-datalayer-event": (
+        "SUPERSEDED (kept for the record, not assurance-eligible): Laya scored this six-condition rule at chance. The "
+        "check is now owned by the validator rubric RUB-S1-VAL-GTM-PURCHASE-EVENT "
+        "(validator-gtm-purchase-event.rubric.json), which decides all six conditions exactly. Do not bind new claims "
+        "to this rubric."),
+    "multilingual-consent-banner": (
+        "SUPERSEDED (kept for the record, not assurance-eligible): Laya scored this three-disclosure rule at chance. The "
+        "rule is now decomposed into one single-condition Laya rubric per disclosure: RUB-S1-CONSENT-STATES-PURPOSE, "
+        "RUB-S1-CONSENT-NAMES-THIRD-PARTIES and RUB-S1-CONSENT-EXPLAINS-WITHDRAWAL (laya-consent-*.rubric.json); the "
+        "banner conforms when all three VERIFY. Those were measured too and none is assurance-eligible, so this check "
+        "has no assurance-eligible backend yet. Do not bind new claims to this rubric."),
+    "wrangler-bindings": (
+        "SUPERSEDED (kept for the record, not assurance-eligible): Laya scored this three-binding rule near chance. The "
+        "check is now owned by the validator rubric RUB-S1-VAL-WRANGLER-REQUIRED-BINDINGS "
+        "(validator-wrangler-required-bindings.rubric.json), which reads JSONC or TOML and decides it exactly. Do not "
+        "bind new claims to this rubric."),
+}
 
 
 def worst_logit_delta():
@@ -141,6 +166,9 @@ def update(rubric):
         notes.append("Not assurance-eligible: " + "; ".join(reasons) + ". Thresholds were not lowered to compensate; "
                      "this rubric may back diagnostic runs only until a re-authored version measures inside the bar.")
     rb["notes"] = notes + kept
+    if rubric in SUPERSEDED:
+        rb["rubric_version"] = "%d.%d.1" % tuple(int(x) for x in rb["rubric_version"].split(".")[:2])
+        rb["notes"] = [SUPERSEDED[rubric]] + rb["notes"]
     with open(path, "w", encoding="utf-8") as fh:
         fh.write(json.dumps(rb, indent=2, ensure_ascii=False) + "\n")
     print(rubric, rb["rubric_version"], name, "eligible" if eligible else "NOT eligible", reasons)

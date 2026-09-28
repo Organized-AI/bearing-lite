@@ -7,7 +7,9 @@ Scripts: `tools/system1-calibration/`.
 
 ## Summary
 
-None of the three Laya rubrics meets its bar. All three are now
+None of the three Laya rubrics meets its bar. (Superseded on 2026-09-28 by the
+hybrid design; see "Hybrid: validators for multi-condition rules, Laya for
+single conditions" below.) All three are now
 `assurance_eligible: false`, and every one of their known-answer controls maps
 to INCONCLUSIVE. The thresholds were not lowered.
 
@@ -54,6 +56,251 @@ Why each rubric fails its bar:
 - **Consent:** all 3 controls are INCONCLUSIVE, and held-out coverage is 0.
 - **Wrangler:** all 3 controls are INCONCLUSIVE. Held-out coverage is 3/180,
   all correct REFUTEDs, a sample far too small to establish precision.
+
+## Hybrid: validators for multi-condition rules, Laya for single conditions
+
+Date: 2026-09-28. The findings above led to a hybrid design. A rule that is
+expressible as code is now decided by a third backend, `validator`: a pinned,
+dependency-free Node program with no model and no probability. Laya is used
+only for single-condition questions, and each such rubric is calibrated with
+the same protocol as above. The three multi-condition Laya rubrics are kept
+for the record and marked SUPERSEDED in their notes (version 2.0.1). They stay
+`assurance_eligible: false`.
+
+### Which backend owns which check
+
+| Check | Owner rubric | Backend | assurance_eligible | Why |
+| --- | --- | --- | --- | --- |
+| GTM `purchase` push meets the six conditions | RUB-S1-VAL-GTM-PURCHASE-EVENT 1.0.0 | `validator` | true | 360/360 dataset agreement, 38/38 edge cases, 3/3 controls |
+| Wrangler binds DB, CACHE, ASSETS (JSONC or TOML) | RUB-S1-VAL-WRANGLER-REQUIRED-BINDINGS 1.0.0 | `validator` | true | 360/360 dataset agreement, 13/13 edge cases, 5/5 controls |
+| Consent banner states the purpose | RUB-S1-CONSENT-STATES-PURPOSE 1.0.0 | `laya` (multilingual) | false | held-out precision 1/2, controls 0/3 |
+| Consent banner says third parties receive the data | RUB-S1-CONSENT-NAMES-THIRD-PARTIES 1.0.0 | `laya` (multilingual) | false | held-out precision 3/3 (Wilson LB 0.44), controls 0/3 |
+| Consent banner explains how to refuse or withdraw | RUB-S1-CONSENT-EXPLAINS-WITHDRAWAL 1.0.0 | `laya` (multilingual) | false | held-out precision 17/22, controls 0/3 |
+| GTM push event is exactly `purchase` (demonstration) | RUB-S1-GTM-EVENT-IS-PURCHASE 1.0.0 | `laya` | true | held-out precision 123/129 (Wilson LB 0.902), controls 3/3; the validator owns this check |
+| Wrangler config has no secret under `vars` | RUB-S1-ABIDE-NO-SECRETS-IN-WRANGLER 1.0.1 | `jev` | false | unmeasured (no Jev credentials) |
+| Superseded: GTM six conditions in one question | RUB-S1-GTM-DATALAYER-PURCHASE 2.0.1 | `laya` | false | chance-level; now owned by the GTM validator |
+| Superseded: wrangler three bindings in one question | RUB-S1-WRANGLER-REQUIRED-BINDINGS 2.0.1 | `laya` | false | near chance; now owned by the wrangler validator |
+| Superseded: consent three disclosures in one question | RUB-S1-CONSENT-BANNER-DISCLOSURES 2.0.1 | `laya` | false | chance-level; split into the three consent rubrics |
+
+The consent check has no assurance-eligible backend yet. Decomposing it into
+single conditions did not make the multilingual checkpoint good enough (see
+below). A consent-banner validator was deliberately not built: deciding
+disclosure presence by keyword matching across eight languages is brittle.
+Until a checkpoint measures inside the bar, a consent claim can only produce
+diagnostic receipts, or its rubrics seal INCONCLUSIVE `control_failed`.
+
+The selection guide in `skills/bearing-lite/references/system1-rubrics.md`
+now reads, in order:
+
+1. `validator` for anything expressible as code.
+2. `laya` only for a single-condition semantic question.
+3. `jev` only where an existing Jev rule applies.
+
+### Validator backend
+
+- **Programs.** `tools/system1-validators/` holds five files: `lib.cjs`,
+  `toml.cjs`, `gtm-purchase-event.cjs`, `wrangler-required-bindings.cjs`, and
+  the backend client `run.cjs`. They are CommonJS with zero runtime
+  dependencies.
+- **Rubric pins.** A validator rubric pins:
+  - the implementation path and the SHA-256 of its source, and every support
+    file;
+  - the rule text and its condition list;
+  - the input format by file extension, the canonicalization, and the byte
+    limit;
+  - controls with real input digests;
+  - a replay of at least two fresh-process runs that must print
+    byte-identical decision-record digests.
+- **What the schema forbids.** The schema variant (`validator_rubric`)
+  forbids a model, question, thresholds, calibration, temperature, ECE,
+  epsilon, or gateway.
+- **Operations.** The operation allowlist is exactly `check`.
+- **Runner checks.** `run.cjs` checks the claim's rubric digest, every pinned
+  file digest, and the target's size and digest. It then runs the controls
+  and decides the target in fresh processes.
+- **Outcomes.**
+  - Unparseable input is ERROR `input_unparseable`.
+  - A TOML construct outside the reader's subset is ERROR
+    `toml_unsupported_construct`.
+  - A malformed claim carries the bridge's `malformed claim` marker, so
+    `sealVerification` rejects it with no receipt.
+
+Agreement with the independent Python labelers (`labelers.py`). A match
+requires the same verdict, the same failing conditions (mapped to the
+labeler's reason strings), and the same SHA-256 of the canonical state:
+
+| Validator | Calibration dataset (both splits) | Edge cases (`test/fixtures/system1-validators/cases.json`) | Controls |
+| --- | --- | --- | --- |
+| `gtm-purchase-event` 1.0.0 | 360/360 | 38/38 | 3/3 |
+| `wrangler-required-bindings` 1.0.0 | 360/360, scored from the original JSONC or TOML source | 13/13 | 5/5 (two in TOML) |
+
+Notes on the agreement check:
+
+- **Starting point.** The first run of the two programs against the datasets
+  already agreed 360/360, so no disagreement had to be resolved.
+- **ISO 4217 list.** The labeler's list was extended by VED, XCG and ZWG,
+  three active codes it lacked. The validator carries an independent copy of
+  the same list, and a test requires the two lists to be equal. No dataset
+  label changed.
+- **TOML reader.** The reader agrees with Python's `tomllib` on all 40 TOML
+  cases:
+  - 16 parse to identical values;
+  - 13 invalid texts are `input_unparseable`;
+  - 11 valid constructs outside the subset are `toml_unsupported_construct`.
+    These are multi-line strings, dates and times, hex, octal and binary
+    integers, `inf` and `nan`, and integers beyond 2^53.
+  - A byte-order mark is rejected, as `tomllib` and `JSON.parse` both do.
+- **Edge cases.** The expected labels are written by
+  `validator_cases.py`, from the Python side only.
+- **Determinism.** Two CLI runs on the same input print byte-identical
+  output, and a deliberately nondeterministic program seals INCONCLUSIVE
+  `replay_output_divergence`.
+- **Round trip.** `test/system1-validators.test.mjs` runs
+  `planVerification`, then the planned argv, then `sealVerification`, then
+  `evaluateVerification`. A VERIFIED control on the eligible GTM rubric gives
+  an assurance PASS.
+
+### Single-condition Laya rubrics
+
+The consent rule was split into its three required disclosures (purpose,
+third parties, withdrawal): one rubric each, pinned to `laya-multilingual` at
+the same revision.
+
+The per-disclosure labeled sets come from the consent generator's segment
+model:
+
+- **Size and balance.** There are 512 banners: 8 disclosure combinations × 8
+  languages × 4 items per split. Each disclosure is present in exactly 128 of
+  256 items per split.
+- **Non-banner text.** In the no-disclosure cell, half the items are ordinary
+  shop text rather than a banner.
+- **Splits.** The splits are paraphrase-disjoint and share no item.
+  Calibration banners use the generator's three original paraphrases per
+  disclosure and language. Held-out banners use two new paraphrases per
+  disclosure and language, 48 in all. Held-out wording was therefore never
+  seen during selection or fitting.
+- **Seeds and controls.** The seeds are 7101 and 7102. The controls are the
+  three existing consent controls plus two new ones: `fr-missing-purpose` and
+  an English shop notice.
+
+The GTM demonstration rubric has its own dataset:
+
+- 360 pushes with seed 9173, half `purchase`.
+- The other half is 40% other GA4 events and 10% near-miss spellings
+  (`Purchase`, `purchase_complete` and similar).
+- The split is stratified 50/50 with seed 20260927.
+
+The added fixtures total about 1.25 MB.
+
+The protocol is the one above:
+
+- The formulation is chosen on the calibration split only, by highest
+  accuracy and then lowest NLL at the fitted T.
+- T is fitted on the calibration split.
+- Thresholds are the original rubrics' and were not lowered: 0.85/0.85 with
+  `max_ece` 0.12 for consent, and 0.90/0.90 with `max_ece` 0.10 for GTM.
+- `assurance_eligible` requires all of the following:
+  - held-out gated precision at least 0.95, with a Wilson 95% lower bound of
+    at least 0.90;
+  - every control on its expected status in every replay run;
+  - measured ECE (the worse of calibration and held-out) at most `max_ece`.
+- Replay ran each control 5 times (2 runs in fresh processes). Every run was
+  bit-identical, so epsilon comes from the worst logit wobble seen on any
+  checkpoint.
+
+| Rubric | Formulation | Held-out acc | ECE raw / shipped / fitted | T | Coverage | Precision (k/n) | Wilson LB | Controls | epsilon | assurance_eligible |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| RUB-S1-CONSENT-STATES-PURPOSE 1.0.0 | `choice2_neutral` | 0.668 | 0.065 / 0.065 / 0.085 | 1.344 | 0.008 | 0.500 (1/2) | 0.095 | 0/3 pass | 0.002 | false |
+| RUB-S1-CONSENT-NAMES-THIRD-PARTIES 1.0.0 | `choice2_neutral` | 0.680 | 0.064 / 0.064 / 0.040 | 1.241 | 0.012 | 1.000 (3/3) | 0.438 | 0/3 pass | 0.002 | false |
+| RUB-S1-CONSENT-EXPLAINS-WITHDRAWAL 1.0.0 | `noul` | 0.641 | 0.263 / 0.263 / 0.083 | 3.375 | 0.086 | 0.773 (17/22) | 0.566 | 0/3 pass | 0.0005 | false |
+| RUB-S1-GTM-EVENT-IS-PURCHASE 1.0.0 | `choice5_events` | 0.811 | 0.097 / 0.075 / 0.053 | 1.404 | 0.717 | 0.953 (123/129) | 0.902 | 3/3 pass | 0.002 | true |
+
+Consent formulations were registered in two stages:
+
+- **Stage 1:** `noul` and `choice2_neutral`.
+- **Stage 2:** `choice2_contrastive` and `noul_sentence`. These were added
+  after stage 1 failed on the calibration split. Stage-1 held-out numbers had
+  already been computed for purpose and third parties, so stage 2 was not
+  blind to them.
+
+The choice among all four formulations still read only the calibration split,
+and no stage-2 formulation was chosen. All formulations:
+
+| Rubric | Formulation | Cal acc | Cal NLL | T | Held-out acc | ECE fitted | Coverage | Precision | V / R / I | Controls |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| consent-purpose | `noul` | 0.500 | 0.681 | 13.14 | 0.500 | 0.190 | 0.000 | n/a | 0 / 0 / 256 | CONSENT-DE-COMPLETE INCONCLUSIVE, CONSENT-FR-NO-PURPOSE INCONCLUSIVE, CONSENT-EN-SHOP-NOTICE INCONCLUSIVE |
+| consent-purpose | `choice2_neutral` (chosen) | 0.648 | 0.644 | 1.344 | 0.668 | 0.085 | 0.008 | 0.500 | 1 / 1 / 254 | CONSENT-DE-COMPLETE INCONCLUSIVE, CONSENT-FR-NO-PURPOSE INCONCLUSIVE, CONSENT-EN-SHOP-NOTICE INCONCLUSIVE |
+| consent-purpose | `choice2_contrastive` | 0.547 | 0.648 | 3.868 | 0.500 | 0.226 | 0.000 | n/a | 0 / 0 / 256 | CONSENT-DE-COMPLETE INCONCLUSIVE, CONSENT-FR-NO-PURPOSE INCONCLUSIVE, CONSENT-EN-SHOP-NOTICE INCONCLUSIVE |
+| consent-purpose | `noul_sentence` | 0.531 | 0.652 | 5.284 | 0.512 | 0.187 | 0.000 | n/a | 0 / 0 / 256 | CONSENT-DE-COMPLETE INCONCLUSIVE, CONSENT-FR-NO-PURPOSE INCONCLUSIVE, CONSENT-EN-SHOP-NOTICE INCONCLUSIVE |
+| consent-third-parties | `noul` | 0.590 | 0.643 | 6.17 | 0.574 | 0.085 | 0.000 | n/a | 0 / 0 / 256 | CONSENT-DE-COMPLETE INCONCLUSIVE, CONSENT-ES-NO-WITHDRAW INCONCLUSIVE, CONSENT-JA-NO-THIRD-PARTY INCONCLUSIVE |
+| consent-third-parties | `choice2_neutral` (chosen) | 0.645 | 0.623 | 1.241 | 0.680 | 0.040 | 0.012 | 1.000 | 2 / 1 / 253 | CONSENT-DE-COMPLETE INCONCLUSIVE, CONSENT-ES-NO-WITHDRAW INCONCLUSIVE, CONSENT-JA-NO-THIRD-PARTY INCONCLUSIVE |
+| consent-third-parties | `choice2_contrastive` | 0.504 | 0.692 | 20 | 0.496 | 0.035 | 0.000 | n/a | 0 / 0 / 256 | CONSENT-DE-COMPLETE INCONCLUSIVE, CONSENT-ES-NO-WITHDRAW INCONCLUSIVE, CONSENT-JA-NO-THIRD-PARTY INCONCLUSIVE |
+| consent-third-parties | `noul_sentence` | 0.641 | 0.607 | 2.966 | 0.590 | 0.114 | 0.078 | 0.650 | 20 / 0 / 236 | CONSENT-DE-COMPLETE INCONCLUSIVE, CONSENT-ES-NO-WITHDRAW INCONCLUSIVE, CONSENT-JA-NO-THIRD-PARTY INCONCLUSIVE |
+| consent-withdrawal | `noul` (chosen) | 0.699 | 0.574 | 3.375 | 0.641 | 0.083 | 0.086 | 0.773 | 20 / 2 / 234 | CONSENT-DE-COMPLETE INCONCLUSIVE, CONSENT-JA-NO-THIRD-PARTY INCONCLUSIVE, CONSENT-ES-NO-WITHDRAW INCONCLUSIVE |
+| consent-withdrawal | `choice2_neutral` | 0.531 | 0.662 | 1.568 | 0.488 | 0.092 | 0.000 | n/a | 0 / 0 / 256 | CONSENT-DE-COMPLETE INCONCLUSIVE, CONSENT-JA-NO-THIRD-PARTY INCONCLUSIVE, CONSENT-ES-NO-WITHDRAW INCONCLUSIVE |
+| consent-withdrawal | `choice2_contrastive` | 0.500 | 0.689 | 16 | 0.500 | 0.041 | 0.000 | n/a | 0 / 0 / 256 | CONSENT-DE-COMPLETE INCONCLUSIVE, CONSENT-JA-NO-THIRD-PARTY INCONCLUSIVE, CONSENT-ES-NO-WITHDRAW INCONCLUSIVE |
+| consent-withdrawal | `noul_sentence` | 0.684 | 0.549 | 2.236 | 0.664 | 0.075 | 0.180 | 0.891 | 45 / 1 / 210 | CONSENT-DE-COMPLETE VERIFIED, CONSENT-JA-NO-THIRD-PARTY INCONCLUSIVE, CONSENT-ES-NO-WITHDRAW INCONCLUSIVE |
+| gtm-event-is-purchase | `noul` | 0.639 | 0.610 | 6.613 | 0.617 | 0.151 | 0.033 | 0.667 | 6 / 0 / 174 | GTM-PURCHASE-VALID INCONCLUSIVE, GTM-PURCHASE-NO-CURRENCY INCONCLUSIVE, GTM-ADD-TO-CART INCONCLUSIVE |
+| gtm-event-is-purchase | `choice2_neutral` | 0.644 | 0.568 | 3.243 | 0.606 | 0.190 | 0.000 | n/a | 0 / 0 / 180 | GTM-PURCHASE-VALID INCONCLUSIVE, GTM-PURCHASE-NO-CURRENCY INCONCLUSIVE, GTM-ADD-TO-CART INCONCLUSIVE |
+| gtm-event-is-purchase | `choice5_events` (chosen) | 0.806 | 0.509 | 1.404 | 0.811 | 0.053 | 0.717 | 0.953 | 80 / 49 / 51 | GTM-PURCHASE-VALID VERIFIED, GTM-PURCHASE-NO-CURRENCY VERIFIED, GTM-ADD-TO-CART REFUTED |
+
+What the consent numbers say:
+
+- **Signal level.** With one condition per question the multilingual
+  checkpoint does better than chance, but not by much. Held-out accuracy is
+  0.64 to 0.68.
+- **Controls.** The fitted temperatures keep almost every item below 0.85, so
+  every control lands on INCONCLUSIVE.
+- **Bias.** The model mostly reacts to "this is a cookie banner" rather than
+  to the specific disclosure. For example:
+  - Withdrawal `noul` answers yes on most banners that state a purpose but
+    give no way to refuse (held-out accuracy 0.16 on purpose-only banners).
+  - Third-parties `choice2_neutral` scores 0.16 on banners with third
+    parties and withdrawal but no purpose.
+  - The `noul` forms answer yes to nearly everything, as on the
+    multi-condition rubric.
+- **Contrastive wording.** The stage-2 contrastive choice made the A-bias
+  worse (253 to 256 of 256 A).
+
+The GTM demonstration passes the bar, but only just. Precision is 123/129,
+with a Wilson lower bound of 0.902.
+
+- **Where it fails.** All six wrong verdicts are near-miss spellings VERIFIED
+  as purchase: 6 of 22 held-out near misses, and none was REFUTED.
+- **Scope of the pass.** It meets the bar on this mix, where about one item
+  in eight is a near miss. It would not meet it on a population with more
+  near misses.
+- **What it shows.** Laya works for a single, simple classification of
+  structured input. Exact-string conditions still belong to the validator,
+  which owns this check.
+
+Limitations:
+
+- **Synthetic data.** The consent paraphrases, including the 48 new ones,
+  were written for this exercise and are not reviewed native copy.
+- **CPU contention.** A few short test runs overlapped the scoring passes on
+  the 2 CPUs. Contention moved logits by at most 3e-4 in the earlier
+  measurement, far below anything that changes a status. The control replays
+  ran on a quiet machine and were bit-identical.
+- **Gate aggregation.** The consent claim "all three disclosures" is the
+  conjunction of three receipts. The gate chain requires every required
+  claim to be `gate_eligible`, which gives that conjunction, but no single
+  receipt states it.
+
+Reproduce the hybrid results:
+
+```sh
+node tools/system1-calibration/build-validator-rubrics.mjs          # validator rubrics + round-trip fixture
+python3 tools/system1-calibration/validator_cases.py                 # edge cases (tomllib + labelers; needs s1cal deps)
+export HF_HUB_OFFLINE=1
+python tools/system1-calibration/single_condition.py generate        # datasets + new controls (tokenizers only)
+python tools/system1-calibration/single_condition.py run             # ~40 min on 2 CPUs, one state per forward pass
+python tools/system1-calibration/single_condition.py evaluate        # no model
+python tools/system1-calibration/single_condition.py replay 2        # fresh-process control replays
+python tools/system1-calibration/single_condition.py rubrics         # writes laya-consent-*.rubric.json, laya-gtm-event-is-purchase
+python tools/system1-calibration/single_condition.py report          # the tables above
+python tools/system1-calibration/update_rubrics.py && node tools/system1-calibration/build-round-trip.mjs  # superseded notes
+```
 
 ## Formulations tried
 

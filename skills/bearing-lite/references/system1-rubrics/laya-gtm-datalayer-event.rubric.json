@@ -3,7 +3,7 @@
   "schema_family": "system1",
   "schema_version": "1",
   "rubric_id": "RUB-S1-GTM-DATALAYER-PURCHASE",
-  "rubric_version": "2.0.0",
+  "rubric_version": "2.0.1",
   "title": "GTM dataLayer purchase event conforms to the tracking spec",
   "claim": {
     "claim_type": "tracking_event_conformance",
@@ -139,6 +139,7 @@
     ]
   },
   "notes": [
+    "SUPERSEDED (kept for the record, not assurance-eligible): Laya scored this six-condition rule at chance. The check is now owned by the validator rubric RUB-S1-VAL-GTM-PURCHASE-EVENT (validator-gtm-purchase-event.rubric.json), which decides all six conditions exactly. Do not bind new claims to this rubric.",
     "Measured on the pinned checkpoint, CPU fp32, eval mode, one state per forward pass: formulation `noul_tight`, held-out accuracy 0.533 (n=180); ECE (15 bins) 0.383 raw logits, 0.298 at the checkpoint's shipped temperature, 0.039 at the fitted temperature 20; at verify 0.90 / refute 0.90, coverage 0.000 (VERIFIED 0, REFUTED 0, INCONCLUSIVE 180) with precision n/a. Calibration split ECE after fitting 0.096 (n=180). Dataset: test/fixtures/system1-calibration/gtm-datalayer-event/ (report: docs/calibration/system1-calibration-report.md).",
     "Formulations tried (held-out accuracy at fitted T): noul_verbatim 0.500, noul_tight 0.533, noul_neutral_labels 0.489, choice2_neutral 0.472, choice2_tight 0.500, typed_choice2_neutral 0.406. Controls at the fitted T: CTL-GTM-PURCHASE-VALID VERIFIED->INCONCLUSIVE (p=0.533); CTL-GTM-PURCHASE-NO-CURRENCY REFUTED->INCONCLUSIVE (p=0.578); CTL-GTM-ADD-TO-CART REFUTED->INCONCLUSIVE (p=0.571). Replay: 9 runs per control (6 in fresh processes), max thresholded-probability delta 0, max logit delta 0; epsilon is 10x the larger of the measured delta and the delta implied by the worst logit wobble seen on any checkpoint (2.99e-4, laya-multilingual under concurrent CPU load), rounded up.",
     "Temperature semantics: `calibration.temperature` replaces the checkpoint's own temperature for this question's (type, option count) bucket, i.e. probabilities are softmax(option logits / T); a runner sets agent.temperature_by_options[temp_bucket] = T and passes no `lang`, so lang_temperatures cannot override it. `measured_ece` is the larger of the calibration-split (in-sample) and held-out test-split ECE at the fitted temperature.",

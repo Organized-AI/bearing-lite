@@ -3,7 +3,7 @@
   "schema_family": "system1",
   "schema_version": "1",
   "rubric_id": "RUB-S1-CONSENT-BANNER-DISCLOSURES",
-  "rubric_version": "2.0.0",
+  "rubric_version": "2.0.1",
   "title": "Localized consent banner states the required disclosures",
   "claim": {
     "claim_type": "localized_copy_disclosure",
@@ -143,6 +143,7 @@
     ]
   },
   "notes": [
+    "SUPERSEDED (kept for the record, not assurance-eligible): Laya scored this three-disclosure rule at chance. The rule is now decomposed into one single-condition Laya rubric per disclosure: RUB-S1-CONSENT-STATES-PURPOSE, RUB-S1-CONSENT-NAMES-THIRD-PARTIES and RUB-S1-CONSENT-EXPLAINS-WITHDRAWAL (laya-consent-*.rubric.json); the banner conforms when all three VERIFY. Those were measured too and none is assurance-eligible, so this check has no assurance-eligible backend yet. Do not bind new claims to this rubric.",
     "Measured on the pinned checkpoint, CPU fp32, eval mode, one state per forward pass: formulation `choice2_neutral`, held-out accuracy 0.514 (n=181); ECE (15 bins) 0.167 raw logits, 0.167 at the checkpoint's shipped temperature, 0.005 at the fitted temperature 20; at verify 0.85 / refute 0.85, coverage 0.000 (VERIFIED 0, REFUTED 0, INCONCLUSIVE 181) with precision n/a. Calibration split ECE after fitting 0.078 (n=179). Dataset: test/fixtures/system1-calibration/multilingual-consent-banner/ (report: docs/calibration/system1-calibration-report.md).",
     "Formulations tried (held-out accuracy at fitted T): choice3_verbatim 0.381, choice3_tight 0.508, choice2_neutral 0.514, noul_tight 0.442. Controls at the fitted T: CTL-CONSENT-DE-COMPLETE VERIFIED->INCONCLUSIVE (p=0.514); CTL-CONSENT-ES-NO-WITHDRAW REFUTED->INCONCLUSIVE (p=0.505); CTL-CONSENT-JA-NO-THIRD-PARTY REFUTED->INCONCLUSIVE (p=0.503). Replay: 9 runs per control (6 in fresh processes), max thresholded-probability delta 4.16e-06, max logit delta 0.000299; epsilon is 10x the larger of the measured delta and the delta implied by the worst logit wobble seen on any checkpoint (2.99e-4, laya-multilingual under concurrent CPU load), rounded up.",
     "Temperature semantics: `calibration.temperature` replaces the checkpoint's own temperature for this question's (type, option count) bucket, i.e. probabilities are softmax(option logits / T); a runner sets agent.temperature_by_options[temp_bucket] = T and passes no `lang`, so lang_temperatures cannot override it. `measured_ece` is the larger of the calibration-split (in-sample) and held-out test-split ECE at the fitted temperature.",

@@ -38,8 +38,8 @@
       "kind": "system1_decision",
       "backend": "laya",
       "rubric_id": "RUB-S1-GTM-DATALAYER-PURCHASE",
-      "rubric_version": "2.0.0",
-      "rubric_digest": "958a7705e06f7889b023c14015f8347a51cf24dba58338f897799af4e80e9e84",
+      "rubric_version": "2.0.1",
+      "rubric_digest": "c45e2c248357424803a5ece41dd646d5c94faa0be85f15a84f5bbafa956f7f38",
       "input_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
     },
     "target": "test/fixtures/datalayer/checkout-complete.json",
@@ -75,7 +75,7 @@
       "backend": "laya",
       "operation": "evaluate",
       "target": "test/fixtures/datalayer/checkout-complete.json",
-      "claim": "{\"backend\":\"laya\",\"input_digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"kind\":\"system1_decision\",\"rubric_digest\":\"958a7705e06f7889b023c14015f8347a51cf24dba58338f897799af4e80e9e84\",\"rubric_id\":\"RUB-S1-GTM-DATALAYER-PURCHASE\",\"rubric_version\":\"2.0.0\"}",
+      "claim": "{\"backend\":\"laya\",\"input_digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"kind\":\"system1_decision\",\"rubric_digest\":\"c45e2c248357424803a5ece41dd646d5c94faa0be85f15a84f5bbafa956f7f38\",\"rubric_id\":\"RUB-S1-GTM-DATALAYER-PURCHASE\",\"rubric_version\":\"2.0.1\"}",
       "args": [],
       "invocation": {
         "executable": "jev-gateway-run",
@@ -108,8 +108,8 @@
             "engine_version": "0.3.21",
             "rubric": {
               "rubric_id": "RUB-S1-GTM-DATALAYER-PURCHASE",
-              "rubric_version": "2.0.0",
-              "rubric_digest": "958a7705e06f7889b023c14015f8347a51cf24dba58338f897799af4e80e9e84",
+              "rubric_version": "2.0.1",
+              "rubric_digest": "c45e2c248357424803a5ece41dd646d5c94faa0be85f15a84f5bbafa956f7f38",
               "question_digest": "9164caae2fc146f6eb42b1d06c7ed60d7573519b06e040fe1ea73c5d21c97d5f"
             },
             "model": {
@@ -210,8 +210,8 @@
             "engine_version": "0.3.21",
             "rubric": {
               "rubric_id": "RUB-S1-GTM-DATALAYER-PURCHASE",
-              "rubric_version": "2.0.0",
-              "rubric_digest": "958a7705e06f7889b023c14015f8347a51cf24dba58338f897799af4e80e9e84",
+              "rubric_version": "2.0.1",
+              "rubric_digest": "c45e2c248357424803a5ece41dd646d5c94faa0be85f15a84f5bbafa956f7f38",
               "question_digest": "9164caae2fc146f6eb42b1d06c7ed60d7573519b06e040fe1ea73c5d21c97d5f"
             },
             "model": {
@@ -313,8 +313,8 @@
             "engine_version": "0.3.21",
             "rubric": {
               "rubric_id": "RUB-S1-GTM-DATALAYER-PURCHASE",
-              "rubric_version": "2.0.0",
-              "rubric_digest": "958a7705e06f7889b023c14015f8347a51cf24dba58338f897799af4e80e9e84",
+              "rubric_version": "2.0.1",
+              "rubric_digest": "c45e2c248357424803a5ece41dd646d5c94faa0be85f15a84f5bbafa956f7f38",
               "question_digest": "9164caae2fc146f6eb42b1d06c7ed60d7573519b06e040fe1ea73c5d21c97d5f"
             },
             "model": {
@@ -399,7 +399,7 @@
         "backend": "laya",
         "operation": "evaluate",
         "target": "test/fixtures/datalayer/checkout-complete.json",
-        "claim": "{\"backend\":\"laya\",\"input_digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"kind\":\"system1_decision\",\"rubric_digest\":\"958a7705e06f7889b023c14015f8347a51cf24dba58338f897799af4e80e9e84\",\"rubric_id\":\"RUB-S1-GTM-DATALAYER-PURCHASE\",\"rubric_version\":\"2.0.0\"}",
+        "claim": "{\"backend\":\"laya\",\"input_digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"kind\":\"system1_decision\",\"rubric_digest\":\"c45e2c248357424803a5ece41dd646d5c94faa0be85f15a84f5bbafa956f7f38\",\"rubric_id\":\"RUB-S1-GTM-DATALAYER-PURCHASE\",\"rubric_version\":\"2.0.1\"}",
         "args": [],
         "invocation": {
           "executable": "jev-gateway-run",
@@ -411,7 +411,7 @@
           ]
         }
       },
-      "evidence_digest": "f79b42bd40cffd7a48ae6fe74165f9c29422cee02525104df7a06b597f8ff901",
+      "evidence_digest": "3d6da9bf18fbfb312bdc3efd80928f9ef6cd50827020643e664ee8d180db3ac8",
       "authority": "diagnostic",
       "produced_by": {
         "role": "implementer",
@@ -436,7 +436,7 @@
         "backend": "laya",
         "operation": "evaluate",
         "target": "test/fixtures/datalayer/checkout-complete.json",
-        "claim": "{\"backend\":\"laya\",\"input_digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"kind\":\"system1_decision\",\"rubric_digest\":\"958a7705e06f7889b023c14015f8347a51cf24dba58338f897799af4e80e9e84\",\"rubric_id\":\"RUB-S1-GTM-DATALAYER-PURCHASE\",\"rubric_version\":\"2.0.0\"}",
+        "claim": "{\"backend\":\"laya\",\"input_digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"kind\":\"system1_decision\",\"rubric_digest\":\"c45e2c248357424803a5ece41dd646d5c94faa0be85f15a84f5bbafa956f7f38\",\"rubric_id\":\"RUB-S1-GTM-DATALAYER-PURCHASE\",\"rubric_version\":\"2.0.1\"}",
         "args": [],
         "invocation": {
           "executable": "jev-gateway-run",
@@ -448,7 +448,7 @@
           ]
         }
       },
-      "evidence_digest": "2be5a3f34c5503e62cde9996e7fe92479afe81679ef8fa4964ed46d629622448",
+      "evidence_digest": "b9bd2fe410563777208ee3945b5ba89b0bcbf57e3aece674f884f657b26cd228",
       "authority": "diagnostic",
       "produced_by": {
         "role": "implementer",
@@ -473,7 +473,7 @@
         "backend": "laya",
         "operation": "evaluate",
         "target": "test/fixtures/datalayer/checkout-complete.json",
-        "claim": "{\"backend\":\"laya\",\"input_digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"kind\":\"system1_decision\",\"rubric_digest\":\"958a7705e06f7889b023c14015f8347a51cf24dba58338f897799af4e80e9e84\",\"rubric_id\":\"RUB-S1-GTM-DATALAYER-PURCHASE\",\"rubric_version\":\"2.0.0\"}",
+        "claim": "{\"backend\":\"laya\",\"input_digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"kind\":\"system1_decision\",\"rubric_digest\":\"c45e2c248357424803a5ece41dd646d5c94faa0be85f15a84f5bbafa956f7f38\",\"rubric_id\":\"RUB-S1-GTM-DATALAYER-PURCHASE\",\"rubric_version\":\"2.0.1\"}",
         "args": [],
         "invocation": {
           "executable": "jev-gateway-run",
@@ -485,7 +485,7 @@
           ]
         }
       },
-      "evidence_digest": "53e7c776534e202576ba35c55915a4369877cb7e2734e936ae36d1d986308c50",
+      "evidence_digest": "f6fbcd85fe0aa4b9a7f83b95da759ce23d836e8acf32d1303de79263cacc0411",
       "authority": "diagnostic",
       "produced_by": {
         "role": "implementer",
