@@ -103,8 +103,8 @@ change is not an override.
 configuration. The shipped `profiles.json` is an empty valid catalog.
 `onboard-bearing` asks one setting at a time, including the
 planning-to-implementation clean-session boolean, with no preselected value.
-Declining Reverify persists `reverify.enabled: false`. A leftover
-`lineups.json` returns `MIGRATION_REQUIRED` and is never live data.
+Declining Jev or Laya persists `jev.enabled: false` or `laya.enabled: false`.
+A leftover `lineups.json` returns `MIGRATION_REQUIRED` and is never live data.
 
 When clean-session is enabled, the planning Orchestrator uses the packaged
 agnostic prompt skill to render a fresh Orchestrator implementation-start

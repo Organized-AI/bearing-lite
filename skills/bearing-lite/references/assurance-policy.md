@@ -9,9 +9,24 @@ session once, allows one aggregated repair, then uses deterministic closure
 without automatic rereview. `hooks/assurance-budget.cjs` is the exact
 runtime mirror of the block below; the block is authoritative.
 
+The `deterministic_verification` gate passes only when every required
+System One claim (`jev` or `laya`) has an independent assurance receipt that
+`hooks/verification.cjs` marks `gate_eligible`; see
+`references/system1-rubrics.md`. A `DECLARED` slot names the backend identity
+as `tool` (`jev`, `laya`, or `jev+laya` when claims use both) and
+`threshold: "all_required_claims_gate_eligible"`; with no eligible claim the
+slot is `NOT_APPLICABLE` with a reason. A declaration that still names the
+retired `reverify` gate fails closed at this slot
+(`retired_gate_name_declared`); no alias maps it to the new slot.
+
 ```json
 {
-  "gate_order": ["build", "types_lint", "red_then_green", "mutation", "changed_line_coverage", "reverify", "reviewer"],
+  "gate_order": ["build", "types_lint", "red_then_green", "mutation", "changed_line_coverage", "deterministic_verification", "reviewer"],
+  "deterministic_verification_gate": {
+    "tools": ["jev", "laya", "jev+laya"],
+    "threshold": "all_required_claims_gate_eligible",
+    "retired_gate_names": ["reverify"]
+  },
   "mixed_cadence_reviewer_consumption": "consume the most recent gate-chain receipt for the unit when no TE receipt exists at the boundary; the gate chain therefore runs at every Reviewer boundary",
   "budget_scope": "per_declared_cadence_unit",
   "cadence_values": ["slice", "phase", "lifecycle"],

@@ -35,7 +35,8 @@ the five artifacts, and generates `implementation.json` and
 5. Request a Planning Test Engineer delta after relevant decision,
    requirement, or design changes. Do not author V&V. Copy selected
    deterministic-verification backends from Planning Test Engineer;
-   never invent claims, methods, or Reverify selection.
+   never invent claims, methods, rubrics, or System One backend selection
+   (`jev` / `laya`).
 
 ## Return and recovery
 

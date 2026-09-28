@@ -346,25 +346,28 @@ describe("SEIT-BDL-004 deterministic verification adapter", () => {
     assert.equal(got.rereview, false);
   });
 
-  it("never downloads Reverify even when asked", () => {
-    let called = 0;
-    const got = adapter.evaluateVerification({
-      download: true,
-      install: true,
-      download_fn: () => {
-        called += 1;
-        return "downloaded";
-      },
-      request: request({ selected: true, required: true }),
-      candidate: { candidate_ref: "cand-1", candidate_revision: REV, candidate_digest: DIGEST },
-      author,
-      gate: "assurance",
-      backend: { name: "reverify", enabled: false, available: false },
-    });
-    assert.equal(called, 0);
-    assert.equal(got.download_attempted, false);
-    assert.equal(got.outcome, "ERROR");
-    assert.equal(got.reason, "backend_unavailable");
+  it("never downloads a backend even when asked", () => {
+    for (const name of ["reverify", "jev", "laya"]) {
+      let called = 0;
+      const got = adapter.evaluateVerification({
+        download: true,
+        install: true,
+        download_fn: () => {
+          called += 1;
+          return "downloaded";
+        },
+        request: request({ backend: name, selected: true, required: true }),
+        candidate: { candidate_ref: "cand-1", candidate_revision: REV, candidate_digest: DIGEST },
+        author,
+        gate: "assurance",
+        backend: { name, enabled: false, available: false },
+      });
+      assert.equal(called, 0, name);
+      assert.equal(got.download_attempted, false, name);
+      assert.equal(got.outcome, "ERROR", name);
+      assert.equal(got.reason, "backend_unavailable", name);
+      assert.equal(got.proceed, "halt", name);
+    }
   });
 
   it("receipt must bind command/configuration; mismatch is rejected", () => {

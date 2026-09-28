@@ -12,7 +12,7 @@ const { ASSURANCE_BUDGET_POLICY } = require(path.join(root, "hooks/policy.cjs"))
 const assurance = require(path.join(root, "hooks/assurance-budget.cjs"));
 const { evaluateVerification } = require(path.join(root, "hooks/verification.cjs"));
 const read = (file) => readFileSync(path.join(root, file), "utf8");
-const ORDER = ["build", "types_lint", "red_then_green", "mutation", "changed_line_coverage", "reverify", "reviewer"];
+const ORDER = ["build", "types_lint", "red_then_green", "mutation", "changed_line_coverage", "deterministic_verification", "reviewer"];
 
 // The evaluator is deliberately absent at baseline. Each case fails at this
 // assertion instead of crashing the file, and will exercise the real export in S5.
@@ -195,4 +195,73 @@ test("W2-F3 red-then-green rejects duplicate candidate ids replacing a baseline 
   } });
   assert.equal(got.outcome, "NEEDS_MORE_EVIDENCE");
   assert.equal(got.failed_gate, "red_then_green");
+});
+
+const systemOne = { status: "DECLARED", tool: "laya", threshold: "all_required_claims_gate_eligible" };
+const claim = (extra = {}) => ({ claim_id: "SEIT-S1-001", backend: "laya", required: true, gate_eligible: true, ...extra });
+const dvResult = (claims) => ({ tool_available: true, outcome: "PASS", claims });
+
+test("System One: gate_order holds deterministic_verification in the seventh slot", () => {
+  assert.equal(ASSURANCE_BUDGET_POLICY.gate_order[5], "deterministic_verification");
+  assert.equal(ASSURANCE_BUDGET_POLICY.gate_order.includes("reverify"), false);
+  assert.deepStrictEqual(ASSURANCE_BUDGET_POLICY.deterministic_verification_gate, {
+    tools: ["jev", "laya", "jev+laya"],
+    threshold: "all_required_claims_gate_eligible",
+    retired_gate_names: ["reverify"],
+  });
+  const got = evaluate(declarations({ deterministic_verification: systemOne }), {
+    deterministic_verification: dvResult([claim(), claim({ claim_id: "SEIT-S1-002", required: false, gate_eligible: false })]),
+  });
+  assert.equal(got.outcome, "PASS");
+  assert.deepStrictEqual(got.gates.map(({ gate }) => gate), ORDER);
+  const both = evaluate(declarations({ deterministic_verification: { ...systemOne, tool: "jev+laya" } }), {
+    deterministic_verification: dvResult([claim(), claim({ claim_id: "SEIT-S1-003", backend: "jev" })]),
+  });
+  assert.equal(both.outcome, "PASS");
+});
+
+test("System One: a frozen plan still declaring reverify fails closed at the slot, no alias", () => {
+  const legacy = declarations();
+  delete legacy.deterministic_verification;
+  legacy.reverify = { status: "DECLARED", tool: "reverify", threshold: 1 };
+  const got = evaluate(legacy, { reverify: passing, deterministic_verification: passing });
+  assert.equal(got.outcome, "NEEDS_MORE_EVIDENCE");
+  assert.equal(got.failed_gate, "deterministic_verification");
+  assert.equal(got.reason, "retired_gate_name_declared");
+  // A leftover reverify key beside the new slot is still ambiguous: fail closed.
+  const mixed = evaluate({ ...declarations(), reverify: skipped });
+  assert.equal(mixed.outcome, "NEEDS_MORE_EVIDENCE");
+  assert.equal(mixed.reason, "retired_gate_name_declared");
+  // reverify is not a System One tool identity inside the new slot either.
+  const renamed = evaluate(declarations({ deterministic_verification: { ...systemOne, tool: "reverify" } }), {
+    deterministic_verification: dvResult([claim({ backend: "reverify" })]),
+  });
+  assert.equal(renamed.failed_gate, "deterministic_verification");
+  assert.equal(renamed.reason, "backend_identity_undeclared");
+});
+
+test("System One: slot passes only when every required claim is gate_eligible", () => {
+  const run = (claims, declaration = systemOne) => evaluate(
+    declarations({ deterministic_verification: declaration }),
+    { deterministic_verification: dvResult(claims) },
+  );
+  const cases = [
+    [[claim({ gate_eligible: false })], "required_claim_not_gate_eligible"],
+    [[claim(), claim({ claim_id: "SEIT-S1-002", gate_eligible: false })], "required_claim_not_gate_eligible"],
+    [[], "required_claim_missing"],
+    [[claim({ required: false })], "required_claim_missing"],
+    [[claim({ backend: "jev" })], "claim_backend_undeclared"],
+  ];
+  for (const [claims, reason] of cases) {
+    const got = run(claims);
+    assert.equal(got.outcome, "NEEDS_MORE_EVIDENCE", reason);
+    assert.equal(got.failed_gate, "deterministic_verification");
+    assert.equal(got.reason, reason);
+  }
+  const loose = run([claim()], { ...systemOne, threshold: 0.9 });
+  assert.equal(loose.reason, "threshold_not_policy");
+  const na = evaluate(declarations({
+    deterministic_verification: { status: "NOT_APPLICABLE", reason: "no claim passes the System One eligibility test" },
+  }));
+  assert.equal(na.outcome, "PASS");
 });

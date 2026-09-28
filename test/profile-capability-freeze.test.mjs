@@ -115,6 +115,28 @@ describe("freezeSelectedRoutes capability preservation (#114)", () => {
     );
   });
 
+  it("deep-copies System One (jev, laya) capability into snapshot and isolates from subsequent mutation", () => {
+    const profile = baseProfile();
+    profile.deterministic_verification = {
+      laya: { enabled: true, default_checkpoint: "laya" },
+      jev: { enabled: false },
+    };
+
+    const frozen = profilesHook.freezeSelectedRoutes({ profile });
+
+    assert.ok(frozen.snapshot, "snapshot must exist");
+    assert.deepEqual(frozen.snapshot.deterministic_verification, {
+      laya: { enabled: true, default_checkpoint: "laya" },
+      jev: { enabled: false },
+    });
+
+    profile.deterministic_verification.laya.default_checkpoint = "laya-multilingual";
+    profile.deterministic_verification.jev.enabled = true;
+
+    assert.equal(frozen.snapshot.deterministic_verification.laya.default_checkpoint, "laya");
+    assert.equal(frozen.snapshot.deterministic_verification.jev.enabled, false);
+  });
+
   it("capability selection changes the configuration digest", () => {
     const baseline = baseProfile();
     const frozenBaseline = profilesHook.freezeSelectedRoutes({ profile: baseline });

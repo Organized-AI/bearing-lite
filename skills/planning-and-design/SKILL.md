@@ -31,7 +31,7 @@ Fresh planning node. If you are the Orchestrator, dispatch this; do not execute 
    `NEEDS_OWNER_DECISION` when register authority is unclear.
 2. Author and prospectively check, in dependency order, the testable
    technical-plan, `design.md`, and `seit.json`. Preserve IDs, do not drop
-   Lifecycle-level proof or published-standard clause coverage, and select Reverify only on applicable binary-level SEIT claims.
+   Lifecycle-level proof or published-standard clause coverage, and select a System One backend (`jev` or `laya`) only on SEIT claims that pass the eligibility test in `bearing-lite/references/system1-rubrics.md`, each bound to one frozen rubric.
 3. Map the implementation graph and propose development strategy
    (`single_implementer` default or `tdd`), role states, profile, reasoning, and
    cadence. Bind the one planning-review slot to owner-supplied

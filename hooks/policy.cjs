@@ -29,9 +29,14 @@ const ASSURANCE_BUDGET_POLICY = Object.freeze({
     "red_then_green",
     "mutation",
     "changed_line_coverage",
-    "reverify",
+    "deterministic_verification",
     "reviewer",
   ],
+  deterministic_verification_gate: {
+    tools: ["jev", "laya", "jev+laya"],
+    threshold: "all_required_claims_gate_eligible",
+    retired_gate_names: ["reverify"],
+  },
   mixed_cadence_reviewer_consumption:
     "consume the most recent gate-chain receipt for the unit when no TE receipt exists at the boundary; the gate chain therefore runs at every Reviewer boundary",
   budget_scope: "per_declared_cadence_unit",

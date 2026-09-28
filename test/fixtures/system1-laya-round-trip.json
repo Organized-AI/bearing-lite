@@ -1,0 +1,501 @@
+{
+  "description": "Laya System One round trip: spec planned from a frozen example rubric, backend outputs as schemas/system1.schema.json backend_output, and the receipts sealVerification emits for them. test/verification-bridge.test.mjs reseals the outputs and must reproduce these receipts; test/schema-validation.py validates outputs and receipts against their schemas.",
+  "rubric_path": "skills/bearing-lite/references/system1-rubrics/laya-gtm-datalayer-event.rubric.json",
+  "spec": {
+    "backend": "laya",
+    "backend_operation": "evaluate",
+    "backend_operations": {
+      "allowed": [
+        "evaluate"
+      ],
+      "denied": [
+        "generate",
+        "propose",
+        "propose_claims",
+        "propose_options",
+        "suggest_options",
+        "rewrite",
+        "rewrite_claim",
+        "rewrite_options",
+        "explain",
+        "complete",
+        "chat",
+        "review"
+      ]
+    },
+    "invocation": {
+      "executable": "jev-gateway-run",
+      "argv_template": [
+        "{operation}",
+        "{target}",
+        "--claim",
+        "{claim}"
+      ]
+    },
+    "claim_id": "SEIT-S1-GTM-001",
+    "claim_type": "tracking_event_conformance",
+    "claim": {
+      "kind": "system1_decision",
+      "backend": "laya",
+      "rubric_id": "RUB-S1-GTM-DATALAYER-PURCHASE",
+      "rubric_version": "1.0.0",
+      "rubric_digest": "f74e21bca85e3177261c644031cdc910e348de96d10301f0142790a91a8b2632",
+      "input_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    },
+    "target": "test/fixtures/datalayer/checkout-complete.json",
+    "candidate": {
+      "candidate_ref": "cand-s1",
+      "candidate_revision": "b5cec79f04f6f6ea506a2ad89bf937aab143d876",
+      "candidate_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "stage": "assurance",
+    "authority": "assurance",
+    "expected_result": "VERIFIED",
+    "selected": true,
+    "required": true
+  },
+  "produced_by": {
+    "role": "test_engineer.assurance",
+    "identity": "ate-s1",
+    "session": "sess-ate-s1"
+  },
+  "request": {
+    "schema_version": "1",
+    "kind": "request",
+    "candidate_ref": "cand-s1",
+    "candidate_revision": "b5cec79f04f6f6ea506a2ad89bf937aab143d876",
+    "candidate_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "claim_id": "SEIT-S1-GTM-001",
+    "claim_type": "tracking_event_conformance",
+    "backend": "laya",
+    "stage": "assurance",
+    "authority": "assurance",
+    "expected_result": "VERIFIED",
+    "command_configuration": {
+      "backend": "laya",
+      "operation": "evaluate",
+      "target": "test/fixtures/datalayer/checkout-complete.json",
+      "claim": "{\"backend\":\"laya\",\"input_digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"kind\":\"system1_decision\",\"rubric_digest\":\"f74e21bca85e3177261c644031cdc910e348de96d10301f0142790a91a8b2632\",\"rubric_id\":\"RUB-S1-GTM-DATALAYER-PURCHASE\",\"rubric_version\":\"1.0.0\"}",
+      "args": [],
+      "invocation": {
+        "executable": "jev-gateway-run",
+        "argv_template": [
+          "{operation}",
+          "{target}",
+          "--claim",
+          "{claim}"
+        ]
+      }
+    },
+    "selected": true,
+    "required": true
+  },
+  "outputs": {
+    "verified": {
+      "schema_family": "system1",
+      "schema_version": "1",
+      "backend": "laya",
+      "backend_version": "laya 0.3.21 convaiinnovations/laya@55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851 laya",
+      "results": [
+        {
+          "claim_id": "SEIT-S1-GTM-001",
+          "kind": "system1_decision",
+          "verdict": "VERIFIED",
+          "detail": "purchase push conforms",
+          "evidence": {
+            "strength": "observed",
+            "engine": "laya",
+            "engine_version": "0.3.21",
+            "rubric": {
+              "rubric_id": "RUB-S1-GTM-DATALAYER-PURCHASE",
+              "rubric_version": "1.0.0",
+              "rubric_digest": "f74e21bca85e3177261c644031cdc910e348de96d10301f0142790a91a8b2632",
+              "question_digest": "d67cbccffc2ec6eaece32e6aef5adcd5b656f757f73730b8ffab491aed395a96"
+            },
+            "model": {
+              "model_id": "convaiinnovations/laya",
+              "revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+              "checkpoint": "laya",
+              "selection": "pinned",
+              "calibration_temperature": 1
+            },
+            "question_type": "noul",
+            "input": {
+              "target": "test/fixtures/datalayer/checkout-complete.json",
+              "canonicalization": "rfc8785_jcs",
+              "input_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "token_count": 180,
+              "token_limit": 320,
+              "truncated": false
+            },
+            "controls": [
+              {
+                "control_id": "CTL-GTM-PURCHASE-VALID",
+                "expected": "VERIFIED",
+                "observed": "VERIFIED"
+              },
+              {
+                "control_id": "CTL-GTM-PURCHASE-NO-CURRENCY",
+                "expected": "REFUTED",
+                "observed": "REFUTED"
+              }
+            ],
+            "runs": [
+              {
+                "run_index": 1,
+                "answer": "yes",
+                "option_probabilities": {
+                  "yes": 0.9731,
+                  "no": 0.0269
+                },
+                "thresholded_probability": 0.9731,
+                "run_status": "VERIFIED",
+                "cache": "MISS",
+                "fresh_process": false,
+                "gateway_request_id": "req-1",
+                "gateway_log_id": "log-1",
+                "served_model_revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+                "served_checkpoint": "laya"
+              },
+              {
+                "run_index": 2,
+                "answer": "yes",
+                "option_probabilities": {
+                  "yes": 0.9731,
+                  "no": 0.0269
+                },
+                "thresholded_probability": 0.9731,
+                "run_status": "VERIFIED",
+                "cache": "BYPASS",
+                "fresh_process": true,
+                "gateway_request_id": "req-2",
+                "gateway_log_id": "log-2",
+                "served_model_revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+                "served_checkpoint": "laya"
+              }
+            ],
+            "replay": {
+              "runs": 2,
+              "identical_answer": true,
+              "identical_status": true,
+              "max_probability_delta": 0,
+              "probability_epsilon": 0.000001,
+              "freshness_met": true
+            },
+            "decision": {
+              "answer": "yes",
+              "thresholded_probability": 0.9731,
+              "verify_threshold": 0.9,
+              "refute_threshold": 0.9,
+              "mapped_status": "VERIFIED"
+            }
+          }
+        }
+      ]
+    },
+    "replay_divergence": {
+      "schema_family": "system1",
+      "schema_version": "1",
+      "backend": "laya",
+      "backend_version": "laya 0.3.21 convaiinnovations/laya@55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851 laya",
+      "results": [
+        {
+          "claim_id": "SEIT-S1-GTM-001",
+          "kind": "system1_decision",
+          "verdict": "INCONCLUSIVE",
+          "detail": "not decided",
+          "evidence": {
+            "strength": "observed",
+            "engine": "laya",
+            "engine_version": "0.3.21",
+            "rubric": {
+              "rubric_id": "RUB-S1-GTM-DATALAYER-PURCHASE",
+              "rubric_version": "1.0.0",
+              "rubric_digest": "f74e21bca85e3177261c644031cdc910e348de96d10301f0142790a91a8b2632",
+              "question_digest": "d67cbccffc2ec6eaece32e6aef5adcd5b656f757f73730b8ffab491aed395a96"
+            },
+            "model": {
+              "model_id": "convaiinnovations/laya",
+              "revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+              "checkpoint": "laya",
+              "selection": "pinned",
+              "calibration_temperature": 1
+            },
+            "question_type": "noul",
+            "input": {
+              "target": "test/fixtures/datalayer/checkout-complete.json",
+              "canonicalization": "rfc8785_jcs",
+              "input_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "token_count": 180,
+              "token_limit": 320,
+              "truncated": false
+            },
+            "controls": [
+              {
+                "control_id": "CTL-GTM-PURCHASE-VALID",
+                "expected": "VERIFIED",
+                "observed": "VERIFIED"
+              },
+              {
+                "control_id": "CTL-GTM-PURCHASE-NO-CURRENCY",
+                "expected": "REFUTED",
+                "observed": "REFUTED"
+              }
+            ],
+            "runs": [
+              {
+                "run_index": 1,
+                "answer": "yes",
+                "option_probabilities": {
+                  "yes": 0.9731,
+                  "no": 0.0269
+                },
+                "thresholded_probability": 0.9731,
+                "run_status": "VERIFIED",
+                "cache": "MISS",
+                "fresh_process": false,
+                "gateway_request_id": "req-1",
+                "gateway_log_id": "log-1",
+                "served_model_revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+                "served_checkpoint": "laya"
+              },
+              {
+                "run_index": 2,
+                "answer": "yes",
+                "option_probabilities": {
+                  "yes": 0.9412,
+                  "no": 0.0588
+                },
+                "thresholded_probability": 0.9412,
+                "run_status": "VERIFIED",
+                "cache": "BYPASS",
+                "fresh_process": true,
+                "gateway_request_id": "req-2",
+                "gateway_log_id": "log-2",
+                "served_model_revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+                "served_checkpoint": "laya"
+              }
+            ],
+            "replay": {
+              "runs": 2,
+              "identical_answer": true,
+              "identical_status": true,
+              "max_probability_delta": 0.0319,
+              "probability_epsilon": 0.000001,
+              "freshness_met": true
+            },
+            "decision": {
+              "answer": "yes",
+              "thresholded_probability": 0.9731,
+              "verify_threshold": 0.9,
+              "refute_threshold": 0.9,
+              "mapped_status": "INCONCLUSIVE"
+            }
+          },
+          "reason": "replay_probability_divergence"
+        }
+      ]
+    },
+    "derived": {
+      "schema_family": "system1",
+      "schema_version": "1",
+      "backend": "laya",
+      "backend_version": "laya 0.3.21 convaiinnovations/laya@55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851 laya",
+      "results": [
+        {
+          "claim_id": "SEIT-S1-GTM-001",
+          "kind": "system1_decision",
+          "verdict": "INCONCLUSIVE",
+          "detail": "not decided",
+          "evidence": {
+            "strength": "DERIVED from gateway log after client timeout",
+            "engine": "laya",
+            "engine_version": "0.3.21",
+            "rubric": {
+              "rubric_id": "RUB-S1-GTM-DATALAYER-PURCHASE",
+              "rubric_version": "1.0.0",
+              "rubric_digest": "f74e21bca85e3177261c644031cdc910e348de96d10301f0142790a91a8b2632",
+              "question_digest": "d67cbccffc2ec6eaece32e6aef5adcd5b656f757f73730b8ffab491aed395a96"
+            },
+            "model": {
+              "model_id": "convaiinnovations/laya",
+              "revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+              "checkpoint": "laya",
+              "selection": "pinned",
+              "calibration_temperature": 1
+            },
+            "question_type": "noul",
+            "input": {
+              "target": "test/fixtures/datalayer/checkout-complete.json",
+              "canonicalization": "rfc8785_jcs",
+              "input_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "token_count": 180,
+              "token_limit": 320,
+              "truncated": false
+            },
+            "controls": [
+              {
+                "control_id": "CTL-GTM-PURCHASE-VALID",
+                "expected": "VERIFIED",
+                "observed": "VERIFIED"
+              },
+              {
+                "control_id": "CTL-GTM-PURCHASE-NO-CURRENCY",
+                "expected": "REFUTED",
+                "observed": "REFUTED"
+              }
+            ],
+            "runs": [
+              {
+                "run_index": 1,
+                "answer": "yes",
+                "option_probabilities": {
+                  "yes": 0.9731,
+                  "no": 0.0269
+                },
+                "thresholded_probability": 0.9731,
+                "run_status": "VERIFIED",
+                "cache": "MISS",
+                "fresh_process": false,
+                "gateway_request_id": "req-1",
+                "gateway_log_id": "log-1",
+                "served_model_revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+                "served_checkpoint": "laya"
+              }
+            ],
+            "replay": {
+              "runs": 1,
+              "identical_answer": true,
+              "identical_status": true,
+              "max_probability_delta": 0,
+              "probability_epsilon": 0.000001,
+              "freshness_met": true
+            },
+            "decision": {
+              "answer": "yes",
+              "thresholded_probability": 0.9731,
+              "verify_threshold": 0.9,
+              "refute_threshold": 0.9,
+              "mapped_status": "INCONCLUSIVE"
+            }
+          },
+          "reason": "verdict_recovered_not_read"
+        }
+      ]
+    }
+  },
+  "receipts": {
+    "verified": {
+      "schema_version": "1",
+      "kind": "receipt",
+      "status": "VERIFIED",
+      "candidate_ref": "cand-s1",
+      "candidate_revision": "b5cec79f04f6f6ea506a2ad89bf937aab143d876",
+      "candidate_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "claim_id": "SEIT-S1-GTM-001",
+      "backend": "laya",
+      "backend_version": "laya 0.3.21 convaiinnovations/laya@55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851 laya",
+      "command_configuration": {
+        "backend": "laya",
+        "operation": "evaluate",
+        "target": "test/fixtures/datalayer/checkout-complete.json",
+        "claim": "{\"backend\":\"laya\",\"input_digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"kind\":\"system1_decision\",\"rubric_digest\":\"f74e21bca85e3177261c644031cdc910e348de96d10301f0142790a91a8b2632\",\"rubric_id\":\"RUB-S1-GTM-DATALAYER-PURCHASE\",\"rubric_version\":\"1.0.0\"}",
+        "args": [],
+        "invocation": {
+          "executable": "jev-gateway-run",
+          "argv_template": [
+            "{operation}",
+            "{target}",
+            "--claim",
+            "{claim}"
+          ]
+        }
+      },
+      "evidence_digest": "bea25cd07366c9debb724c1086c8b71338557f3381ba697ed80b1570b0c9344c",
+      "authority": "assurance",
+      "produced_by": {
+        "role": "test_engineer.assurance",
+        "identity": "ate-s1",
+        "session": "sess-ate-s1"
+      },
+      "stage": "assurance",
+      "evidence_tier": "observed",
+      "backend_verdict": "VERIFIED"
+    },
+    "replay_divergence": {
+      "schema_version": "1",
+      "kind": "receipt",
+      "status": "INCONCLUSIVE",
+      "candidate_ref": "cand-s1",
+      "candidate_revision": "b5cec79f04f6f6ea506a2ad89bf937aab143d876",
+      "candidate_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "claim_id": "SEIT-S1-GTM-001",
+      "backend": "laya",
+      "backend_version": "laya 0.3.21 convaiinnovations/laya@55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851 laya",
+      "command_configuration": {
+        "backend": "laya",
+        "operation": "evaluate",
+        "target": "test/fixtures/datalayer/checkout-complete.json",
+        "claim": "{\"backend\":\"laya\",\"input_digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"kind\":\"system1_decision\",\"rubric_digest\":\"f74e21bca85e3177261c644031cdc910e348de96d10301f0142790a91a8b2632\",\"rubric_id\":\"RUB-S1-GTM-DATALAYER-PURCHASE\",\"rubric_version\":\"1.0.0\"}",
+        "args": [],
+        "invocation": {
+          "executable": "jev-gateway-run",
+          "argv_template": [
+            "{operation}",
+            "{target}",
+            "--claim",
+            "{claim}"
+          ]
+        }
+      },
+      "evidence_digest": "2fef0d7f43765560ad27da6ef3e45491d3f313865e28857178bbc19d078351b4",
+      "authority": "assurance",
+      "produced_by": {
+        "role": "test_engineer.assurance",
+        "identity": "ate-s1",
+        "session": "sess-ate-s1"
+      },
+      "stage": "assurance",
+      "evidence_tier": "observed",
+      "backend_verdict": "INCONCLUSIVE"
+    },
+    "derived": {
+      "schema_version": "1",
+      "kind": "receipt",
+      "status": "INCONCLUSIVE",
+      "candidate_ref": "cand-s1",
+      "candidate_revision": "b5cec79f04f6f6ea506a2ad89bf937aab143d876",
+      "candidate_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "claim_id": "SEIT-S1-GTM-001",
+      "backend": "laya",
+      "backend_version": "laya 0.3.21 convaiinnovations/laya@55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851 laya",
+      "command_configuration": {
+        "backend": "laya",
+        "operation": "evaluate",
+        "target": "test/fixtures/datalayer/checkout-complete.json",
+        "claim": "{\"backend\":\"laya\",\"input_digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"kind\":\"system1_decision\",\"rubric_digest\":\"f74e21bca85e3177261c644031cdc910e348de96d10301f0142790a91a8b2632\",\"rubric_id\":\"RUB-S1-GTM-DATALAYER-PURCHASE\",\"rubric_version\":\"1.0.0\"}",
+        "args": [],
+        "invocation": {
+          "executable": "jev-gateway-run",
+          "argv_template": [
+            "{operation}",
+            "{target}",
+            "--claim",
+            "{claim}"
+          ]
+        }
+      },
+      "evidence_digest": "3d12381ae34de7fbfbad01d0e2127403b26dd4d6ef9cc2172d451f7663bd2499",
+      "authority": "assurance",
+      "produced_by": {
+        "role": "test_engineer.assurance",
+        "identity": "ate-s1",
+        "session": "sess-ate-s1"
+      },
+      "stage": "assurance",
+      "evidence_tier": "derived",
+      "backend_verdict": "INCONCLUSIVE",
+      "evidence_engine": "laya 0.3.21"
+    }
+  }
+}

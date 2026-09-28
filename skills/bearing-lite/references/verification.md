@@ -5,8 +5,8 @@ Decision source: `DEC-BDL-036`, `DEC-BDL-037`, `DEC-BDL-053`, `DES-BDL-008`,
 
 `hooks/verification.cjs` is the exact runtime evaluator of this contract. It
 declares no hook class and registers no host event. A backend is never a role.
-Reverify is optional profile configuration; this adapter never downloads or
-installs it.
+System One backends are optional profile configuration; this adapter
+never downloads, installs, or calls them.
 
 A **request** binds candidate, claim, backend, stage, authority, expected
 result, and command/configuration, plus whether the backend is `selected` or
@@ -35,12 +35,18 @@ typed gap (`ERROR` / `backend_unavailable`), not success and not invented
 behavior. Required unavailability emits `proceed: "halt"`; enabled-only
 unavailability emits `proceed: "proceed-with-note"`. Only unselected AND unrequired absence stays inactive and is not a
 global failure. Assurance packets consume frozen `deterministic_verification`
-from the Lifecycle snapshot, never the live catalog. Reverify identity stays
-`reverify`; a generic backend name must not stand in for an absent binding.
-Profile `reverify.enabled` records user configuration;
-availability does not select Reverify for every task. Planning Test Engineer
-selects it on an applicable binary-level SEIT claim; Plan Integrator copies
-that selection and must not invent V&V.
+from the Lifecycle snapshot, never the live catalog. Backend identity is `jev`
+or `laya` and stays that name in every request, receipt, and gate declaration.
+`jev` and `laya` are distinct identities: a generic name such as `system1` must
+not stand in for an absent binding, and one backend never substitutes for the
+other inside an assurance receipt; switching backend is a new rubric, a new
+binding, and a plan amendment, never a fallback. Profile `jev.enabled` and
+`laya.enabled` record user configuration; availability does not select a
+backend for any task. The Planning Test Engineer selects one only on a SEIT
+claim that passes the eligibility test in `references/system1-rubrics.md` and
+binds it to one frozen rubric (id, version, digest). Plan Integrator copies that
+selection and must not invent V&V. `reverify` is a legacy identity: it may not
+be enabled together with `jev` or `laya`.
 
 ## Gates
 
@@ -89,6 +95,15 @@ Three refusals carry the contract:
   parse returns `claim_malformed` with the backend's own detail, and no
   receipt. Sealing it as `INCONCLUSIVE` would read as "not proven" and quietly
   weaken the gate.
+
+For `jev` and `laya`, the backend output follows `schemas/system1.schema.json`
+`backend_output`: one result whose `verdict` is mechanically derived from the
+frozen rubric (thresholds, calibration, replay), and whose evidence records
+rubric digest, model revision, checkpoint, gateway request and log ids, and
+every replay run. A verdict reconstructed rather than read (for example from a
+gateway log after a timeout) is marked `DERIVED` and seals INCONCLUSIVE.
+Rubrics, thresholds, and the gate slot are defined in
+`references/system1-rubrics.md`.
 
 These refusals are stated in engineering terms. An adopting project maps them
 to whatever assurance standard it follows.

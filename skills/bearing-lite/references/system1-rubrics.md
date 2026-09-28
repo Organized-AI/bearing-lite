@@ -196,9 +196,11 @@ in for a different binding, which `verification.md` forbids. Keeping position
 means deterministic evidence is complete before Reviewer consumes the gate-chain
 receipt. The slot passes only when every required claim's receipt is
 `gate_eligible` under `hooks/verification.cjs`; with no eligible claim it is
-declared `NOT_APPLICABLE` with a reason. This rename is a proposal until
-`hooks/policy.cjs` and the `assurance-policy.md` block change together
-(`docs/proposals/system1-backend.md`).
+declared `NOT_APPLICABLE` with a reason. `hooks/policy.cjs` and the
+`assurance-policy.md` block carry the rename together
+(`docs/proposals/system1-backend.md`, applied), and `evaluateGateChain`
+fails a declaration that still names `reverify` closed at this slot
+(`retired_gate_name_declared`).
 
 ## 9. What Reviewer may and may not request
 

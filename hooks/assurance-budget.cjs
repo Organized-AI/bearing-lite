@@ -197,17 +197,21 @@ const sameTestIds = (a, b) => {
  * (NEEDS_MORE_EVIDENCE), never PASS; undeclared gates fail closed unless
  * NOT_APPLICABLE with a reason; the red-then-green gate needs a receipt
  * holding both the baseline failing run and the candidate passing run over
- * the same test ids.
+ * the same test ids. The deterministic_verification gate needs a declared
+ * System One backend identity and the policy threshold, and passes only when
+ * every required claim was judged gate_eligible; a retired gate name (for
+ * example `reverify`) fails closed at that slot and is never aliased.
  *
  * @param {{ gate_declarations?: object, results?: object }} input
- * @returns {{ outcome: string, failed_gate?: string, gates: Array<{ gate: string, outcome: string }> }}
+ * @returns {{ outcome: string, failed_gate?: string, reason?: string, gates: Array<{ gate: string, outcome: string }> }}
  */
 function evaluateGateChain(input) {
   const gates = [];
-  const fail = (gate, outcome) => {
+  const fail = (gate, outcome, reason) => {
     gates.push({ gate, outcome });
-    return { outcome, failed_gate: gate, gates };
+    return reason ? { outcome, failed_gate: gate, reason, gates } : { outcome, failed_gate: gate, gates };
   };
+  const dv = POLICY.deterministic_verification_gate;
   try {
     if (!isPlainObject(input)) {
       return { outcome: "NEEDS_MORE_EVIDENCE", failed_gate: POLICY.gate_order[0], gates };
@@ -216,6 +220,12 @@ function evaluateGateChain(input) {
     const results = isPlainObject(input.results) ? input.results : {};
     for (const gate of POLICY.gate_order) {
       const declaration = declarations[gate];
+      if (
+        gate === "deterministic_verification" &&
+        dv.retired_gate_names.some((name) => Object.hasOwn(declarations, name))
+      ) {
+        return fail(gate, "NEEDS_MORE_EVIDENCE", "retired_gate_name_declared");
+      }
       if (!isPlainObject(declaration)) {
         return fail(gate, "NEEDS_MORE_EVIDENCE");
       }
@@ -228,6 +238,14 @@ function evaluateGateChain(input) {
       }
       if (declaration.status !== "DECLARED" || !declaration.tool || !declaration.threshold) {
         return fail(gate, "NEEDS_MORE_EVIDENCE");
+      }
+      if (gate === "deterministic_verification") {
+        if (!dv.tools.includes(declaration.tool)) {
+          return fail(gate, "NEEDS_MORE_EVIDENCE", "backend_identity_undeclared");
+        }
+        if (declaration.threshold !== dv.threshold) {
+          return fail(gate, "NEEDS_MORE_EVIDENCE", "threshold_not_policy");
+        }
       }
       const result = results[gate];
       if (!isPlainObject(result)) {
@@ -256,6 +274,23 @@ function evaluateGateChain(input) {
       }
       if (result.outcome === "FAIL") {
         return fail(gate, "FAIL");
+      }
+      if (gate === "deterministic_verification") {
+        // Each entry is one claim's evaluateVerification judgement. The slot
+        // passes only when every required claim was gate_eligible under the
+        // backend the declaration names; one backend never covers another.
+        const backends = declaration.tool.split("+");
+        const claims = Array.isArray(result.claims) ? result.claims : [];
+        const required = claims.filter((claim) => isPlainObject(claim) && claim.required === true);
+        if (!required.length) {
+          return fail(gate, "NEEDS_MORE_EVIDENCE", "required_claim_missing");
+        }
+        if (!required.every((claim) => backends.includes(claim.backend))) {
+          return fail(gate, "NEEDS_MORE_EVIDENCE", "claim_backend_undeclared");
+        }
+        if (!required.every((claim) => claim.gate_eligible === true)) {
+          return fail(gate, "NEEDS_MORE_EVIDENCE", "required_claim_not_gate_eligible");
+        }
       }
       if (
         typeof result.score === "number" &&

@@ -3,7 +3,7 @@
 /**
  * Deterministic verification adapter (DES-BDL-008 / AC-BDL-009 / SEIT-BDL-004).
  * Pure evaluator: no HOOK_CLASS, no host event, no download, no role dispatch.
- * Reverify is one optional backend; availability never selects it for a task.
+ * Backends (`jev`, `laya`) are optional; availability never selects one for a task.
  */
 
 const STATUSES = Object.freeze(["VERIFIED", "REFUTED", "INCONCLUSIVE", "ERROR"]);
@@ -168,7 +168,7 @@ function evaluateVerification(input) {
     if (!isPlainObject(input)) {
       return result("NEEDS_MORE_EVIDENCE", "verification_request_missing");
     }
-    // Reverify/download is never performed here. A caller hint is ignored.
+    // Backend download or invocation is never performed here. A caller hint is ignored.
     if (input.download === true || input.install === true || typeof input.download_fn === "function") {
       // Fall through without invoking anything.
     }

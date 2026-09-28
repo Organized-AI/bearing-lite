@@ -171,6 +171,9 @@ FORBIDDEN_AUTHORITY_ALIASES = ("granting_owner_decision", "expiry")
 FORBIDDEN_PROOF_ALIASES = ("evidence", "pass_fail")
 
 PROFILES_SCHEMA_NAME = "profiles.schema.json"
+SYSTEM1_SCHEMA_NAME = "system1.schema.json"
+SYSTEM1_RUBRICS_DIR = ROOT / "skills" / "bearing-lite" / "references" / "system1-rubrics"
+SYSTEM1_ROUND_TRIP_PATH = ROOT / "test" / "fixtures" / "system1-laya-round-trip.json"
 VERIFICATION_SCHEMA_NAME = "verification.schema.json"
 VERIFICATION_MISSING_SCHEMA = f"missing schemas/{VERIFICATION_SCHEMA_NAME}"
 VERIFICATION_REQUEST_FIELDS = (
@@ -794,6 +797,12 @@ def review_unknown_key() -> dict:
     return doc
 
 
+def with_deterministic_verification(section: dict) -> dict:
+    doc = complete_user_catalog()
+    doc["profiles"]["fixture-alpha"]["deterministic_verification"] = copy.deepcopy(section)
+    return doc
+
+
 def complete_profile() -> dict:
     return copy.deepcopy(complete_user_catalog()["profiles"]["fixture-alpha"])
 
@@ -1349,6 +1358,24 @@ def profiles_cases() -> list[tuple[str, str, object, str, str | None]]:
         ("SEIT-BDL-002", "review_coverage_assist_disabled_accepted", with_review_capability(False, False), "accept", None),
         ("SEIT-BDL-002", "review_capability_without_enabled_rejected", review_missing_enabled(), "reject", None),
         ("SEIT-BDL-002", "unknown_review_capability_rejected", review_unknown_key(), "reject", None),
+        ("SEIT-BDL-004", "system1_laya_and_jev_enabled_with_reverify_disabled_accepted", with_deterministic_verification({
+            "reverify": {"enabled": False},
+            "laya": {"enabled": True, "default_checkpoint": "laya"},
+            "jev": {"enabled": True},
+        }), "accept", None),
+        ("SEIT-BDL-004", "system1_reverify_enabled_with_laya_rejected", with_deterministic_verification({
+            "reverify": {"enabled": True},
+            "laya": {"enabled": True},
+        }), "reject", None),
+        ("SEIT-BDL-004", "system1_reverify_enabled_with_jev_rejected", with_deterministic_verification({
+            "reverify": {"enabled": True},
+            "jev": {"enabled": True},
+        }), "reject", None),
+        ("SEIT-BDL-004", "system1_reverify_enabled_with_both_disabled_accepted", with_deterministic_verification({
+            "reverify": {"enabled": True},
+            "laya": {"enabled": False},
+            "jev": {"enabled": False},
+        }), "accept", None),
     ])
     return out
 
@@ -1441,6 +1468,45 @@ def verification_cases() -> list[tuple[str, str, object, str]]:
             omit(complete_verification_receipt(), field),
             "reject",
         ))
+    return out
+
+
+def load_system1_round_trip() -> dict:
+    with SYSTEM1_ROUND_TRIP_PATH.open(encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def system1_cases() -> list[tuple[str, str, str, object, str]]:
+    """(seit_id, name, schema key verification|system1, instance, expect accept|reject).
+
+    Receipts are the exact sealVerification output for the laya round trip
+    (test/verification-bridge.test.mjs reseals and deep-compares them).
+    """
+    out: list[tuple[str, str, str, object, str]] = []
+    for path in sorted(SYSTEM1_RUBRICS_DIR.glob("*.rubric.json")):
+        with path.open(encoding="utf-8") as fh:
+            out.append(("SEIT-BDL-004", f"system1_rubric_{path.stem}", "system1", json.load(fh), "accept"))
+    trip = load_system1_round_trip()
+    for key, output in sorted(trip["outputs"].items()):
+        out.append(("SEIT-BDL-004", f"system1_backend_output_{key}", "system1", output, "accept"))
+    for key, receipt in sorted(trip["receipts"].items()):
+        out.append(("SEIT-BDL-004", f"sealed_laya_receipt_{key}", "verification", receipt, "accept"))
+        out.append((
+            "SEIT-BDL-004", f"sealed_laya_receipt_{key}_command_configuration", "system1",
+            receipt["command_configuration"], "accept",
+        ))
+    out.append(("SEIT-BDL-004", "system1_request", "verification", trip["request"], "accept"))
+    verified = trip["receipts"]["verified"]
+    out.extend([
+        ("SEIT-BDL-004", "sealed_receipt_evidence_tier_invalid", "verification",
+         {**verified, "evidence_tier": "guessed"}, "reject"),
+        ("SEIT-BDL-004", "sealed_receipt_backend_verdict_invalid", "verification",
+         {**verified, "backend_verdict": "PASS"}, "reject"),
+        ("SEIT-BDL-004", "sealed_receipt_evidence_engine_empty", "verification",
+         {**verified, "evidence_engine": ""}, "reject"),
+        ("SEIT-BDL-004", "system1_command_configuration_with_args_rejected", "system1",
+         {**verified["command_configuration"], "args": ["--verify-threshold", "0.5"]}, "reject"),
+    ])
     return out
 
 
@@ -1731,6 +1797,39 @@ def run_cases() -> int:
             failed += 1
             continue
         messages = errors_for(verification_schema, instance)
+        accepted = not messages
+        want_accept = expect == "accept"
+        ok = accepted if want_accept else not accepted
+        if ok:
+            print(f"PASS {line}")
+            passed += 1
+            continue
+        failed += 1
+        if want_accept:
+            first = messages[0] if messages else "rejected with no message"
+            print(f"FAIL {line}: rejected (expected accept): {first}")
+        else:
+            print(f"FAIL {line}: accepted (expected reject)")
+
+    system1_path = SCHEMAS_DIR / SYSTEM1_SCHEMA_NAME
+    system1_schema = None
+    if system1_path.is_file():
+        with system1_path.open(encoding="utf-8") as fh:
+            system1_schema = json.load(fh)
+    try:
+        system1_case_list = system1_cases()
+    except (OSError, KeyError, ValueError) as exc:
+        print(f"FAIL SEIT-BDL-004 system1_fixtures: {exc}")
+        failed += 1
+        system1_case_list = []
+    for seit_id, name, schema_key, instance, expect in system1_case_list:
+        line = f"{seit_id} {name}"
+        schema = verification_schema if schema_key == "verification" else system1_schema
+        if not isinstance(schema, dict):
+            print(f"FAIL {line}: missing schemas/{VERIFICATION_SCHEMA_NAME if schema_key == 'verification' else SYSTEM1_SCHEMA_NAME}")
+            failed += 1
+            continue
+        messages = errors_for(schema, instance)
         accepted = not messages
         want_accept = expect == "accept"
         ok = accepted if want_accept else not accepted

@@ -29,7 +29,7 @@ function planUnavailable(declared) {
   });
 }
 
-function evaluateUnavailable({ selected, required }) {
+function evaluateUnavailable({ selected, required, backend = "reverify" }) {
   return verification.evaluateVerification({
     request: {
       schema_version: "1",
@@ -39,7 +39,7 @@ function evaluateUnavailable({ selected, required }) {
       candidate_digest: DIGEST,
       claim_id: "SEIT-SYN-BIN-001",
       claim_type: "binary_reachability",
-      backend: "reverify",
+      backend,
       stage: "assurance",
       authority: "assurance",
       expected_result: "VERIFIED",
@@ -55,8 +55,8 @@ function evaluateUnavailable({ selected, required }) {
       candidate_revision: REV,
       candidate_digest: DIGEST,
       claim_id: "SEIT-SYN-BIN-001",
-      backend: "reverify",
-      backend_version: "reverify-0.0-test",
+      backend,
+      backend_version: `${backend}-0.0-test`,
       command_configuration: { command: "reverify check" },
       evidence_digest: EVIDENCE,
       authority: "assurance",
@@ -66,7 +66,7 @@ function evaluateUnavailable({ selected, required }) {
     candidate: { candidate_ref: "cand-1", candidate_revision: REV, candidate_digest: DIGEST },
     author: { role: "implementer", identity: "author-1", session: "sess-impl" },
     gate: "assurance",
-    backend: { name: "reverify", enabled: true, available: false },
+    backend: { name: backend, enabled: true, available: false },
   });
 }
 
@@ -104,5 +104,18 @@ describe("#111 required vs enabled unavailable semantics", () => {
     assert.equal(bothVerify.proceed, HALT);
     assert.equal(enabledVerify.proceed, enabledReview.proceed);
     assert.equal(requiredVerify.proceed, requiredReview.proceed);
+  });
+
+  it("System One backends follow the same split and never fall back to each other", () => {
+    for (const backend of ["jev", "laya"]) {
+      const selectedOnly = evaluateUnavailable({ selected: true, required: false, backend });
+      const required = evaluateUnavailable({ selected: false, required: true, backend });
+      assert.equal(selectedOnly.outcome, "ERROR", backend);
+      assert.equal(selectedOnly.reason, "backend_unavailable", backend);
+      assert.equal(selectedOnly.proceed, NOTE, backend);
+      assert.equal(required.reason, "backend_unavailable", backend);
+      assert.equal(required.proceed, HALT, backend);
+      assert.equal(required.gate_eligible, false, backend);
+    }
   });
 });

@@ -1,9 +1,60 @@
 # Proposal: Jev and Laya as the deterministic-verification backends
 
-Status: proposal. This branch adds the schema, the profile keys, the rubric
-reference, and example rubrics. It does **not** change runtime hooks or skill
-prose. Each change below is what remains to swap Reverify for the System One
-backends `jev` and `laya` completely.
+Status: **Applied.** Sections 1 to 12 are implemented on branch
+`system1-backend`; section 13 (hosting) remains documentation. The sections
+below keep the original proposal text; "Applied with changes" lists where the
+implementation departs from it and why.
+
+## Applied with changes
+
+- **Section 1, gate shape and typed reasons.** The proposal said
+  `evaluateGateChain` needs no code change. It needed some: without it a frozen
+  plan declaring `reverify` failed at the new slot with no typed reason, and a
+  `DECLARED` slot would accept any `tool` (including `reverify`) and any
+  threshold. `ASSURANCE_BUDGET_POLICY` therefore gains
+  `deterministic_verification_gate`
+  (`tools: ["jev", "laya", "jev+laya"]`,
+  `threshold: "all_required_claims_gate_eligible"`,
+  `retired_gate_names: ["reverify"]`), mirrored in the `assurance-policy.md`
+  block. At the `deterministic_verification` slot the evaluator returns
+  `NEEDS_MORE_EVIDENCE` with a typed `reason`:
+  `retired_gate_name_declared` (any `reverify` key in the declaration, even
+  beside the new slot; no alias), `backend_identity_undeclared`,
+  `threshold_not_policy`, `required_claim_missing`,
+  `claim_backend_undeclared`, or `required_claim_not_gate_eligible`. The slot
+  result carries `claims: [{ claim_id, backend, required, gate_eligible }]`,
+  one entry per claim's `evaluateVerification` judgement.
+- **Section 2.** The added sentence is followed by a short paragraph stating
+  the slot semantics and the retired-name failure.
+- **Section 3.** The opening sentence is wrapped so "never downloads" stays on
+  one line (`test/verification.test.mjs` matches it).
+- **Sections 4 and 7, line budget.** `skills-conformance` caps a skill at 60
+  lines, so the new test-engineer and onboard-bearing text is reflowed onto
+  wider lines instead of adding lines.
+- **Section 7, Reverify exclusivity.** onboard-bearing asks `jev` then `laya`
+  as separate questions with no preselection. Enabling either records
+  `reverify.enabled: false`; an existing `reverify.enabled: true` needs an
+  explicit answer to disable it first, otherwise `OWNER_DECISION_REQUIRED` and
+  neither is enabled. The onboarding guide says the same.
+- **`system1-rubrics.md` section 8.** "This rename is a proposal until ..."
+  now states that the rename is applied and names the typed failure.
+- **Section 12, where the cases live.** The laya round trip
+  (`planVerification` -> `sealVerification` -> `evaluateVerification`) is one
+  suite in `test/verification-bridge.test.mjs`, driven by
+  `test/fixtures/system1-laya-round-trip.json` (spec bound to the example
+  `laya-gtm-datalayer-event` rubric by digest, three backend outputs, and the
+  exact receipts). It covers assurance PASS on VERIFIED, INCONCLUSIVE
+  `replay_probability_divergence` not gate-eligible, DERIVED sealing
+  INCONCLUSIVE, generative operations refused, and a `jev` receipt against a
+  `laya` request rejected. `test/verification.test.mjs` renames the download
+  case and runs it for `reverify`, `jev`, and `laya`;
+  `test/required-semantics.test.mjs` adds the `jev`/`laya` selected-versus-
+  required split. `test/gate-chain.test.mjs` adds the slot, legacy-slot, and
+  eligibility cases. `test/schema-validation.py` validates the example
+  rubrics, the fixture backend outputs and command configurations against
+  `system1.schema.json`, the fixture receipts against
+  `verification.schema.json` (they fail against the pre-section-11 schema),
+  and the profile exclusivity positives and negatives.
 
 Already on this branch:
 

@@ -484,3 +484,123 @@ describe("verification receipt bridge (#105)", () => {
     assert.equal(verdict.gate_eligible, true, JSON.stringify(verdict));
   });
 });
+
+/**
+ * System One (Jev, Laya): a laya claim planned from a frozen example rubric,
+ * sealed from schema-shaped backend output, and judged by the adapter.
+ * test/fixtures/system1-laya-round-trip.json holds the outputs and the exact
+ * receipts; test/schema-validation.py validates both against their schemas.
+ */
+describe("System One laya receipt round trip", () => {
+  const { readFileSync } = require("node:fs");
+  const S1 = JSON.parse(readFileSync(path.join(ROOT, "test/fixtures/system1-laya-round-trip.json"), "utf8"));
+  const rubric = JSON.parse(readFileSync(path.join(ROOT, S1.rubric_path), "utf8"));
+  const layaBackend = { name: "laya", enabled: true, available: true };
+
+  function layaPlan(extra = {}) {
+    return bridge.planVerification({ ...S1.spec, ...extra });
+  }
+
+  function roundTrip(outputKey) {
+    const plan = layaPlan();
+    assert.equal(plan.outcome, "READY", JSON.stringify(plan));
+    const seal = bridge.sealVerification({ plan, output: S1.outputs[outputKey], produced_by: S1.produced_by });
+    assert.equal(seal.outcome, "READY", JSON.stringify(seal));
+    const verdict = adapter.evaluateVerification({
+      request: plan.request,
+      receipt: seal.receipt,
+      candidate: S1.spec.candidate,
+      backend: layaBackend,
+      author,
+      gate: "assurance",
+    });
+    return { plan, seal, verdict };
+  }
+
+  it("binds the claim to the frozen rubric by id, version, and digest", () => {
+    assert.equal(rubric.backend, "laya");
+    assert.equal(S1.spec.claim.rubric_id, rubric.rubric_id);
+    assert.equal(S1.spec.claim.rubric_version, rubric.rubric_version);
+    assert.equal(
+      S1.spec.claim.rubric_digest,
+      createHash("sha256").update(bridge.canonicalJson(rubric), "utf8").digest("hex"),
+    );
+    assert.deepEqual(S1.spec.backend_operations, rubric.operations);
+    assert.deepEqual(layaPlan().request, S1.request);
+  });
+
+  it("reproduces the fixture receipts exactly, so the schema-validated receipts are real seals", () => {
+    for (const key of Object.keys(S1.outputs)) {
+      const { seal } = roundTrip(key);
+      assert.deepEqual(seal.receipt, S1.receipts[key], key);
+    }
+  });
+
+  it("VERIFIED laya receipt passes the assurance gate and is gate_eligible", () => {
+    const { seal, verdict } = roundTrip("verified");
+    assert.equal(seal.receipt.backend, "laya");
+    assert.equal(seal.receipt.evidence_tier, "observed");
+    assert.equal(verdict.outcome, "PASS", JSON.stringify(verdict));
+    assert.equal(verdict.reason, "independent_assurance_verified");
+    assert.equal(verdict.gate_eligible, true);
+  });
+
+  it("INCONCLUSIVE replay_probability_divergence is not gate_eligible", () => {
+    const { seal, verdict } = roundTrip("replay_divergence");
+    assert.equal(seal.receipt.status, "INCONCLUSIVE");
+    assert.equal(verdict.outcome, "INCONCLUSIVE");
+    assert.equal(verdict.reason, "inconclusive_cannot_satisfy_gate");
+    assert.equal(verdict.gate_eligible, false);
+  });
+
+  it("a DERIVED laya verdict seals INCONCLUSIVE with evidence_tier derived", () => {
+    const { seal, verdict } = roundTrip("derived");
+    assert.equal(seal.receipt.status, "INCONCLUSIVE");
+    assert.equal(seal.receipt.evidence_tier, "derived");
+    assert.equal(seal.receipt.evidence_engine, "laya 0.3.21");
+    assert.equal(verdict.gate_eligible, false);
+    // Even a runner that reports VERIFIED beside a DERIVED strength cannot close a gate.
+    const forged = structuredClone(S1.outputs.derived);
+    forged.results[0].verdict = "VERIFIED";
+    delete forged.results[0].reason;
+    const resealed = bridge.sealVerification({ plan: layaPlan(), output: forged, produced_by: S1.produced_by });
+    assert.equal(resealed.receipt.status, "INCONCLUSIVE");
+    assert.equal(resealed.receipt.backend_verdict, "VERIFIED");
+    assert.equal(resealed.receipt.evidence_tier, "derived");
+  });
+
+  it("refuses a generative operation drawn from the rubric's denied list", () => {
+    for (const operation of ["propose_claims", "propose_options", "rewrite_claim", "review"]) {
+      assert.ok(rubric.operations.denied.includes(operation), operation);
+      const plan = layaPlan({ backend_operation: operation });
+      assert.equal(plan.outcome, "REJECT", operation);
+      assert.equal(plan.reason, "generative_backend_operation_denied", operation);
+    }
+  });
+
+  it("a jev receipt against a laya request is claim_or_backend_mismatch: no silent fallback", () => {
+    const laya = layaPlan();
+    const jev = layaPlan({
+      backend: "jev",
+      claim: { ...S1.spec.claim, backend: "jev" },
+    });
+    assert.equal(jev.outcome, "READY", JSON.stringify(jev));
+    const jevOutput = structuredClone(S1.outputs.verified);
+    jevOutput.backend = "jev";
+    jevOutput.backend_version = "jev 1.13.0";
+    jevOutput.results[0].evidence.engine = "jev";
+    const seal = bridge.sealVerification({ plan: jev, output: jevOutput, produced_by: S1.produced_by });
+    assert.equal(seal.receipt.backend, "jev");
+    const verdict = adapter.evaluateVerification({
+      request: laya.request,
+      receipt: seal.receipt,
+      candidate: S1.spec.candidate,
+      backend: layaBackend,
+      author,
+      gate: "assurance",
+    });
+    assert.equal(verdict.outcome, "REJECT");
+    assert.equal(verdict.reason, "claim_or_backend_mismatch");
+    assert.equal(verdict.gate_eligible, false);
+  });
+});

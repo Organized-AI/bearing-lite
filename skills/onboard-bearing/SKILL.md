@@ -31,23 +31,23 @@ user's explicit instruction. Preserves every unaddressed existing value.
    It then writes a semantically equivalent `profiles.json`, validates
    readback, then removes `lineups.json`. Do not auto-assign Surveyor or any
    retired role.
-3. Ask settings one at a time with no preselected value: named role/session
-   routes and fallbacks, session enablement, development strategy,
-   planning review, assurance cadence, concurrency, clean-session, holds, and
-   optional Reverify. When `development_strategy.mode` is `tdd`, collect Test
-   Implementer (`roles.test_implementer`) independently of Product Implementer
-   (`roles.implementer`). A missing, disabled, or malformed Test Implementer
-   route returns `OWNER_DECISION_REQUIRED` with an onboard prompt; must ask
-   for the missing Test Implementer and never copies or invents a route from
-   Product Implementer, Test Engineer, Light Implementer, or a retired role.
-   `single_implementer` stays valid with no `test_implementer` field. Enabling Coordinator adds value only for a one-wave need
-   (two or more proven-independent packets, shared wave evidence, or aggregate repair
-   ownership); permit an explicit disabled choice. A disabled Coordinator
-   on a true direct packet is not a capability gap. Declining Reverify or its
-   download persists `reverify.enabled: false` for that named profile.
-   Ask whether a coverage-assist capability is enabled and required
-   (`review.coverage_assist`); an explicit disabled choice is not a capability
-   gap, and its provider, model and credentials stay in its own tooling.
+3. Ask settings one at a time with no preselected value: named role/session routes and fallbacks, session
+   enablement, development strategy, planning review, assurance cadence, concurrency, clean-session, holds, and
+   optional System One backends, `jev` then `laya` as separate questions (enabled, required, jev-gateway env-var
+   names; `laya.default_checkpoint` when Laya is enabled). When `development_strategy.mode` is `tdd`, collect
+   Test Implementer (`roles.test_implementer`) independently of Product Implementer (`roles.implementer`). A
+   missing, disabled, or malformed Test Implementer route returns `OWNER_DECISION_REQUIRED` with an onboard
+   prompt; must ask for the missing Test Implementer and never copies or invents a route from Product
+   Implementer, Test Engineer, Light Implementer, or a retired role. `single_implementer` stays valid with no
+   `test_implementer` field. Enabling Coordinator adds value only for a one-wave need (two or more
+   proven-independent packets, shared wave evidence, or aggregate repair ownership); permit an explicit disabled
+   choice. A disabled Coordinator on a true direct packet is not a capability gap. Declining a System One
+   backend persists `jev.enabled: false` or `laya.enabled: false` for that named profile. Enabling `jev` or
+   `laya` records `reverify.enabled: false`; an existing `reverify.enabled: true` needs an explicit answer to
+   disable it first, else return `OWNER_DECISION_REQUIRED` and enable neither. Record gateway ids, endpoints,
+   and tokens only as env-var names. Ask whether a coverage-assist capability is enabled and required
+   (`review.coverage_assist`); an explicit disabled choice is not a capability gap, and its provider, model and
+   credentials stay in its own tooling.
 4. Write only explicit choices atomically. Validate Draft 2020-12 readback
    against `schemas/profiles.schema.json`. Store no credentials.
 
