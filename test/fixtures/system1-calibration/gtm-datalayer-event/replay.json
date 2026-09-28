@@ -1,0 +1,198 @@
+{
+ "rubric": "gtm-datalayer-event",
+ "formulation": "noul_tight",
+ "temperature": 19.999999999999993,
+ "sessions": [
+  {
+   "rubric": "gtm-datalayer-event",
+   "formulation": "noul_tight",
+   "temperature": 19.999999999999993,
+   "session": 1,
+   "source": "replay log (per-run logits not retained); 3 in-process runs + 2 fresh processes, the second fresh process ran while tools/system1-calibration/generate.py was also using the CPU",
+   "max_probability_delta": 0.0,
+   "max_logit_delta": 0.0,
+   "max_rounded_probability_delta": 0.0,
+   "controls": {
+    "CTL-GTM-PURCHASE-VALID": {
+     "runs": 5,
+     "fresh_process_runs": 2,
+     "statuses": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ]
+    },
+    "CTL-GTM-PURCHASE-NO-CURRENCY": {
+     "runs": 5,
+     "fresh_process_runs": 2,
+     "statuses": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ]
+    },
+    "CTL-GTM-ADD-TO-CART": {
+     "runs": 5,
+     "fresh_process_runs": 2,
+     "statuses": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ]
+    }
+   }
+  },
+  {
+   "rubric": "gtm-datalayer-event",
+   "formulation": "noul_tight",
+   "temperature": 19.999999999999993,
+   "controls": {
+    "CTL-GTM-PURCHASE-VALID": {
+     "runs": 7,
+     "fresh_process_runs": 4,
+     "statuses": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answers": [
+      "no",
+      "no",
+      "no",
+      "no",
+      "no",
+      "no",
+      "no"
+     ],
+     "thresholded_probability": [
+      0.533197642528017,
+      0.533197642528017,
+      0.533197642528017,
+      0.533197642528017,
+      0.533197642528017,
+      0.533197642528017,
+      0.533197642528017
+     ],
+     "max_probability_delta": 0.0,
+     "max_logit_delta": 0.0,
+     "max_rounded_probability_delta": 0.0,
+     "identical_status": true,
+     "identical_answer": true
+    },
+    "CTL-GTM-PURCHASE-NO-CURRENCY": {
+     "runs": 7,
+     "fresh_process_runs": 4,
+     "statuses": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answers": [
+      "yes",
+      "yes",
+      "yes",
+      "yes",
+      "yes",
+      "yes",
+      "yes"
+     ],
+     "thresholded_probability": [
+      0.5782916913723201,
+      0.5782916913723201,
+      0.5782916913723201,
+      0.5782916913723201,
+      0.5782916913723201,
+      0.5782916913723201,
+      0.5782916913723201
+     ],
+     "max_probability_delta": 0.0,
+     "max_logit_delta": 0.0,
+     "max_rounded_probability_delta": 0.0,
+     "identical_status": true,
+     "identical_answer": true
+    },
+    "CTL-GTM-ADD-TO-CART": {
+     "runs": 7,
+     "fresh_process_runs": 4,
+     "statuses": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answers": [
+      "yes",
+      "yes",
+      "yes",
+      "yes",
+      "yes",
+      "yes",
+      "yes"
+     ],
+     "thresholded_probability": [
+      0.5712485413278482,
+      0.5712485413278482,
+      0.5712485413278482,
+      0.5712485413278482,
+      0.5712485413278482,
+      0.5712485413278482,
+      0.5712485413278482
+     ],
+     "max_probability_delta": 0.0,
+     "max_logit_delta": 0.0,
+     "max_rounded_probability_delta": 0.0,
+     "identical_status": true,
+     "identical_answer": true
+    }
+   },
+   "max_probability_delta": 0.0,
+   "max_logit_delta": 0.0,
+   "max_rounded_probability_delta": 0.0,
+   "session": 2,
+   "source": "3 in-process runs + 4 fresh processes, machine otherwise idle"
+  }
+ ],
+ "max_probability_delta": 0.0,
+ "max_logit_delta": 0.0,
+ "max_rounded_probability_delta": 0.0,
+ "controls": {
+  "CTL-GTM-PURCHASE-VALID": {
+   "runs": 9,
+   "fresh_process_runs": 6,
+   "statuses": [
+    "INCONCLUSIVE"
+   ]
+  },
+  "CTL-GTM-PURCHASE-NO-CURRENCY": {
+   "runs": 9,
+   "fresh_process_runs": 6,
+   "statuses": [
+    "INCONCLUSIVE"
+   ]
+  },
+  "CTL-GTM-ADD-TO-CART": {
+   "runs": 9,
+   "fresh_process_runs": 6,
+   "statuses": [
+    "INCONCLUSIVE"
+   ]
+  }
+ }
+}

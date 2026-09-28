@@ -1,0 +1,211 @@
+{
+ "rubric": "multilingual-consent-banner",
+ "formulation": "choice2_neutral",
+ "temperature": 19.999999999999993,
+ "sessions": [
+  {
+   "rubric": "multilingual-consent-banner",
+   "formulation": "choice2_neutral",
+   "temperature": 19.999999999999993,
+   "session": 1,
+   "source": "replay log (per-run logits not retained); 3 in-process runs + 2 fresh processes, the second fresh process ran while tools/system1-calibration/generate.py was also using the CPU",
+   "max_probability_delta": 4.160069576375491e-06,
+   "max_logit_delta": 0.0002987384796142578,
+   "max_rounded_probability_delta": 0.0,
+   "controls": {
+    "CTL-CONSENT-DE-COMPLETE": {
+     "runs": 5,
+     "fresh_process_runs": 2,
+     "statuses": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "max_probability_delta": 4.160069576375491e-06,
+     "max_logit_delta": 0.0002987384796142578,
+     "thresholded_probability": [
+      0.5141105337329658,
+      0.5141105337329658,
+      0.5141105337329658,
+      0.5141105337329658,
+      0.5141063736633894
+     ]
+    },
+    "CTL-CONSENT-ES-NO-WITHDRAW": {
+     "runs": 5,
+     "fresh_process_runs": 2,
+     "statuses": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "max_probability_delta": 0.0,
+     "max_logit_delta": 0.0
+    },
+    "CTL-CONSENT-JA-NO-THIRD-PARTY": {
+     "runs": 5,
+     "fresh_process_runs": 2,
+     "statuses": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "max_probability_delta": 0.0,
+     "max_logit_delta": 0.0
+    }
+   }
+  },
+  {
+   "rubric": "multilingual-consent-banner",
+   "formulation": "choice2_neutral",
+   "temperature": 19.999999999999993,
+   "controls": {
+    "CTL-CONSENT-DE-COMPLETE": {
+     "runs": 7,
+     "fresh_process_runs": 4,
+     "statuses": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answers": [
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A"
+     ],
+     "thresholded_probability": [
+      0.5141105337329658,
+      0.5141105337329658,
+      0.5141105337329658,
+      0.5141105337329658,
+      0.5141105337329658,
+      0.5141105337329658,
+      0.5141105337329658
+     ],
+     "max_probability_delta": 0.0,
+     "max_logit_delta": 0.0,
+     "max_rounded_probability_delta": 0.0,
+     "identical_status": true,
+     "identical_answer": true
+    },
+    "CTL-CONSENT-ES-NO-WITHDRAW": {
+     "runs": 7,
+     "fresh_process_runs": 4,
+     "statuses": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answers": [
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A"
+     ],
+     "thresholded_probability": [
+      0.5050327568236781,
+      0.5050327568236781,
+      0.5050327568236781,
+      0.5050327568236781,
+      0.5050327568236781,
+      0.5050327568236781,
+      0.5050327568236781
+     ],
+     "max_probability_delta": 0.0,
+     "max_logit_delta": 0.0,
+     "max_rounded_probability_delta": 0.0,
+     "identical_status": true,
+     "identical_answer": true
+    },
+    "CTL-CONSENT-JA-NO-THIRD-PARTY": {
+     "runs": 7,
+     "fresh_process_runs": 4,
+     "statuses": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answers": [
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B"
+     ],
+     "thresholded_probability": [
+      0.502530875048552,
+      0.502530875048552,
+      0.502530875048552,
+      0.502530875048552,
+      0.502530875048552,
+      0.502530875048552,
+      0.502530875048552
+     ],
+     "max_probability_delta": 0.0,
+     "max_logit_delta": 0.0,
+     "max_rounded_probability_delta": 0.0,
+     "identical_status": true,
+     "identical_answer": true
+    }
+   },
+   "max_probability_delta": 0.0,
+   "max_logit_delta": 0.0,
+   "max_rounded_probability_delta": 0.0,
+   "session": 2,
+   "source": "3 in-process runs + 4 fresh processes, machine otherwise idle"
+  }
+ ],
+ "max_probability_delta": 4.160069576375491e-06,
+ "max_logit_delta": 0.0002987384796142578,
+ "max_rounded_probability_delta": 0.0,
+ "controls": {
+  "CTL-CONSENT-DE-COMPLETE": {
+   "runs": 9,
+   "fresh_process_runs": 6,
+   "statuses": [
+    "INCONCLUSIVE"
+   ]
+  },
+  "CTL-CONSENT-ES-NO-WITHDRAW": {
+   "runs": 9,
+   "fresh_process_runs": 6,
+   "statuses": [
+    "INCONCLUSIVE"
+   ]
+  },
+  "CTL-CONSENT-JA-NO-THIRD-PARTY": {
+   "runs": 9,
+   "fresh_process_runs": 6,
+   "statuses": [
+    "INCONCLUSIVE"
+   ]
+  }
+ }
+}

@@ -1,0 +1,28 @@
+{
+  "rubric": "gtm-datalayer-event",
+  "generator_seed": 4217,
+  "split_seed": 20260927,
+  "split": "stratified by label, 50% calibration",
+  "checkpoint_tokenizer": "laya",
+  "token_limit": 320,
+  "dropped_over_limit": 0,
+  "calibration": {
+    "file": "calibration.jsonl",
+    "sha256": "329c47d084e5ab105f608a44365cb49074feae989a592e20c9603dcb9d119d2b",
+    "size": 180,
+    "labels": {
+      "fails": 95,
+      "holds": 85
+    }
+  },
+  "test": {
+    "file": "test.jsonl",
+    "sha256": "791f46f1c8a5d27ecbf6e0b77dfeda56a6220e48b88bbbc6c69523d93554214b",
+    "size": 180,
+    "labels": {
+      "fails": 95,
+      "holds": 85
+    }
+  },
+  "max_state_tokens": 157
+}

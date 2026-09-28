@@ -1,5 +1,5 @@
 {
-  "description": "Laya System One round trip: spec planned from a frozen example rubric, backend outputs as schemas/system1.schema.json backend_output, and the receipts sealVerification emits for them. test/verification-bridge.test.mjs reseals the outputs and must reproduce these receipts; test/schema-validation.py validates outputs and receipts against their schemas.",
+  "description": "Laya System One round trip: spec planned from a frozen example rubric, backend outputs as schemas/system1.schema.json backend_output, and the receipts sealVerification emits for them. test/verification-bridge.test.mjs reseals the outputs and must reproduce these receipts; test/schema-validation.py validates outputs and receipts against their schemas. Rebuilt by tools/system1-calibration/build-round-trip.mjs. Run probabilities, gateway ids, and control observations are synthetic bridge inputs, not measurements: the bound rubric's measured calibration (it is not assurance-eligible) is in docs/calibration/system1-calibration-report.md.",
   "rubric_path": "skills/bearing-lite/references/system1-rubrics/laya-gtm-datalayer-event.rubric.json",
   "spec": {
     "backend": "laya",
@@ -38,8 +38,8 @@
       "kind": "system1_decision",
       "backend": "laya",
       "rubric_id": "RUB-S1-GTM-DATALAYER-PURCHASE",
-      "rubric_version": "1.0.0",
-      "rubric_digest": "f74e21bca85e3177261c644031cdc910e348de96d10301f0142790a91a8b2632",
+      "rubric_version": "2.0.0",
+      "rubric_digest": "958a7705e06f7889b023c14015f8347a51cf24dba58338f897799af4e80e9e84",
       "input_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
     },
     "target": "test/fixtures/datalayer/checkout-complete.json",
@@ -75,7 +75,7 @@
       "backend": "laya",
       "operation": "evaluate",
       "target": "test/fixtures/datalayer/checkout-complete.json",
-      "claim": "{\"backend\":\"laya\",\"input_digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"kind\":\"system1_decision\",\"rubric_digest\":\"f74e21bca85e3177261c644031cdc910e348de96d10301f0142790a91a8b2632\",\"rubric_id\":\"RUB-S1-GTM-DATALAYER-PURCHASE\",\"rubric_version\":\"1.0.0\"}",
+      "claim": "{\"backend\":\"laya\",\"input_digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"kind\":\"system1_decision\",\"rubric_digest\":\"958a7705e06f7889b023c14015f8347a51cf24dba58338f897799af4e80e9e84\",\"rubric_id\":\"RUB-S1-GTM-DATALAYER-PURCHASE\",\"rubric_version\":\"2.0.0\"}",
       "args": [],
       "invocation": {
         "executable": "jev-gateway-run",
@@ -108,16 +108,16 @@
             "engine_version": "0.3.21",
             "rubric": {
               "rubric_id": "RUB-S1-GTM-DATALAYER-PURCHASE",
-              "rubric_version": "1.0.0",
-              "rubric_digest": "f74e21bca85e3177261c644031cdc910e348de96d10301f0142790a91a8b2632",
-              "question_digest": "d67cbccffc2ec6eaece32e6aef5adcd5b656f757f73730b8ffab491aed395a96"
+              "rubric_version": "2.0.0",
+              "rubric_digest": "958a7705e06f7889b023c14015f8347a51cf24dba58338f897799af4e80e9e84",
+              "question_digest": "9164caae2fc146f6eb42b1d06c7ed60d7573519b06e040fe1ea73c5d21c97d5f"
             },
             "model": {
               "model_id": "convaiinnovations/laya",
               "revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
               "checkpoint": "laya",
               "selection": "pinned",
-              "calibration_temperature": 1
+              "calibration_temperature": 20
             },
             "question_type": "noul",
             "input": {
@@ -179,7 +179,7 @@
               "identical_answer": true,
               "identical_status": true,
               "max_probability_delta": 0,
-              "probability_epsilon": 0.000001,
+              "probability_epsilon": 0.00008,
               "freshness_met": true
             },
             "decision": {
@@ -210,16 +210,16 @@
             "engine_version": "0.3.21",
             "rubric": {
               "rubric_id": "RUB-S1-GTM-DATALAYER-PURCHASE",
-              "rubric_version": "1.0.0",
-              "rubric_digest": "f74e21bca85e3177261c644031cdc910e348de96d10301f0142790a91a8b2632",
-              "question_digest": "d67cbccffc2ec6eaece32e6aef5adcd5b656f757f73730b8ffab491aed395a96"
+              "rubric_version": "2.0.0",
+              "rubric_digest": "958a7705e06f7889b023c14015f8347a51cf24dba58338f897799af4e80e9e84",
+              "question_digest": "9164caae2fc146f6eb42b1d06c7ed60d7573519b06e040fe1ea73c5d21c97d5f"
             },
             "model": {
               "model_id": "convaiinnovations/laya",
               "revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
               "checkpoint": "laya",
               "selection": "pinned",
-              "calibration_temperature": 1
+              "calibration_temperature": 20
             },
             "question_type": "noul",
             "input": {
@@ -281,7 +281,7 @@
               "identical_answer": true,
               "identical_status": true,
               "max_probability_delta": 0.0319,
-              "probability_epsilon": 0.000001,
+              "probability_epsilon": 0.00008,
               "freshness_met": true
             },
             "decision": {
@@ -313,16 +313,16 @@
             "engine_version": "0.3.21",
             "rubric": {
               "rubric_id": "RUB-S1-GTM-DATALAYER-PURCHASE",
-              "rubric_version": "1.0.0",
-              "rubric_digest": "f74e21bca85e3177261c644031cdc910e348de96d10301f0142790a91a8b2632",
-              "question_digest": "d67cbccffc2ec6eaece32e6aef5adcd5b656f757f73730b8ffab491aed395a96"
+              "rubric_version": "2.0.0",
+              "rubric_digest": "958a7705e06f7889b023c14015f8347a51cf24dba58338f897799af4e80e9e84",
+              "question_digest": "9164caae2fc146f6eb42b1d06c7ed60d7573519b06e040fe1ea73c5d21c97d5f"
             },
             "model": {
               "model_id": "convaiinnovations/laya",
               "revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
               "checkpoint": "laya",
               "selection": "pinned",
-              "calibration_temperature": 1
+              "calibration_temperature": 20
             },
             "question_type": "noul",
             "input": {
@@ -368,7 +368,7 @@
               "identical_answer": true,
               "identical_status": true,
               "max_probability_delta": 0,
-              "probability_epsilon": 0.000001,
+              "probability_epsilon": 0.00008,
               "freshness_met": true
             },
             "decision": {
@@ -399,7 +399,7 @@
         "backend": "laya",
         "operation": "evaluate",
         "target": "test/fixtures/datalayer/checkout-complete.json",
-        "claim": "{\"backend\":\"laya\",\"input_digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"kind\":\"system1_decision\",\"rubric_digest\":\"f74e21bca85e3177261c644031cdc910e348de96d10301f0142790a91a8b2632\",\"rubric_id\":\"RUB-S1-GTM-DATALAYER-PURCHASE\",\"rubric_version\":\"1.0.0\"}",
+        "claim": "{\"backend\":\"laya\",\"input_digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"kind\":\"system1_decision\",\"rubric_digest\":\"958a7705e06f7889b023c14015f8347a51cf24dba58338f897799af4e80e9e84\",\"rubric_id\":\"RUB-S1-GTM-DATALAYER-PURCHASE\",\"rubric_version\":\"2.0.0\"}",
         "args": [],
         "invocation": {
           "executable": "jev-gateway-run",
@@ -411,7 +411,7 @@
           ]
         }
       },
-      "evidence_digest": "bea25cd07366c9debb724c1086c8b71338557f3381ba697ed80b1570b0c9344c",
+      "evidence_digest": "f79b42bd40cffd7a48ae6fe74165f9c29422cee02525104df7a06b597f8ff901",
       "authority": "assurance",
       "produced_by": {
         "role": "test_engineer.assurance",
@@ -436,7 +436,7 @@
         "backend": "laya",
         "operation": "evaluate",
         "target": "test/fixtures/datalayer/checkout-complete.json",
-        "claim": "{\"backend\":\"laya\",\"input_digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"kind\":\"system1_decision\",\"rubric_digest\":\"f74e21bca85e3177261c644031cdc910e348de96d10301f0142790a91a8b2632\",\"rubric_id\":\"RUB-S1-GTM-DATALAYER-PURCHASE\",\"rubric_version\":\"1.0.0\"}",
+        "claim": "{\"backend\":\"laya\",\"input_digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"kind\":\"system1_decision\",\"rubric_digest\":\"958a7705e06f7889b023c14015f8347a51cf24dba58338f897799af4e80e9e84\",\"rubric_id\":\"RUB-S1-GTM-DATALAYER-PURCHASE\",\"rubric_version\":\"2.0.0\"}",
         "args": [],
         "invocation": {
           "executable": "jev-gateway-run",
@@ -448,7 +448,7 @@
           ]
         }
       },
-      "evidence_digest": "2fef0d7f43765560ad27da6ef3e45491d3f313865e28857178bbc19d078351b4",
+      "evidence_digest": "2be5a3f34c5503e62cde9996e7fe92479afe81679ef8fa4964ed46d629622448",
       "authority": "assurance",
       "produced_by": {
         "role": "test_engineer.assurance",
@@ -473,7 +473,7 @@
         "backend": "laya",
         "operation": "evaluate",
         "target": "test/fixtures/datalayer/checkout-complete.json",
-        "claim": "{\"backend\":\"laya\",\"input_digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"kind\":\"system1_decision\",\"rubric_digest\":\"f74e21bca85e3177261c644031cdc910e348de96d10301f0142790a91a8b2632\",\"rubric_id\":\"RUB-S1-GTM-DATALAYER-PURCHASE\",\"rubric_version\":\"1.0.0\"}",
+        "claim": "{\"backend\":\"laya\",\"input_digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"kind\":\"system1_decision\",\"rubric_digest\":\"958a7705e06f7889b023c14015f8347a51cf24dba58338f897799af4e80e9e84\",\"rubric_id\":\"RUB-S1-GTM-DATALAYER-PURCHASE\",\"rubric_version\":\"2.0.0\"}",
         "args": [],
         "invocation": {
           "executable": "jev-gateway-run",
@@ -485,7 +485,7 @@
           ]
         }
       },
-      "evidence_digest": "3d12381ae34de7fbfbad01d0e2127403b26dd4d6ef9cc2172d451f7663bd2499",
+      "evidence_digest": "53e7c776534e202576ba35c55915a4369877cb7e2734e936ae36d1d986308c50",
       "authority": "assurance",
       "produced_by": {
         "role": "test_engineer.assurance",

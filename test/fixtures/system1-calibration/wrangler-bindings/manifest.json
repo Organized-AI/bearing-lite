@@ -1,0 +1,28 @@
+{
+  "rubric": "wrangler-bindings",
+  "generator_seed": 8785,
+  "split_seed": 20260927,
+  "split": "stratified by label, 50% calibration",
+  "checkpoint_tokenizer": "laya",
+  "token_limit": 320,
+  "dropped_over_limit": 0,
+  "calibration": {
+    "file": "calibration.jsonl",
+    "sha256": "ac67355d94862211d30c8cba831cba237c37e7937e548a7846871ec60452b4a6",
+    "size": 180,
+    "labels": {
+      "fails": 88,
+      "holds": 92
+    }
+  },
+  "test": {
+    "file": "test.jsonl",
+    "sha256": "3a7ad811c047dd36f22d759d00c27e820c315ca3d613b3a7bc075dc1118fe0e7",
+    "size": 180,
+    "labels": {
+      "fails": 89,
+      "holds": 91
+    }
+  },
+  "max_state_tokens": 233
+}

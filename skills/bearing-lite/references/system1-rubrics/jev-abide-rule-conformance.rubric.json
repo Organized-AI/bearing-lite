@@ -3,7 +3,7 @@
   "schema_family": "system1",
   "schema_version": "1",
   "rubric_id": "RUB-S1-ABIDE-NO-SECRETS-IN-WRANGLER",
-  "rubric_version": "1.0.0",
+  "rubric_version": "1.0.1",
   "title": "Code edit obeys project rule: no secret values in wrangler vars",
   "claim": {
     "claim_type": "project_rule_conformance",
@@ -13,7 +13,7 @@
       "abide rule: no-secrets-in-wrangler-vars"
     ]
   },
-  "assurance_eligible": true,
+  "assurance_eligible": false,
   "backend": "jev",
   "model": {
     "provider": "typesafe",
@@ -131,9 +131,9 @@
     ]
   },
   "notes": [
-    "Placeholder digests (all zeros) mark inputs that do not exist yet: the calibration set and the control fixtures. Replace them with real SHA-256 digests and a measured ECE before this rubric is frozen into a plan; a rubric with a placeholder digest must not back an assurance request.",
+    "UNMEASURED: no TypeSafe Jev API credentials were available when the Laya rubrics were calibrated (docs/calibration/system1-calibration-report.md), so this rubric has no calibration set, no fitted temperature, no control fixtures, and no replay measurement. The all-zero calibration_set_digest and control input_digest values are placeholders, temperature 1 is not fitted, and calibration_set_size and measured_ece are not measurements. assurance_eligible is false until a calibration run on Jev replaces them (a new rubric_version and a plan amendment).",
     "Jev is hosted and closed: the pinned model_version is the only revision handle, fresh-process replay is not available, and a served version other than 1.13.0 is ERROR `model_revision_mismatch`. That is why epsilon is wider (0.01) than for pinned CPU Laya.",
-    "Published third-party Jev ECE figures (as returned) range from 0.144 (typed-decisions) to 0.246; measured_ece 0.144 is that published figure, not a measurement on this rubric. Fit the temperature on this rubric's calibration set and record the measured ECE before freezing.",
+    "Published third-party Jev ECE figures (as returned) range from 0.144 (typed-decisions) to 0.246; measured_ece 0.144 is that published figure, not a measurement on this rubric. It was not measured on this rubric.",
     "Neutral option keys (A/B/C) with the verdict in the description avoid label-following on yes/no wording.",
     "The input budget uses UTF-8 bytes as a conservative token bound because Jev's tokenizer is not available client-side; 4000 is a chosen budget, not Jev's documented context limit.",
     "This is a rule-conformance verdict on a fixed diff, not code review: Jev never proposes a fix, rewrites the diff, or judges code quality."

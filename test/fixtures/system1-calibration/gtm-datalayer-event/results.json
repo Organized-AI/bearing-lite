@@ -1,0 +1,768 @@
+{
+ "rubric": "gtm-datalayer-event",
+ "verify_threshold": 0.9,
+ "refute_threshold": 0.9,
+ "max_ece": 0.1,
+ "calibration_size": 180,
+ "test_size": 180,
+ "formulations": {
+  "noul_verbatim": {
+   "checkpoint": "laya",
+   "schema_ok": true,
+   "question_type": "noul",
+   "temperature": 19.999999999999993,
+   "shipped_temperature": 1.983399510383606,
+   "test_raw": {
+    "n": 180,
+    "accuracy": 0.5,
+    "ece": 0.3949299662832171,
+    "nll": 1.47972243660014,
+    "coverage": 0.5888888888888889,
+    "precision": 0.5094339622641509,
+    "verified": 84,
+    "verified_correct": 40,
+    "refuted": 22,
+    "refuted_correct": 14,
+    "inconclusive": 74,
+    "pred_counts": {
+     "no": 41,
+     "yes": 139
+    }
+   },
+   "test_shipped": {
+    "n": 180,
+    "accuracy": 0.5,
+    "ece": 0.27325950680330785,
+    "nll": 0.9466294996403822,
+    "coverage": 0.15,
+    "precision": 0.5555555555555556,
+    "verified": 18,
+    "verified_correct": 9,
+    "refuted": 9,
+    "refuted_correct": 6,
+    "inconclusive": 153,
+    "pred_counts": {
+     "no": 41,
+     "yes": 139
+    }
+   },
+   "test_calibrated": {
+    "n": 180,
+    "accuracy": 0.5,
+    "ece": 0.03891465516626071,
+    "nll": 0.6941499106380249,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 180,
+    "pred_counts": {
+     "no": 41,
+     "yes": 139
+    }
+   },
+   "calibration_calibrated": {
+    "n": 180,
+    "accuracy": 0.42777777777777776,
+    "ece": 0.10250223733118541,
+    "nll": 0.7062051989291447,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 180,
+    "pred_counts": {
+     "no": 30,
+     "yes": 150
+    }
+   },
+   "controls": {
+    "CTL-GTM-PURCHASE-VALID": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.538848,
+     "pass": false
+    },
+    "CTL-GTM-PURCHASE-NO-CURRENCY": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.532202,
+     "pass": false
+    },
+    "CTL-GTM-ADD-TO-CART": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.552702,
+     "pass": false
+    }
+   },
+   "test_accuracy_by_variant": {
+    "bad_currency": 0.23529411764705882,
+    "ecommerce_missing": 0.2857142857142857,
+    "empty_items": 0.1111111111111111,
+    "empty_transaction_id": 0.16666666666666666,
+    "items_not_array": 0.0,
+    "items_without_id_or_name": 0.23076923076923078,
+    "missing_currency": 0.0,
+    "missing_transaction_id": 0.6,
+    "missing_value": 0.2857142857142857,
+    "valid": 0.8115942028985508,
+    "valid_noise": 0.6875,
+    "wrong_event": 0.4666666666666667
+   },
+   "controls_pass": false
+  },
+  "noul_tight": {
+   "checkpoint": "laya",
+   "schema_ok": true,
+   "question_type": "noul",
+   "temperature": 19.999999999999993,
+   "shipped_temperature": 1.983399510383606,
+   "test_raw": {
+    "n": 180,
+    "accuracy": 0.5333333333333333,
+    "ece": 0.38250438517765883,
+    "nll": 2.183242663193872,
+    "coverage": 0.6777777777777778,
+    "precision": 0.5409836065573771,
+    "verified": 36,
+    "verified_correct": 20,
+    "refuted": 86,
+    "refuted_correct": 46,
+    "inconclusive": 58,
+    "pred_counts": {
+     "no": 113,
+     "yes": 67
+    }
+   },
+   "test_shipped": {
+    "n": 180,
+    "accuracy": 0.5333333333333333,
+    "ece": 0.2981578064074763,
+    "nll": 1.2494997052629497,
+    "coverage": 0.4777777777777778,
+    "precision": 0.5232558139534884,
+    "verified": 16,
+    "verified_correct": 7,
+    "refuted": 70,
+    "refuted_correct": 38,
+    "inconclusive": 94,
+    "pred_counts": {
+     "no": 113,
+     "yes": 67
+    }
+   },
+   "test_calibrated": {
+    "n": 180,
+    "accuracy": 0.5333333333333333,
+    "ece": 0.038797680569929244,
+    "nll": 0.6937269363429789,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 180,
+    "pred_counts": {
+     "no": 113,
+     "yes": 67
+    }
+   },
+   "calibration_calibrated": {
+    "n": 180,
+    "accuracy": 0.4666666666666667,
+    "ece": 0.09590740529930057,
+    "nll": 0.7078643347454641,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 180,
+    "pred_counts": {
+     "no": 107,
+     "yes": 73
+    }
+   },
+   "controls": {
+    "CTL-GTM-PURCHASE-VALID": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "no",
+     "thresholded_probability": 0.533198,
+     "pass": false
+    },
+    "CTL-GTM-PURCHASE-NO-CURRENCY": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.578292,
+     "pass": false
+    },
+    "CTL-GTM-ADD-TO-CART": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.571249,
+     "pass": false
+    }
+   },
+   "test_accuracy_by_variant": {
+    "bad_currency": 0.5882352941176471,
+    "ecommerce_missing": 0.7142857142857143,
+    "empty_items": 0.8888888888888888,
+    "empty_transaction_id": 0.5,
+    "items_not_array": 0.6363636363636364,
+    "items_without_id_or_name": 0.7692307692307693,
+    "missing_currency": 0.0,
+    "missing_transaction_id": 1.0,
+    "missing_value": 0.2857142857142857,
+    "valid": 0.37681159420289856,
+    "valid_noise": 0.5,
+    "wrong_event": 0.8
+   },
+   "controls_pass": false
+  },
+  "noul_neutral_labels": {
+   "checkpoint": "laya",
+   "schema_ok": false,
+   "question_type": "noul",
+   "temperature": 19.999999999999993,
+   "shipped_temperature": 1.983399510383606,
+   "test_raw": {
+    "n": 180,
+    "accuracy": 0.4888888888888889,
+    "ece": 0.3629863321084996,
+    "nll": 1.3335824262642912,
+    "coverage": 0.4722222222222222,
+    "precision": 0.43529411764705883,
+    "verified": 84,
+    "verified_correct": 37,
+    "refuted": 1,
+    "refuted_correct": 0,
+    "inconclusive": 95,
+    "pred_counts": {
+     "no": 15,
+     "yes": 165
+    }
+   },
+   "test_shipped": {
+    "n": 180,
+    "accuracy": 0.4888888888888889,
+    "ece": 0.2573948217595335,
+    "nll": 0.9131798162307821,
+    "coverage": 0.005555555555555556,
+    "precision": 0.0,
+    "verified": 1,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 179,
+    "pred_counts": {
+     "no": 15,
+     "yes": 165
+    }
+   },
+   "test_calibrated": {
+    "n": 180,
+    "accuracy": 0.4888888888888889,
+    "ece": 0.06367622083744089,
+    "nll": 0.7010643385210856,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 180,
+    "pred_counts": {
+     "no": 15,
+     "yes": 165
+    }
+   },
+   "calibration_calibrated": {
+    "n": 180,
+    "accuracy": 0.4666666666666667,
+    "ece": 0.1162621964916703,
+    "nll": 0.7035553181490057,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 180,
+    "pred_counts": {
+     "no": 11,
+     "yes": 169
+    }
+   },
+   "controls": {
+    "CTL-GTM-PURCHASE-VALID": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.53003,
+     "pass": false
+    },
+    "CTL-GTM-PURCHASE-NO-CURRENCY": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.525697,
+     "pass": false
+    },
+    "CTL-GTM-ADD-TO-CART": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.554333,
+     "pass": false
+    }
+   },
+   "test_accuracy_by_variant": {
+    "bad_currency": 0.11764705882352941,
+    "ecommerce_missing": 0.0,
+    "empty_items": 0.0,
+    "empty_transaction_id": 0.0,
+    "items_not_array": 0.0,
+    "items_without_id_or_name": 0.0,
+    "missing_currency": 0.0,
+    "missing_transaction_id": 0.2,
+    "missing_value": 0.14285714285714285,
+    "valid": 0.9855072463768116,
+    "valid_noise": 0.6875,
+    "wrong_event": 0.3333333333333333
+   },
+   "controls_pass": false
+  },
+  "choice2_neutral": {
+   "checkpoint": "laya",
+   "schema_ok": true,
+   "question_type": "choice",
+   "temperature": 19.999999999999993,
+   "shipped_temperature": 1.9063563346862793,
+   "test_raw": {
+    "n": 180,
+    "accuracy": 0.4722222222222222,
+    "ece": 0.46330329987806024,
+    "nll": 1.9983412252443071,
+    "coverage": 0.8333333333333334,
+    "precision": 0.4666666666666667,
+    "verified": 150,
+    "verified_correct": 70,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 30,
+    "pred_counts": {
+     "A": 174,
+     "B": 6
+    }
+   },
+   "test_shipped": {
+    "n": 180,
+    "accuracy": 0.4722222222222222,
+    "ece": 0.37182302532923794,
+    "nll": 1.1872491009164599,
+    "coverage": 0.37777777777777777,
+    "precision": 0.38235294117647056,
+    "verified": 68,
+    "verified_correct": 26,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 112,
+    "pred_counts": {
+     "A": 174,
+     "B": 6
+    }
+   },
+   "test_calibrated": {
+    "n": 180,
+    "accuracy": 0.4722222222222222,
+    "ece": 0.07250148292167566,
+    "nll": 0.7040761551107284,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 180,
+    "pred_counts": {
+     "A": 174,
+     "B": 6
+    }
+   },
+   "calibration_calibrated": {
+    "n": 180,
+    "accuracy": 0.4666666666666667,
+    "ece": 0.07931775544917741,
+    "nll": 0.7055677090206793,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 180,
+    "pred_counts": {
+     "A": 177,
+     "B": 3
+    }
+   },
+   "controls": {
+    "CTL-GTM-PURCHASE-VALID": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.546376,
+     "pass": false
+    },
+    "CTL-GTM-PURCHASE-NO-CURRENCY": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.536872,
+     "pass": false
+    },
+    "CTL-GTM-ADD-TO-CART": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.554248,
+     "pass": false
+    }
+   },
+   "test_accuracy_by_variant": {
+    "bad_currency": 0.0,
+    "ecommerce_missing": 0.0,
+    "empty_items": 0.0,
+    "empty_transaction_id": 0.0,
+    "items_not_array": 0.0,
+    "items_without_id_or_name": 0.0,
+    "missing_currency": 0.0,
+    "missing_transaction_id": 0.0,
+    "missing_value": 0.14285714285714285,
+    "valid": 1.0,
+    "valid_noise": 0.8125,
+    "wrong_event": 0.13333333333333333
+   },
+   "controls_pass": false
+  },
+  "choice2_tight": {
+   "checkpoint": "laya",
+   "schema_ok": true,
+   "question_type": "choice",
+   "temperature": 19.999999999999993,
+   "shipped_temperature": 1.9063563346862793,
+   "test_raw": {
+    "n": 180,
+    "accuracy": 0.5,
+    "ece": 0.3957536282166123,
+    "nll": 1.514367394398231,
+    "coverage": 0.5944444444444444,
+    "precision": 0.4672897196261682,
+    "verified": 107,
+    "verified_correct": 50,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 73,
+    "pred_counts": {
+     "A": 173,
+     "B": 7
+    }
+   },
+   "test_shipped": {
+    "n": 180,
+    "accuracy": 0.5,
+    "ece": 0.2771450636202734,
+    "nll": 0.985814218156404,
+    "coverage": 0.19444444444444445,
+    "precision": 0.42857142857142855,
+    "verified": 35,
+    "verified_correct": 15,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 145,
+    "pred_counts": {
+     "A": 173,
+     "B": 7
+    }
+   },
+   "test_calibrated": {
+    "n": 180,
+    "accuracy": 0.5,
+    "ece": 0.04383734059500047,
+    "nll": 0.6976707891664267,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 180,
+    "pred_counts": {
+     "A": 173,
+     "B": 7
+    }
+   },
+   "calibration_calibrated": {
+    "n": 180,
+    "accuracy": 0.5111111111111111,
+    "ece": 0.08807004622166618,
+    "nll": 0.6990202327607149,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 180,
+    "pred_counts": {
+     "A": 171,
+     "B": 9
+    }
+   },
+   "controls": {
+    "CTL-GTM-PURCHASE-VALID": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.534253,
+     "pass": false
+    },
+    "CTL-GTM-PURCHASE-NO-CURRENCY": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.552038,
+     "pass": false
+    },
+    "CTL-GTM-ADD-TO-CART": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.509927,
+     "pass": false
+    }
+   },
+   "test_accuracy_by_variant": {
+    "bad_currency": 0.0,
+    "ecommerce_missing": 0.0,
+    "empty_items": 0.0,
+    "empty_transaction_id": 0.0,
+    "items_not_array": 0.0,
+    "items_without_id_or_name": 0.0,
+    "missing_currency": 0.0,
+    "missing_transaction_id": 0.0,
+    "missing_value": 0.0,
+    "valid": 1.0,
+    "valid_noise": 0.9375,
+    "wrong_event": 0.4
+   },
+   "controls_pass": false
+  },
+  "typed_choice2_neutral": {
+   "checkpoint": "laya-typed-decisions",
+   "schema_ok": true,
+   "question_type": "choice",
+   "temperature": 19.99999999999975,
+   "shipped_temperature": 1.9063563346862793,
+   "test_raw": {
+    "n": 180,
+    "accuracy": 0.40555555555555556,
+    "ece": 0.31218518928416344,
+    "nll": 1.002069249676209,
+    "coverage": 0.05555555555555555,
+    "precision": 0.2,
+    "verified": 10,
+    "verified_correct": 2,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 170,
+    "pred_counts": {
+     "A": 144,
+     "B": 36
+    }
+   },
+   "test_shipped": {
+    "n": 180,
+    "accuracy": 0.40555555555555556,
+    "ece": 0.2215722789509567,
+    "nll": 0.8185854705339657,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 180,
+    "pred_counts": {
+     "A": 144,
+     "B": 36
+    }
+   },
+   "test_calibrated": {
+    "n": 180,
+    "accuracy": 0.40555555555555556,
+    "ece": 0.10718881282342801,
+    "nll": 0.7009958696178944,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 180,
+    "pred_counts": {
+     "A": 144,
+     "B": 36
+    }
+   },
+   "calibration_calibrated": {
+    "n": 180,
+    "accuracy": 0.45,
+    "ece": 0.06228303931524752,
+    "nll": 0.701048126621529,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 180,
+    "pred_counts": {
+     "A": 148,
+     "B": 32
+    }
+   },
+   "controls": {
+    "CTL-GTM-PURCHASE-VALID": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.513827,
+     "pass": false
+    },
+    "CTL-GTM-PURCHASE-NO-CURRENCY": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.514272,
+     "pass": false
+    },
+    "CTL-GTM-ADD-TO-CART": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.533502,
+     "pass": false
+    }
+   },
+   "test_accuracy_by_variant": {
+    "bad_currency": 0.058823529411764705,
+    "ecommerce_missing": 0.14285714285714285,
+    "empty_items": 0.0,
+    "empty_transaction_id": 0.3333333333333333,
+    "items_not_array": 0.0,
+    "items_without_id_or_name": 0.15384615384615385,
+    "missing_currency": 0.0,
+    "missing_transaction_id": 0.4,
+    "missing_value": 0.0,
+    "valid": 0.7246376811594203,
+    "valid_noise": 0.6875,
+    "wrong_event": 0.26666666666666666
+   },
+   "controls_pass": false
+  }
+ },
+ "chosen": {
+  "formulation": "noul_tight",
+  "assurance_eligible": false,
+  "reasons": [
+   "controls land on the wrong status: CTL-GTM-PURCHASE-VALID, CTL-GTM-PURCHASE-NO-CURRENCY, CTL-GTM-ADD-TO-CART",
+   "no held-out item clears either threshold (coverage 0)"
+  ]
+ }
+}

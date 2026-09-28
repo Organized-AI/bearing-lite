@@ -3,7 +3,7 @@
   "schema_family": "system1",
   "schema_version": "1",
   "rubric_id": "RUB-S1-WRANGLER-REQUIRED-BINDINGS",
-  "rubric_version": "1.0.0",
+  "rubric_version": "2.0.0",
   "title": "Wrangler config binds the required D1, KV, and R2 resources",
   "claim": {
     "claim_type": "deployment_config_conformance",
@@ -13,7 +13,7 @@
       "design: Worker resource bindings"
     ]
   },
-  "assurance_eligible": true,
+  "assurance_eligible": false,
   "backend": "laya",
   "model": {
     "provider": "huggingface",
@@ -35,9 +35,9 @@
   "question": {
     "key": "required_bindings_present",
     "type": "noul",
-    "instructions": "The state is the bindings section of a Cloudflare wrangler configuration as JSON. Rule: d1_databases has an entry with binding \"DB\" and a non-empty database_id; kv_namespaces has an entry with binding \"CACHE\" and a non-empty id; r2_buckets has an entry with binding \"ASSETS\" and a non-empty bucket_name. Does the configuration satisfy all three parts of the rule?"
+    "instructions": "The state is the bindings section of a Cloudflare wrangler configuration as JSON. Binding names are case-sensitive and must match exactly. Check every condition: (1) the d1_databases array contains an entry whose binding is exactly \"DB\" with a non-empty database_id; (2) the kv_namespaces array contains an entry whose binding is exactly \"CACHE\" with a non-empty id; (3) the r2_buckets array contains an entry whose binding is exactly \"ASSETS\" with a non-empty bucket_name. Do all three conditions hold?"
   },
-  "question_digest": "3ee9ba6bc7515959c6e300bc392cd4c9274e90bce3abb64d298fa7f376ed5583",
+  "question_digest": "8c8392a00ce12ba3b22bb3036096bf6e1c81d47743320a390a5d9ceea749e1b8",
   "decision": {
     "claim_holds_options": [
       "yes"
@@ -52,10 +52,10 @@
   },
   "calibration": {
     "method": "temperature_scaled",
-    "temperature": 1,
-    "calibration_set_digest": "0000000000000000000000000000000000000000000000000000000000000000",
-    "calibration_set_size": 200,
-    "measured_ece": 0.081,
+    "temperature": 5.341616,
+    "calibration_set_digest": "ac67355d94862211d30c8cba831cba237c37e7937e548a7846871ec60452b4a6",
+    "calibration_set_size": 180,
+    "measured_ece": 0.0889,
     "max_ece": 0.1
   },
   "input": {
@@ -75,25 +75,25 @@
     {
       "control_id": "CTL-WRANGLER-ALL-BOUND",
       "locator": "test/fixtures/wrangler/controls/all-bound.jsonc",
-      "input_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "input_digest": "d9b6049b23e5ee512df631a3290f8e473053689878afec8191b456c5807ba69d",
       "expected": "VERIFIED"
     },
     {
       "control_id": "CTL-WRANGLER-NO-R2",
       "locator": "test/fixtures/wrangler/controls/missing-r2.jsonc",
-      "input_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "input_digest": "bea43ad157769064563cfa37f627689a2c0495da632c3f77c33018f109037f66",
       "expected": "REFUTED"
     },
     {
       "control_id": "CTL-WRANGLER-WRONG-KV-NAME",
       "locator": "test/fixtures/wrangler/controls/kv-bound-as-kv.jsonc",
-      "input_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "input_digest": "d525d8cf0a6e2e39e71226761e88fce165303fc8c4f18bbbd55518423100d3c4",
       "expected": "REFUTED"
     }
   ],
   "replay": {
     "min_runs": 2,
-    "probability_epsilon": 0.000001,
+    "probability_epsilon": 0.0003,
     "require_identical_answer": true,
     "require_identical_status": true,
     "freshness": "uncached_and_fresh_process"
@@ -139,9 +139,11 @@
     ]
   },
   "notes": [
-    "Placeholder digests (all zeros) mark inputs that do not exist yet: the calibration set and the control fixtures. Replace them with real SHA-256 digests and a measured ECE before this rubric is frozen into a plan; a rubric with a placeholder digest must not back an assurance request.",
+    "Measured on the pinned checkpoint, CPU fp32, eval mode, one state per forward pass: formulation `noul_tight`, held-out accuracy 0.606 (n=180); ECE (15 bins) 0.347 raw logits, 0.232 at the checkpoint's shipped temperature, 0.089 at the fitted temperature 5.342; at verify 0.90 / refute 0.90, coverage 0.017 (VERIFIED 0, REFUTED 3, INCONCLUSIVE 177) with precision 1.000. Calibration split ECE after fitting 0.085 (n=180). Dataset: test/fixtures/system1-calibration/wrangler-bindings/ (report: docs/calibration/system1-calibration-report.md).",
+    "Formulations tried (held-out accuracy at fitted T): noul_verbatim 0.517, noul_tight 0.606, noul_neutral_labels 0.511, choice2_neutral 0.506, choice2_tight 0.506, typed_choice2_neutral 0.522. Controls at the fitted T: CTL-WRANGLER-ALL-BOUND VERIFIED->INCONCLUSIVE (p=0.652); CTL-WRANGLER-NO-R2 REFUTED->INCONCLUSIVE (p=0.708); CTL-WRANGLER-WRONG-KV-NAME REFUTED->INCONCLUSIVE (p=0.657). Replay: 9 runs per control (6 in fresh processes), max thresholded-probability delta 0, max logit delta 0; epsilon is 10x the larger of the measured delta and the delta implied by the worst logit wobble seen on any checkpoint (2.99e-4, laya-multilingual under concurrent CPU load), rounded up.",
+    "Temperature semantics: `calibration.temperature` replaces the checkpoint's own temperature for this question's (type, option count) bucket, i.e. probabilities are softmax(option logits / T); a runner sets agent.temperature_by_options[temp_bucket] = T and passes no `lang`, so lang_temperatures cannot override it. `measured_ece` is the larger of the calibration-split (in-sample) and held-out test-split ECE at the fitted temperature.",
+    "Not assurance-eligible: controls land on the wrong status: CTL-WRANGLER-ALL-BOUND, CTL-WRANGLER-NO-R2, CTL-WRANGLER-WRONG-KV-NAME; held-out precision rests on only 3 gated verdicts (3 correct; Wilson 95% lower bound 0.44). Thresholds were not lowered to compensate; this rubric may back diagnostic runs only until a re-authored version measures inside the bar.",
     "The extractor keeps only the three binding arrays so the state fits the 320-token state budget of the 512-context checkpoint; a config whose bindings exceed it is ERROR `input_over_context_limit`, never truncated.",
-    "Honest limit: exact binding names are decidable by a JSON parser, and a parser test is stronger evidence than any model. Use this rubric only where the plan states binding requirements in prose that a fixed parser does not encode; otherwise the Planning Test Engineer should select a test, not a System One backend.",
-    "noul label-following risk on the English checkpoint (laya issue #156) is covered by the REFUTED controls."
+    "Honest limit: exact binding names are decidable by a JSON parser, and a parser test is stronger evidence than any model. Use this rubric only where the plan states binding requirements in prose that a fixed parser does not encode; otherwise the Planning Test Engineer should select a test, not a System One backend."
   ]
 }

@@ -3,7 +3,7 @@
   "schema_family": "system1",
   "schema_version": "1",
   "rubric_id": "RUB-S1-CONSENT-BANNER-DISCLOSURES",
-  "rubric_version": "1.0.0",
+  "rubric_version": "2.0.0",
   "title": "Localized consent banner states the required disclosures",
   "claim": {
     "claim_type": "localized_copy_disclosure",
@@ -13,7 +13,7 @@
       "consent spec: banner disclosures"
     ]
   },
-  "assurance_eligible": true,
+  "assurance_eligible": false,
   "backend": "laya",
   "model": {
     "provider": "huggingface",
@@ -38,11 +38,10 @@
     "instructions": "The state is the visible text of a website consent banner in any language. Which option describes it?",
     "criteria": {
       "A": "it states the purpose of data collection, AND names third parties or partners who receive data, AND tells the visitor how to refuse or withdraw consent",
-      "B": "it is a consent banner but at least one of those three disclosures is missing",
-      "C": "it is not consent banner text"
+      "B": "at least one of those three disclosures is missing"
     }
   },
-  "question_digest": "2f69bf68cabbd3fb2295bde17ce2ad29cc791eb237e85dcb8cbe72ddc3e4b86b",
+  "question_digest": "fb42935b22f8152b68899dc7fd10161f5837c5c73ee627d539f390bb3055b853",
   "decision": {
     "claim_holds_options": [
       "A"
@@ -57,10 +56,10 @@
   },
   "calibration": {
     "method": "temperature_scaled",
-    "temperature": 1,
-    "calibration_set_digest": "0000000000000000000000000000000000000000000000000000000000000000",
-    "calibration_set_size": 300,
-    "measured_ece": 0.106,
+    "temperature": 20.0,
+    "calibration_set_digest": "dac8736dd5194c5ce401e40d9a7ad2192f16f208b4766a4045ebc298fcc704e5",
+    "calibration_set_size": 179,
+    "measured_ece": 0.0785,
     "max_ece": 0.12
   },
   "input": {
@@ -80,25 +79,25 @@
     {
       "control_id": "CTL-CONSENT-DE-COMPLETE",
       "locator": "test/fixtures/consent/controls/de-complete.txt",
-      "input_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "input_digest": "21a735ee0f63003ef1a9881d32bcd11d0baa70cef874036ff1e31d8ae409cc2e",
       "expected": "VERIFIED"
     },
     {
       "control_id": "CTL-CONSENT-ES-NO-WITHDRAW",
       "locator": "test/fixtures/consent/controls/es-missing-withdrawal.txt",
-      "input_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "input_digest": "7ae7f1ab159b2ed1721d84a65d20be414343ab6bbfd9632fa76d994effcace5c",
       "expected": "REFUTED"
     },
     {
       "control_id": "CTL-CONSENT-JA-NO-THIRD-PARTY",
       "locator": "test/fixtures/consent/controls/ja-missing-third-parties.txt",
-      "input_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "input_digest": "b46b800e2c6a33ea5aa5788a870defdbea8e4cdbddba72ab1b01174d217ac40d",
       "expected": "REFUTED"
     }
   ],
   "replay": {
     "min_runs": 2,
-    "probability_epsilon": 0.000001,
+    "probability_epsilon": 8e-05,
     "require_identical_answer": true,
     "require_identical_status": true,
     "freshness": "uncached_and_fresh_process"
@@ -144,10 +143,13 @@
     ]
   },
   "notes": [
-    "Placeholder digests (all zeros) mark inputs that do not exist yet: the calibration set and the control fixtures. Replace them with real SHA-256 digests and a measured ECE before this rubric is frozen into a plan; a rubric with a placeholder digest must not back an assurance request.",
+    "Measured on the pinned checkpoint, CPU fp32, eval mode, one state per forward pass: formulation `choice2_neutral`, held-out accuracy 0.514 (n=181); ECE (15 bins) 0.167 raw logits, 0.167 at the checkpoint's shipped temperature, 0.005 at the fitted temperature 20; at verify 0.85 / refute 0.85, coverage 0.000 (VERIFIED 0, REFUTED 0, INCONCLUSIVE 181) with precision n/a. Calibration split ECE after fitting 0.078 (n=179). Dataset: test/fixtures/system1-calibration/multilingual-consent-banner/ (report: docs/calibration/system1-calibration-report.md).",
+    "Formulations tried (held-out accuracy at fitted T): choice3_verbatim 0.381, choice3_tight 0.508, choice2_neutral 0.514, noul_tight 0.442. Controls at the fitted T: CTL-CONSENT-DE-COMPLETE VERIFIED->INCONCLUSIVE (p=0.514); CTL-CONSENT-ES-NO-WITHDRAW REFUTED->INCONCLUSIVE (p=0.505); CTL-CONSENT-JA-NO-THIRD-PARTY REFUTED->INCONCLUSIVE (p=0.503). Replay: 9 runs per control (6 in fresh processes), max thresholded-probability delta 4.16e-06, max logit delta 0.000299; epsilon is 10x the larger of the measured delta and the delta implied by the worst logit wobble seen on any checkpoint (2.99e-4, laya-multilingual under concurrent CPU load), rounded up.",
+    "Temperature semantics: `calibration.temperature` replaces the checkpoint's own temperature for this question's (type, option count) bucket, i.e. probabilities are softmax(option logits / T); a runner sets agent.temperature_by_options[temp_bucket] = T and passes no `lang`, so lang_temperatures cannot override it. `measured_ece` is the larger of the calibration-split (in-sample) and held-out test-split ECE at the fitted temperature.",
+    "The fitted temperature sits at the schema's upper bound (20): NLL keeps falling as T grows, i.e. the logits carry no usable signal for this rule and the best calibration is a flat 0.5.",
+    "Not assurance-eligible: controls land on the wrong status: CTL-CONSENT-DE-COMPLETE, CTL-CONSENT-ES-NO-WITHDRAW, CTL-CONSENT-JA-NO-THIRD-PARTY; no held-out item clears either threshold (coverage 0). Thresholds were not lowered to compensate; this rubric may back diagnostic runs only until a re-authored version measures inside the bar.",
     "Checkpoint is pinned to laya-multilingual; Router auto-selection is not used because a mostly-English banner would route to the English checkpoint and change the model under test per input.",
-    "measured_ece 0.106 is the published post-temperature figure for laya-multilingual, not a measurement on this rubric's calibration set.",
-    "Option C is deliberately in neither set: non-banner text maps to INCONCLUSIVE `answer_not_decisive`, which means the target locator is wrong, not that the claim failed.",
-    "This checks that disclosures are stated, not that the wording satisfies any particular law; legal sufficiency is out of scope for a System One rubric."
+    "This checks that disclosures are stated, not that the wording satisfies any particular law; legal sufficiency is out of scope for a System One rubric.",
+    "Two-option form: there is no 'not a banner' option, so text that is not a consent banner (it states none of the disclosures) maps to B and can REFUTE; the extractor and locator, not the model, are what establish that the input is the banner."
   ]
 }

@@ -1,0 +1,30 @@
+{
+  "rubric": "multilingual-consent-banner",
+  "generator_seed": 1156,
+  "split_seed": 20260927,
+  "split": "stratified by label, 50% calibration",
+  "checkpoint_tokenizer": "laya-multilingual",
+  "token_limit": 768,
+  "dropped_over_limit": 0,
+  "calibration": {
+    "file": "calibration.jsonl",
+    "sha256": "dac8736dd5194c5ce401e40d9a7ad2192f16f208b4766a4045ebc298fcc704e5",
+    "size": 179,
+    "labels": {
+      "A": 79,
+      "B": 86,
+      "C": 14
+    }
+  },
+  "test": {
+    "file": "test.jsonl",
+    "sha256": "64b20cb32951c739370f4a6dc3807287cda2659ffce8e8ddd30e1383019280ac",
+    "size": 181,
+    "labels": {
+      "A": 79,
+      "B": 87,
+      "C": 15
+    }
+  },
+  "max_state_tokens": 109
+}

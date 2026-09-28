@@ -1,0 +1,1 @@
+{"d1_databases":[{"binding":"DB","database_id":"0f6d2c4e-8a1b-4c3d-9e5f-7a6b5c4d3e2f","database_name":"control-db"}],"kv_namespaces":[{"binding":"CACHE","id":"5d41402abc4b2a76b9719d911017c592"}],"r2_buckets":[{"binding":"ASSETS","bucket_name":"control-assets"}]}

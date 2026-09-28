@@ -1,0 +1,538 @@
+{
+ "rubric": "multilingual-consent-banner",
+ "verify_threshold": 0.85,
+ "refute_threshold": 0.85,
+ "max_ece": 0.12,
+ "calibration_size": 179,
+ "test_size": 181,
+ "formulations": {
+  "choice3_verbatim": {
+   "checkpoint": "laya-multilingual",
+   "schema_ok": true,
+   "question_type": "choice",
+   "temperature": 19.999999999999993,
+   "shipped_temperature": 1.0,
+   "test_raw": {
+    "n": 181,
+    "accuracy": 0.3812154696132597,
+    "ece": 0.07719892844046192,
+    "nll": 1.1551606786239599,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 181,
+    "pred_counts": {
+     "A": 40,
+     "B": 93,
+     "C": 48
+    }
+   },
+   "test_shipped": {
+    "n": 181,
+    "accuracy": 0.3812154696132597,
+    "ece": 0.07719892844046192,
+    "nll": 1.1551606786239599,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 181,
+    "pred_counts": {
+     "A": 40,
+     "B": 93,
+     "C": 48
+    }
+   },
+   "test_calibrated": {
+    "n": 181,
+    "accuracy": 0.3812154696132597,
+    "ece": 0.041821541897457404,
+    "nll": 1.0986111921647557,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 181,
+    "pred_counts": {
+     "A": 40,
+     "B": 93,
+     "C": 48
+    }
+   },
+   "calibration_calibrated": {
+    "n": 179,
+    "accuracy": 0.3128491620111732,
+    "ece": 0.026529132384470744,
+    "nll": 1.1013166916566495,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 179,
+    "pred_counts": {
+     "A": 37,
+     "B": 99,
+     "C": 43
+    }
+   },
+   "controls": {
+    "CTL-CONSENT-DE-COMPLETE": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "B",
+     "thresholded_probability": 0.335614,
+     "pass": false
+    },
+    "CTL-CONSENT-ES-NO-WITHDRAW": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "B",
+     "thresholded_probability": 0.341652,
+     "pass": false
+    },
+    "CTL-CONSENT-JA-NO-THIRD-PARTY": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "C",
+     "thresholded_probability": 0.341158,
+     "pass": false
+    }
+   },
+   "test_accuracy_by_lang": {
+    "de": 0.4,
+    "en": 0.42105263157894735,
+    "es": 0.34782608695652173,
+    "fr": 0.15789473684210525,
+    "it": 0.5,
+    "ja": 0.3333333333333333,
+    "nl": 0.4482758620689655,
+    "pt": 0.38095238095238093
+   },
+   "test_accuracy_by_variant": {
+    "complete": 0.2911392405063291,
+    "missing_one": 0.48333333333333334,
+    "missing_two": 0.7777777777777778,
+    "none": 0.3333333333333333,
+    "not_banner": 0.0
+   },
+   "controls_pass": false
+  },
+  "choice3_tight": {
+   "checkpoint": "laya-multilingual",
+   "schema_ok": true,
+   "question_type": "choice",
+   "temperature": 1.0798118475911882,
+   "shipped_temperature": 1.0,
+   "test_raw": {
+    "n": 181,
+    "accuracy": 0.5082872928176796,
+    "ece": 0.09568915775615769,
+    "nll": 1.0218355695698034,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 181,
+    "pred_counts": {
+     "A": 104,
+     "B": 69,
+     "C": 8
+    }
+   },
+   "test_shipped": {
+    "n": 181,
+    "accuracy": 0.5082872928176796,
+    "ece": 0.09568915775615769,
+    "nll": 1.0218355695698034,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 181,
+    "pred_counts": {
+     "A": 104,
+     "B": 69,
+     "C": 8
+    }
+   },
+   "test_calibrated": {
+    "n": 181,
+    "accuracy": 0.5082872928176796,
+    "ece": 0.1085443883950679,
+    "nll": 1.0208242382626198,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 181,
+    "pred_counts": {
+     "A": 104,
+     "B": 69,
+     "C": 8
+    }
+   },
+   "calibration_calibrated": {
+    "n": 179,
+    "accuracy": 0.48044692737430167,
+    "ece": 0.05484828734637329,
+    "nll": 1.0080366472177469,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 179,
+    "pred_counts": {
+     "A": 100,
+     "B": 65,
+     "C": 14
+    }
+   },
+   "controls": {
+    "CTL-CONSENT-DE-COMPLETE": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.563082,
+     "pass": false
+    },
+    "CTL-CONSENT-ES-NO-WITHDRAW": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.823181,
+     "pass": false
+    },
+    "CTL-CONSENT-JA-NO-THIRD-PARTY": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.499832,
+     "pass": false
+    }
+   },
+   "test_accuracy_by_lang": {
+    "de": 0.5,
+    "en": 0.5789473684210527,
+    "es": 0.5652173913043478,
+    "fr": 0.3684210526315789,
+    "it": 0.6538461538461539,
+    "ja": 0.4166666666666667,
+    "nl": 0.5517241379310345,
+    "pt": 0.38095238095238093
+   },
+   "test_accuracy_by_variant": {
+    "complete": 0.6835443037974683,
+    "missing_one": 0.35,
+    "missing_two": 0.6666666666666666,
+    "none": 0.5555555555555556,
+    "not_banner": 0.0
+   },
+   "controls_pass": false
+  },
+  "choice2_neutral": {
+   "checkpoint": "laya-multilingual",
+   "schema_ok": true,
+   "question_type": "choice",
+   "temperature": 19.999999999999993,
+   "shipped_temperature": 1.0,
+   "test_raw": {
+    "n": 181,
+    "accuracy": 0.5138121546961326,
+    "ece": 0.16745833444855135,
+    "nll": 0.7668113110678634,
+    "coverage": 0.03314917127071823,
+    "precision": 0.3333333333333333,
+    "verified": 1,
+    "verified_correct": 0,
+    "refuted": 5,
+    "refuted_correct": 2,
+    "inconclusive": 175,
+    "pred_counts": {
+     "A": 51,
+     "B": 130
+    }
+   },
+   "test_shipped": {
+    "n": 181,
+    "accuracy": 0.5138121546961326,
+    "ece": 0.16745833444855135,
+    "nll": 0.7668113110678634,
+    "coverage": 0.03314917127071823,
+    "precision": 0.3333333333333333,
+    "verified": 1,
+    "verified_correct": 0,
+    "refuted": 5,
+    "refuted_correct": 2,
+    "inconclusive": 175,
+    "pred_counts": {
+     "A": 51,
+     "B": 130
+    }
+   },
+   "test_calibrated": {
+    "n": 181,
+    "accuracy": 0.5138121546961326,
+    "ece": 0.005136639770852103,
+    "nll": 0.6928865581710055,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 181,
+    "pred_counts": {
+     "A": 51,
+     "B": 130
+    }
+   },
+   "calibration_calibrated": {
+    "n": 179,
+    "accuracy": 0.4301675977653631,
+    "ece": 0.07848732719004553,
+    "nll": 0.696520827750521,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 179,
+    "pred_counts": {
+     "A": 53,
+     "B": 126
+    }
+   },
+   "controls": {
+    "CTL-CONSENT-DE-COMPLETE": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.514111,
+     "pass": false
+    },
+    "CTL-CONSENT-ES-NO-WITHDRAW": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "A",
+     "thresholded_probability": 0.505033,
+     "pass": false
+    },
+    "CTL-CONSENT-JA-NO-THIRD-PARTY": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "B",
+     "thresholded_probability": 0.502531,
+     "pass": false
+    }
+   },
+   "test_accuracy_by_lang": {
+    "de": 0.6,
+    "en": 0.5263157894736842,
+    "es": 0.4782608695652174,
+    "fr": 0.3157894736842105,
+    "it": 0.5,
+    "ja": 0.6666666666666666,
+    "nl": 0.5172413793103449,
+    "pt": 0.47619047619047616
+   },
+   "test_accuracy_by_variant": {
+    "complete": 0.26582278481012656,
+    "missing_one": 0.7,
+    "missing_two": 0.7777777777777778,
+    "none": 1.0,
+    "not_banner": 0.4666666666666667
+   },
+   "controls_pass": false
+  },
+  "noul_tight": {
+   "checkpoint": "laya-multilingual",
+   "schema_ok": true,
+   "question_type": "noul",
+   "temperature": 19.999999999999993,
+   "shipped_temperature": 1.0,
+   "test_raw": {
+    "n": 181,
+    "accuracy": 0.4419889502762431,
+    "ece": 0.5206048869265005,
+    "nll": 2.0972189318513648,
+    "coverage": 0.9502762430939227,
+    "precision": 0.45348837209302323,
+    "verified": 172,
+    "verified_correct": 78,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 9,
+    "pred_counts": {
+     "no": 1,
+     "yes": 180
+    }
+   },
+   "test_shipped": {
+    "n": 181,
+    "accuracy": 0.4419889502762431,
+    "ece": 0.5206048869265005,
+    "nll": 2.0972189318513648,
+    "coverage": 0.9502762430939227,
+    "precision": 0.45348837209302323,
+    "verified": 172,
+    "verified_correct": 78,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 9,
+    "pred_counts": {
+     "no": 1,
+     "yes": 180
+    }
+   },
+   "test_calibrated": {
+    "n": 181,
+    "accuracy": 0.4419889502762431,
+    "ece": 0.10749877372755595,
+    "nll": 0.7019848061078114,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 181,
+    "pred_counts": {
+     "no": 1,
+     "yes": 180
+    }
+   },
+   "calibration_calibrated": {
+    "n": 179,
+    "accuracy": 0.441340782122905,
+    "ece": 0.11022526975943062,
+    "nll": 0.7033987508423587,
+    "coverage": 0.0,
+    "precision": null,
+    "verified": 0,
+    "verified_correct": 0,
+    "refuted": 0,
+    "refuted_correct": 0,
+    "inconclusive": 179,
+    "pred_counts": {
+     "no": 0,
+     "yes": 179
+    }
+   },
+   "controls": {
+    "CTL-CONSENT-DE-COMPLETE": {
+     "expected": "VERIFIED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.560967,
+     "pass": false
+    },
+    "CTL-CONSENT-ES-NO-WITHDRAW": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.541313,
+     "pass": false
+    },
+    "CTL-CONSENT-JA-NO-THIRD-PARTY": {
+     "expected": "REFUTED",
+     "observed": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answer": "yes",
+     "thresholded_probability": 0.558684,
+     "pass": false
+    }
+   },
+   "test_accuracy_by_lang": {
+    "de": 0.35,
+    "en": 0.3684210526315789,
+    "es": 0.43478260869565216,
+    "fr": 0.47368421052631576,
+    "it": 0.5,
+    "ja": 0.4166666666666667,
+    "nl": 0.5517241379310345,
+    "pt": 0.38095238095238093
+   },
+   "test_accuracy_by_variant": {
+    "complete": 1.0,
+    "missing_one": 0.0,
+    "missing_two": 0.0,
+    "none": 0.1111111111111111,
+    "not_banner": 0.0
+   },
+   "controls_pass": false
+  }
+ },
+ "chosen": {
+  "formulation": "choice2_neutral",
+  "assurance_eligible": false,
+  "reasons": [
+   "controls land on the wrong status: CTL-CONSENT-DE-COMPLETE, CTL-CONSENT-ES-NO-WITHDRAW, CTL-CONSENT-JA-NO-THIRD-PARTY",
+   "no held-out item clears either threshold (coverage 0)"
+  ]
+ }
+}

@@ -1,0 +1,198 @@
+{
+ "rubric": "wrangler-bindings",
+ "formulation": "noul_tight",
+ "temperature": 5.341616299216181,
+ "sessions": [
+  {
+   "rubric": "wrangler-bindings",
+   "formulation": "noul_tight",
+   "temperature": 5.341616299216181,
+   "session": 1,
+   "source": "replay log (per-run logits not retained); 3 in-process runs + 2 fresh processes, the second fresh process ran while tools/system1-calibration/generate.py was also using the CPU",
+   "max_probability_delta": 0.0,
+   "max_logit_delta": 0.0,
+   "max_rounded_probability_delta": 0.0,
+   "controls": {
+    "CTL-WRANGLER-ALL-BOUND": {
+     "runs": 5,
+     "fresh_process_runs": 2,
+     "statuses": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ]
+    },
+    "CTL-WRANGLER-NO-R2": {
+     "runs": 5,
+     "fresh_process_runs": 2,
+     "statuses": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ]
+    },
+    "CTL-WRANGLER-WRONG-KV-NAME": {
+     "runs": 5,
+     "fresh_process_runs": 2,
+     "statuses": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ]
+    }
+   }
+  },
+  {
+   "rubric": "wrangler-bindings",
+   "formulation": "noul_tight",
+   "temperature": 5.341616299216181,
+   "controls": {
+    "CTL-WRANGLER-ALL-BOUND": {
+     "runs": 7,
+     "fresh_process_runs": 4,
+     "statuses": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answers": [
+      "yes",
+      "yes",
+      "yes",
+      "yes",
+      "yes",
+      "yes",
+      "yes"
+     ],
+     "thresholded_probability": [
+      0.6521512495562263,
+      0.6521512495562263,
+      0.6521512495562263,
+      0.6521512495562263,
+      0.6521512495562263,
+      0.6521512495562263,
+      0.6521512495562263
+     ],
+     "max_probability_delta": 0.0,
+     "max_logit_delta": 0.0,
+     "max_rounded_probability_delta": 0.0,
+     "identical_status": true,
+     "identical_answer": true
+    },
+    "CTL-WRANGLER-NO-R2": {
+     "runs": 7,
+     "fresh_process_runs": 4,
+     "statuses": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answers": [
+      "no",
+      "no",
+      "no",
+      "no",
+      "no",
+      "no",
+      "no"
+     ],
+     "thresholded_probability": [
+      0.7076642210963259,
+      0.7076642210963259,
+      0.7076642210963259,
+      0.7076642210963259,
+      0.7076642210963259,
+      0.7076642210963259,
+      0.7076642210963259
+     ],
+     "max_probability_delta": 0.0,
+     "max_logit_delta": 0.0,
+     "max_rounded_probability_delta": 0.0,
+     "identical_status": true,
+     "identical_answer": true
+    },
+    "CTL-WRANGLER-WRONG-KV-NAME": {
+     "runs": 7,
+     "fresh_process_runs": 4,
+     "statuses": [
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE",
+      "INCONCLUSIVE"
+     ],
+     "answers": [
+      "yes",
+      "yes",
+      "yes",
+      "yes",
+      "yes",
+      "yes",
+      "yes"
+     ],
+     "thresholded_probability": [
+      0.6572683595481043,
+      0.6572683595481043,
+      0.6572683595481043,
+      0.6572683595481043,
+      0.6572683595481043,
+      0.6572683595481043,
+      0.6572683595481043
+     ],
+     "max_probability_delta": 0.0,
+     "max_logit_delta": 0.0,
+     "max_rounded_probability_delta": 0.0,
+     "identical_status": true,
+     "identical_answer": true
+    }
+   },
+   "max_probability_delta": 0.0,
+   "max_logit_delta": 0.0,
+   "max_rounded_probability_delta": 0.0,
+   "session": 2,
+   "source": "3 in-process runs + 4 fresh processes, machine otherwise idle"
+  }
+ ],
+ "max_probability_delta": 0.0,
+ "max_logit_delta": 0.0,
+ "max_rounded_probability_delta": 0.0,
+ "controls": {
+  "CTL-WRANGLER-ALL-BOUND": {
+   "runs": 9,
+   "fresh_process_runs": 6,
+   "statuses": [
+    "INCONCLUSIVE"
+   ]
+  },
+  "CTL-WRANGLER-NO-R2": {
+   "runs": 9,
+   "fresh_process_runs": 6,
+   "statuses": [
+    "INCONCLUSIVE"
+   ]
+  },
+  "CTL-WRANGLER-WRONG-KV-NAME": {
+   "runs": 9,
+   "fresh_process_runs": 6,
+   "statuses": [
+    "INCONCLUSIVE"
+   ]
+  }
+ }
+}
